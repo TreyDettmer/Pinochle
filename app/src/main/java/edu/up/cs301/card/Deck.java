@@ -1,16 +1,18 @@
-package edu.up.cs301.Pinochle;
+package edu.up.cs301.card;
 
 
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import edu.up.cs301.card.Card;
-
 /**
  * Deck class - represents a deck of cards (not necessarily a full one)
  *
  * @author Steven R. Vegdahl
- * @version July 2013
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
  *
  */
 public class Deck implements Serializable {
@@ -53,11 +55,14 @@ public class Deck implements Serializable {
      * @return
      * 		the deck
      */
-    public Deck add52() {
+    public Deck reset() {
         // add the cards
-        for (char s : "SHDC".toCharArray()) {
-            for (char r : "KQJT98765432A".toCharArray()) {
-                this.add(Card.fromString(""+r+s));
+        synchronized(this.cards) {
+            for (char s : "SHDC".toCharArray()) {
+                for (char r : "9TJQKA".toCharArray()) {
+                    this.add(Card.fromString(""+r+s));
+                    this.add(Card.fromString(""+r+s));
+                }
             }
         }
 
@@ -224,7 +229,7 @@ public class Deck implements Serializable {
                     rtnVal += " --";
                 }
                 else {
-                    rtnVal += " "+c.shortName();
+                    rtnVal += " " + c.getShortName();
                 }
             }
         }

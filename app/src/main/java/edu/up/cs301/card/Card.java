@@ -23,7 +23,11 @@ import android.graphics.RectF;
  * res/drawable-hdpi project area.
  * 
  * @author Steven R. Vegdahl
- * @version December 2016
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
  */
 public class Card implements Serializable {
 
@@ -95,7 +99,7 @@ public class Card implements Serializable {
 	 *		A string such as "Jack of Spades", which describes the card.
      */
     public String toString() {
-        return rank.longName()+" of "+suit.longName()+"s";
+        return rank.getName() + " of "+ suit.getName() + "s";
     }
 
 	/**
@@ -123,7 +127,7 @@ public class Card implements Serializable {
 	 */
 	@Override
 	public int hashCode() {
-		return rank.hashCode()*18737 + suit.hashCode()*1737372;
+		return rank.hashCode() * 18737 + suit.hashCode() * 1737372;
 	}
 
     /**
@@ -144,7 +148,7 @@ public class Card implements Serializable {
     	Bitmap bitmap = cardImages[this.getSuit().ordinal()][this.getRank().ordinal()];
     	
     	// create the source rectangle
-    	Rect r = new Rect(0,0,bitmap.getWidth(),bitmap.getHeight());
+    	Rect r = new Rect(0,0, bitmap.getWidth(), bitmap.getHeight());
     	
     	// draw the bitmap into the target rectangle
     	g.drawBitmap(bitmap, r, where, p);
@@ -155,8 +159,8 @@ public class Card implements Serializable {
      * Gives a two-character version of the card (e.g., "TS" for ten of
      * spades).
      */
-    public String shortName() {
-        return "" + getRank().shortName() + getSuit().shortName();
+    public String getShortName() {
+        return "" + getRank().getShortName() + getSuit().getShortName();
     }
 
     /**
@@ -185,32 +189,20 @@ public class Card implements Serializable {
     // images
     private static int[][] resIdx = {
     	{
-    		R.drawable.card_ac, R.drawable.card_2c, R.drawable.card_3c,
-    		R.drawable.card_4c, R.drawable.card_5c, R.drawable.card_6c,
-    		R.drawable.card_7c, R.drawable.card_8c, R.drawable.card_9c,
-    		R.drawable.card_tc, R.drawable.card_jc, R.drawable.card_qc,
-    		R.drawable.card_kc, 
+    		R.drawable.card_9c, R.drawable.card_tc, R.drawable.card_jc,
+			R.drawable.card_qc, R.drawable.card_kc, R.drawable.card_ac,
+		},
+    	{
+			R.drawable.card_9d, R.drawable.card_td, R.drawable.card_jd,
+			R.drawable.card_qd, R.drawable.card_kd, R.drawable.card_ad,
     	},
     	{
-    		R.drawable.card_ad, R.drawable.card_2d, R.drawable.card_3d,
-    		R.drawable.card_4d, R.drawable.card_5d, R.drawable.card_6d,
-    		R.drawable.card_7d, R.drawable.card_8d, R.drawable.card_9d,
-    		R.drawable.card_td, R.drawable.card_jd, R.drawable.card_qd,
-    		R.drawable.card_kd, 
+			R.drawable.card_9h, R.drawable.card_th, R.drawable.card_jh,
+			R.drawable.card_qh, R.drawable.card_kh, R.drawable.card_ah,
     	},
     	{
-    		R.drawable.card_ah, R.drawable.card_2h, R.drawable.card_3h,
-    		R.drawable.card_4h, R.drawable.card_5h, R.drawable.card_6h,
-    		R.drawable.card_7h, R.drawable.card_8h, R.drawable.card_9h,
-    		R.drawable.card_th, R.drawable.card_jh, R.drawable.card_qh,
-    		R.drawable.card_kh, 
-    	},
-    	{
-    		R.drawable.card_as, R.drawable.card_2s, R.drawable.card_3s,
-    		R.drawable.card_4s, R.drawable.card_5s, R.drawable.card_6s,
-    		R.drawable.card_7s, R.drawable.card_8s, R.drawable.card_9s,
-    		R.drawable.card_ts, R.drawable.card_js, R.drawable.card_qs,
-    		R.drawable.card_ks, 
+			R.drawable.card_9s, R.drawable.card_ts, R.drawable.card_js,
+			R.drawable.card_qs, R.drawable.card_ks, R.drawable.card_as,
     	},
     };
     

@@ -223,7 +223,7 @@ public class Deck implements Serializable {
 					rtnVal += " --";
 				}
 				else {
-					rtnVal += " "+c.shortName();
+					rtnVal += " "+c.getShortName();
 				}
 			}
 		}

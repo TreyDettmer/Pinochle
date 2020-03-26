@@ -1,4 +1,4 @@
-package edu.up.cs301.Pinochle;
+package edu.up.cs301.pinochle;
 
 import android.util.Log;
 
@@ -6,15 +6,24 @@ import edu.up.cs301.game.GameFramework.GamePlayer;
 import edu.up.cs301.game.GameFramework.LocalGame;
 import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
 
-public class PinLocalGame extends LocalGame {
+/*
+ * Description
+ *
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
+ */
+public class PinochleLocalGame extends LocalGame {
 
     //the game's state
-    PinGameState state;
+    PinochleGameState state;
 
-    public PinLocalGame()
+    public PinochleLocalGame()
     {
-        Log.i("PinLocalGame", "creating game");
-        state = new PinGameState();
+        Log.i("PinochleLocalGame", "Creating game");
+        state = new PinochleGameState();
     }
 
     @Override

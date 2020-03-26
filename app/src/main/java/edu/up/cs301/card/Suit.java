@@ -6,8 +6,12 @@ import java.util.ArrayList;
 /**
  * Suit the suit of a playing card (e.g., Club).
  * 
- * @author Steven R. Vegdahl 
- * @version December 2016
+ * @author Steven R. Vegdahl
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
  */
 public enum Suit implements Serializable {
 	
@@ -34,7 +38,7 @@ public enum Suit implements Serializable {
 	 * @return
 	 * 		the suit's short name
 	 */
-	public char shortName() { return longName().charAt(0); }
+	public char getShortName() { return getName().charAt(0); }
 	
 	/**
 	 * the "long" (full-word) name that represents the suit
@@ -42,7 +46,7 @@ public enum Suit implements Serializable {
 	 * @return
 	 * 		the suit's long name
 	 */
-	public String longName() {
+	public String getName() {
 		return toString();
 	}
 
@@ -85,7 +89,7 @@ public enum Suit implements Serializable {
 		
 		// initialize the list with the characters, in suit-order
 		for (Suit s : vals) {
-			suitChars.add(Character.toLowerCase(s.shortName()));
+			suitChars.add(Character.toLowerCase(s.getShortName()));
 		}
 	}
 }

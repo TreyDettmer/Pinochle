@@ -6,81 +6,19 @@ import java.util.ArrayList;
 /**
  *
  * @author Steven R. Vegdahl
- * @version December 2016
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
  */
 public enum Rank implements Serializable {
-
-	// ace
-	ACE,
-	
-	// deuce
-	TWO {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '2';
-		}
-	},
-
-	// three
-	THREE {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '3';
-		}
-	},
-
-	// four
-	FOUR {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '4';
-		}
-	},
-
-	// five
-	FIVE {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '5';
-		}
-	},
-
-	// six
-	SIX {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '6';
-		}
-	},
-
-	// seven
-	SEVEN {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '7';
-		}
-	},
-
-	// eight
-	EIGHT {
-		// override the shortName behavior: the corresponding digit
-		@Override
-		public char shortName() {
-			return '8';
-		}
-	},
 	
 	// nine
 	NINE {
-		// override the shortName behavior: the corresponding digit
+		// override the getShortName behavior: the corresponding digit
 		@Override
-		public char shortName() {
+		public char getShortName() {
 			return '9';
 		}
 	},
@@ -95,11 +33,32 @@ public enum Rank implements Serializable {
 	QUEEN,
 
 	// king
-	KING
+	KING,
+
+	// ace
+	ACE,
+
 	;
 
 	// to satisfy the Serializable interface
 	private static final long serialVersionUID = 893542931190030342L;
+
+	public int getOrder() {
+		return ordinal();
+	}
+
+	/**
+	 * the "long name" of the rank--fully spelled out
+	 *
+	 * @return
+	 * 		the rank's long name
+	 */
+	public String getName() {
+		// use the print-string, with the first character upper case, and the
+		// rest lower case
+		String s = this.toString();
+		return s.substring(0,1).toUpperCase()+s.substring(1).toLowerCase();
+	}
 
 	/**
 	 * the short (one-character) name of a rank
@@ -107,36 +66,10 @@ public enum Rank implements Serializable {
 	 * @return
 	 * 		the rank's short name
 	 */
-	public char shortName() {
+	public char getShortName() {
 		// the default is the first character of the print-string;
 		// TWO through NINE override this
 		return this.toString().charAt(0);
-	}
-	
-	/**
-	 * the numeric value of the rank
-	 * 
-	 * @param aceValue
-	 * 		the value to use for an Ace
-	 * @return
-	 * 		the numeric value of the rank: 2-13 for TWO through KING;
-	 * 		the given value (typically 1 or 14) for ACE
-	 */
-	public int value(int aceValue) {
-		return this == ACE ? aceValue : ordinal()+1;
-	}
-	
-	/**
-	 * the "long name" of the rank--fully spelled out
-	 * 
-	 * @return
-	 * 		the rank's long name
-	 */
-	public String longName() {
-		// use the print-string, with the first character upper case, and the
-		// rest lower case
-		String s = this.toString();
-		return s.substring(0,1).toUpperCase()+s.substring(1).toLowerCase();
 	}
 	
 	// an array to help us convert from character to rank; it will be initialized
@@ -171,13 +104,14 @@ public enum Rank implements Serializable {
 	private static void initRankChars() {
 		// the list of ranks, in numeric order
 		Rank[] vals = Rank.values();
-		
+
 		// create the list of characters
 		rankChars = new ArrayList<Character>();
-		
+
 		// initialize the list with the characters, in rank-order
 		for (Rank r : vals) {
-			rankChars.add(Character.toLowerCase(r.shortName()));
+			rankChars.add(Character.toLowerCase(r.getShortName()));
 		}
 	}
+
 }
