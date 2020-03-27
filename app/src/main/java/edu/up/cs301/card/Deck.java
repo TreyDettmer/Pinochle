@@ -3,6 +3,7 @@ package edu.up.cs301.card;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Deck class - represents a deck of cards (not necessarily a full one)
@@ -141,16 +142,50 @@ public class Deck implements Serializable {
     }
 
     /**
-     * add a card to the top of a deck
+     * add a card or cards to the top of a deck
      *
-     * @param c
+     * @param cards
      * 		the card to add
      */
-    public void add(Card c) {
+    public void add(Card... cards) {
         // synchronize so that the underlying ArrayList is not accessed
         // inconsistently
         synchronized(this.cards) {
-            cards.add(c);
+            for (Card c : cards) {
+                this.cards.add(c);
+            }
+        }
+    }
+
+
+
+    /**
+     * remove a card
+     *
+     * @param c
+     * 		the card to remove
+     */
+    public void remove(Card c) {
+        // synchronize so that the underlying ArrayList is not accessed
+        // inconsistently
+        synchronized(this.cards) {
+            if (cards.indexOf(c) != -1) {
+                cards.remove(c);
+            }
+        }
+    }
+
+    /**
+     * clear the deck
+     *
+     */
+    public Card[] clear() {
+        // synchronize so that the underlying ArrayList is not accessed
+        // inconsistently
+        synchronized(this.cards) {
+            Card[] clone = (Card[]) cards.toArray();
+            cards.clear();
+            return clone;
         }
     }
 
