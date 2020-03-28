@@ -37,9 +37,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     public PinochleHumanPlayer(String name)
     {
         super(name);
-        backgroundColor = Color.BLUE;
+        backgroundColor = Color.rgb(0,230,61);
         p = new Paint();
         p.setColor(Color.RED);
+
     }
 
     @Override
@@ -60,7 +61,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         surface = (AnimationSurface) myActivity
                 .findViewById(R.id.animation_surface);
         surface.setAnimator(this);
-
+        surface.setBackgroundColor(backgroundColor);
         // if the state is not null, simulate having just received the state so that
         // any state-related processing is done
         if (state != null) {
@@ -92,7 +93,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     //animator methods
     @Override
     public void tick(Canvas canvas) {
-        canvas.drawCircle(100,100,100,p);
+
     }
 
     @Override
