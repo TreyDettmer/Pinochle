@@ -5,10 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import edu.up.cs301.card.Card;
+import edu.up.cs301.card.Deck;
 import edu.up.cs301.game.GameFramework.GameHumanPlayer;
 import edu.up.cs301.game.GameFramework.GameMainActivity;
 import edu.up.cs301.game.GameFramework.animation.AnimationSurface;
@@ -32,7 +34,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private Activity myActivity;
     private AnimationSurface surface;
     private int backgroundColor;
-    Paint p;
+    static Paint p;
 
     public PinochleHumanPlayer(String name)
     {
@@ -46,6 +48,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     @Override
     public void receiveInfo(GameInfo info) {
 
+        if (info instanceof PinochleGameState)
+        {
+            this.state = (PinochleGameState)info;
+        }
+        else
+        {
+            return;
+        }
     }
 
     @Override
@@ -61,7 +71,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         surface = (AnimationSurface) myActivity
                 .findViewById(R.id.animation_surface);
         surface.setAnimator(this);
-        surface.setBackgroundColor(backgroundColor);
         // if the state is not null, simulate having just received the state so that
         // any state-related processing is done
         if (state != null) {
@@ -93,7 +102,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     //animator methods
     @Override
     public void tick(Canvas canvas) {
-
+        if (state == null)
+        {
+            return;
+        }
+        Deck hand = null; //null hand since we currently don't distribute the hands
+        drawHand(canvas,hand);
     }
 
     @Override
@@ -119,6 +133,32 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     @Override
     public void onTouch(MotionEvent event) {
 
+    }
+
+    /**
+     * draw the player's hand
+     *
+     * @param g
+     * 		the canvas object
+     * @param hand
+     * 		the hand
+     */
+    private static void drawHand(Canvas g, Deck hand){
+        int cardOffset = 90;
+
+        RectF initalRect = new RectF(240,720,410,970);
+        if (hand != null) {
+            for (int i = 0; i < hand.size(); i++) {
+                drawCard(g, new RectF(initalRect.left * (i + 1), initalRect.top, initalRect.right, initalRect.bottom), null);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < 12; i++)
+            {
+                drawCard(g, new RectF(initalRect.left + (cardOffset * (i + 1)), initalRect.top, initalRect.right + (cardOffset * (i + 1)), initalRect.bottom), null);
+            }
+        }
     }
 
     /**

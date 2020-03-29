@@ -56,6 +56,9 @@ public class PinochleGameState extends GameState {
         centerDeck = new Deck();
         teamTricksDeck = new Deck[NUM_PLAYERS];
         lastTrick = -1;
+
+
+        // initialize the main deck and deal
     }
 
     // Copy Constructor:

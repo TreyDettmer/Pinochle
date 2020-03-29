@@ -38,6 +38,7 @@ public class PinochleLocalGame extends LocalGame {
         if (state == null) {
             return;
         }
+        p.sendInfo(state);
     }
 
     @Override
