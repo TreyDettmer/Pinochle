@@ -72,6 +72,15 @@ public class Deck implements Serializable {
     }
 
     /**
+     * Returns the cards in the deck.
+     *
+     * @return an array list of the cards in the deck.
+     */
+    public ArrayList<Card> getCards() {
+        return cards;
+    }
+
+    /**
      *
      */
     public Deck shuffle() {

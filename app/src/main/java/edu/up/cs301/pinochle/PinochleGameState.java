@@ -27,6 +27,7 @@ public class PinochleGameState extends GameState {
     private static final int NUM_PLAYERS = 4;
     private static final int DEAL_CARDS = 12;
 
+    // Phases: 0 - Dealing, 1 - Bidding, 2 - Suit, 3 - Exchanging, 4 - Melding, 5 - Go set. 6 - Trick-taking
     private int phase;  // Number of the phase the game is on.
     private int turn;   // Number of player whose turn it is.
     private int[] scoreboard;   // Array of player scores.
