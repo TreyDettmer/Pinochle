@@ -126,8 +126,10 @@ public class PinochleLocalGame extends LocalGame {
                 int maxBid = gameState.getMaxBid();
                 if (maxBid == 0) {
                     gameState.setBid(gameState.getFirstBidder(), 250);
+                    gameState.setWonBid(gameState.getFirstBidder());
+                } else {
+                    gameState.setWonBid(gameState.getTurn());
                 }
-                gameState.setWonBid(gameState.getTurn());
                 gameState.nextPhase();
             }
             return true;
