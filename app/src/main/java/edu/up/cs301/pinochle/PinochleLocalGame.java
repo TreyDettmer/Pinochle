@@ -145,12 +145,12 @@ public class PinochleLocalGame extends LocalGame {
             if (!trickSuit.equals(leadTrickSuit) && gameState.playerHasSuit(playerIdx, leadTrickSuit)) return false;
             if (!trickSuit.equals(trumpSuit) && gameState.playerHasSuit(playerIdx, trumpSuit)) return false;
 
-            gameState.addCardToCenter(trick); //need some way to track whose trick is whose
+            gameState.addTrickToCenter(playerIdx, trick);
             gameState.removeCardFromPlayer(playerIdx, trick);
 
-            if (gameState.isLastPlayer(playerIdx)) {
+            if (playerIdx == (gameState.getPreviousTrickWinner() - 1) % PinochleGameState.NUM_PLAYERS) {
                 int trickWinner = gameState.getTrickWinner();
-
+                gameState.setPreviousTrickWinner(trickWinner);
                 if (gameState.getTrickRound() == 11) {
                     gameState.setLastTrick(trickWinner);
                     gameState.removeAllCardsFromCenter();
@@ -159,8 +159,9 @@ public class PinochleLocalGame extends LocalGame {
                 } else {
                     gameState.addTrickToPlayer(playerIdx);
                     gameState.removeAllCardsFromCenter();
+                    gameState.nextTrickRound();
+                    gameState.setPlayerTurn(trickWinner);
                 }
-                gameState.nextTrickRound();
             } else {
                 gameState.nextPlayerTurn();
             }

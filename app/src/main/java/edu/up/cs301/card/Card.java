@@ -37,6 +37,7 @@ public class Card implements Serializable {
 	// instance variables: the card's rank and the suit
     private Rank rank;
     private Suit suit;
+    private int player;
 
 	/**
 	 * Constructor for class card
@@ -184,7 +185,25 @@ public class Card implements Serializable {
     public Suit getSuit() {
     	return suit;
     }
- 
+
+	/**
+	 * Sets the card's owner for tricks.
+	 *
+	 * @param player card's owner player id
+	 */
+    public void setPlayer(int player) {
+    	this.player = player;
+	}
+
+	/**
+	 * Gets the card's owner for tricks.
+	 *
+	 * @return player id
+	 */
+	public int getPlayer() {
+		return player;
+	}
+
     // array that contains the android resource indices for the 52 card
     // images
     private static int[][] resIdx = {

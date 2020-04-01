@@ -22,10 +22,10 @@ import edu.up.cs301.game.GameFramework.infoMessage.GameState;
  */
 public class PinochleGameState extends GameState {
     private static final long serialVersionUID = 545884920868735343L;
-    private static final int NUM_PHASES = 6;
-    private static final int NUM_TEAMS = 2;
-    private static final int NUM_PLAYERS = 4;
-    private static final int DEAL_CARDS = 12;
+    public static final int NUM_PHASES = 6;
+    public static final int NUM_TEAMS = 2;
+    public static final int NUM_PLAYERS = 4;
+    public static final int DEAL_CARDS = 12;
 
     // Phases: 0 - Dealing, 1 - Bidding, 2 - Suit, 3 - Exchanging, 4 - Melding, 5 - Go set. 6 - Trick-taking
     private int phase;  // Number of the phase the game is on.
@@ -46,6 +46,7 @@ public class PinochleGameState extends GameState {
     private Card leadTrick;
     private int lastTrick;  // Number of the player that won the last trick.
     private int trickRound;
+    private int previousTrickWinner;
 
     // Constructor:
     public PinochleGameState() {
@@ -62,6 +63,7 @@ public class PinochleGameState extends GameState {
         tricksDeck = new Deck[NUM_PLAYERS];
         lastTrick = -1;
         trickRound = 0;
+        previousTrickWinner = -1;
 
 
         // initialize the main deck and deal
@@ -86,6 +88,7 @@ public class PinochleGameState extends GameState {
         leadTrick = gameState.getLeadTrick();
         lastTrick = gameState.getLastTrick();
         trickRound = gameState.getTrickRound();
+        previousTrickWinner = gameState.getPreviousTrickWinner();
     }
 
     /**
@@ -344,9 +347,11 @@ public class PinochleGameState extends GameState {
     /**
      * Adds the specific card to the center deck.
      *
+     * @param player the card's owner player id
      * @param card the card to be played.
      */
-    public void addCardToCenter(Card card) {
+    public void addTrickToCenter(int player, Card card) {
+        card.setPlayer(player);
         centerDeck.add(card);
     }
 
@@ -390,6 +395,10 @@ public class PinochleGameState extends GameState {
 
     public void nextTrickRound() {
         trickRound++;
+    }
+
+    public void setPreviousTrickWinner(int previousTrickWinner) {
+        this.previousTrickWinner = previousTrickWinner;
     }
 
     /**
@@ -625,6 +634,10 @@ public class PinochleGameState extends GameState {
 
     public int getTrickWinner() {
         return -1;//TODO
+    }
+
+    public int getPreviousTrickWinner() {
+        return previousTrickWinner;
     }
 
 }
