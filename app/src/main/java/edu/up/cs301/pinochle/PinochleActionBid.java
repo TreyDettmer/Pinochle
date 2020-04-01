@@ -16,12 +16,22 @@ public class PinochleActionBid extends GameAction {
 
     private static final long serialVersionUID = 2107100271012188849L;
 
+    public static final int BID_10 = 10;
+    public static final int BID_20 = 20;
+
+    private int bid;
+
     /**
      * constructor for GameAction
      *
      * @param player the player who created the action
      */
-    public PinochleActionBid(GamePlayer player) {
+    public PinochleActionBid(GamePlayer player, int bid) {
         super(player);
     }
+
+    public int getBid() {
+        return bid;
+    }
+
 }

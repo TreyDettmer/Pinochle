@@ -119,10 +119,18 @@ public class PinochleGameState extends GameState {
 
     /**
      * Updates the whose turn it is.
+     *
+     * @return the index of the player
      */
-    public void nextPlayerTurn() {
+    public int nextPlayerTurn() {
         turn = (turn + 1) % NUM_PLAYERS;
+        return turn;
     }
+
+    public int getNextPlayerTurn() {
+        return (turn + 1) % NUM_PLAYERS;
+    }
+
 
     /**
      * Sets the turn to that of a specific player.
@@ -425,15 +433,39 @@ public class PinochleGameState extends GameState {
         return bids.clone();
     }
 
+    public int getMaxBid() {
+        int max = 0;
+        for (int bid : bids) {
+            if (bid > max) max = bid;
+        }
+        return max;
+    }
+
     /**
-     * Returns who has passed.
+     * Returns who passed
      *
-     * @return the array of players that have passed.
+     * @return boolean array of who passed
      */
     public boolean[] getPassed() {
         return passed.clone();
     }
 
+    /**
+     * Returns if the player has passed.
+     *
+     * @return boolean if passed.
+     */
+    public boolean getPassed(int player) {
+        return passed[player];
+    }
+
+    public int countPassed() {
+        int count = 0;
+        for (boolean pass : passed) {
+            if (pass) count++;
+        }
+        return count;
+    }
     /**
      * Returns who won the bid.
      *

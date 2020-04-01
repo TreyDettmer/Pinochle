@@ -1,14 +1,11 @@
 package edu.up.cs301.pinochle;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Random;
 
 import edu.up.cs301.card.Card;
-import edu.up.cs301.card.Deck;
 import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
-import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
 
 /*
  * Description
@@ -58,12 +55,12 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     // If the random number is 0, the player bids 10.
                     if (num == 0) {
                         // TODO: Need to send BID_10 with the action.
-                        game.sendAction(new PinochleActionBid(this));
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_10));
 
                         // Else if the random number is 1, the player bids 20.
                     } else if (num == 1) {
                         // TODO: Need to send BID_20 with the action.
-                        game.sendAction(new PinochleActionBid(this));
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_20));
 
                         // Otherwise the player passes.
                     } else {
@@ -194,7 +191,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             playCard = suitCards.get(num);
 
                             // TODO: Need to send the card to play with the action.
-                            game.sendAction(new PinochleActionPlayCard(this));
+                            game.sendAction(new PinochleActionPlayTrick(this));
 
                             // Removes the card from the array to avoid duplicates.
                             suitCards.remove(playCard);
@@ -217,7 +214,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             playCard = trumpCards.get(num);
 
                             // TODO: Need to send the card to play with the action.
-                            game.sendAction(new PinochleActionPlayCard(this));
+                            game.sendAction(new PinochleActionPlayTrick(this));
 
                             // Removes the card from the array to avoid duplicates.
                             trumpCards.remove(playCard);
@@ -234,7 +231,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             playCard = backUpCards.get(num);
 
                             // TODO: Need to send the card to play with the action.
-                            game.sendAction(new PinochleActionPlayCard(this));
+                            game.sendAction(new PinochleActionPlayTrick(this));
 
                             // Removes the card from the array to avoid duplicates.
                             backUpCards.remove(playCard);

@@ -13,7 +13,7 @@ import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
  * @author Kai Vickers
  * @version March 2020
  */
-public class PinochleActionPlayCard extends GameAction {
+public class PinochleActionPlayTrick extends GameAction {
 
     private static final long serialVersionUID = 14235348543893323L;
 
@@ -22,7 +22,7 @@ public class PinochleActionPlayCard extends GameAction {
      *
      * @param player the player who created the action
      */
-    public PinochleActionPlayCard(GamePlayer player) {
+    public PinochleActionPlayTrick(GamePlayer player) {
         super(player);
     }
 }
