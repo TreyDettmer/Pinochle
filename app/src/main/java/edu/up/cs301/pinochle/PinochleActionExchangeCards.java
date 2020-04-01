@@ -19,13 +19,20 @@ public class PinochleActionExchangeCards extends GameAction {
 
     private static final long serialVersionUID = 607100275012188749L;
 
-    private ArrayList<Card> cards;
+    private Card[] cards;
+
     /**
      * constructor for GameAction
      *
      * @param player the player who created the action
      */
-    public PinochleActionExchangeCards(GamePlayer player) {
+    public PinochleActionExchangeCards(GamePlayer player, Card[] cards) {
         super(player);
+        this.cards = cards;
     }
+
+    public Card[] getCards() {
+        return cards;
+    }
+
 }

@@ -117,6 +117,10 @@ public class PinochleGameState extends GameState {
         phase = (phase + 1) % NUM_PHASES;
     }
 
+
+    public boolean isLastPlayer(int player) {
+        return player == NUM_PLAYERS - 1;
+    }
     /**
      * Updates the whose turn it is.
      *
@@ -278,14 +282,14 @@ public class PinochleGameState extends GameState {
     }
 
     /**
-     * Adds a specific card to a player's deck.
+     * Adds cards to a player's deck.
      *
      * @param player the number of the player.
-     * @param card the card to be added.
+     * @param cards the card sto be added.
      */
-    public void addCardToPlayer(int player, Card card) {
+    public void addCardsToPlayer(int player, Card... cards) {
         if (isValidPlayer(player)) {
-            allPlayerDecks[player].add(card);
+            allPlayerDecks[player].add(cards);
         }
     }
 
@@ -413,6 +417,15 @@ public class PinochleGameState extends GameState {
      */
     public int[] getScoreboard() {
         return scoreboard.clone();
+    }
+
+    public boolean biddingTeamHadLowPoints() {
+            //get bid winning team
+            //get teammates
+            //get score of each team and add the two
+            //see if score is 250 less than teams bid only if the team won bid
+        return false; //temp
+
     }
 
     /**
