@@ -1,7 +1,5 @@
 package edu.up.cs301.pinochle;
 
-
-import edu.up.cs301.card.Card;
 import edu.up.cs301.game.GameFramework.GamePlayer;
 import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
 
@@ -14,24 +12,24 @@ import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
  * @author Kai Vickers
  * @version March 2020
  */
-public class PinochleActionPlayTrick extends GameAction {
+public class PinochleActionVoteGoSet extends GameAction {
 
-    private static final long serialVersionUID = 14235348543893323L;
+    private static final long serialVersionUID = 54356363464368849L;
 
-    private Card trick;
+    private boolean vote;
 
     /**
      * constructor for GameAction
      *
      * @param player the player who created the action
      */
-    public PinochleActionPlayTrick(GamePlayer player, Card trick) {
+    public PinochleActionVoteGoSet(GamePlayer player, boolean vote) {
         super(player);
-        this.trick = trick;
+        this.vote = vote;
     }
 
-    public Card getTrick() {
-        return trick;
+    public boolean getVote() {
+        return vote;
     }
 
 }

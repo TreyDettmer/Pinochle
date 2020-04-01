@@ -131,7 +131,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
                     // If the random number is 0, the player votes to go set.
                     if (num == 0) {
-                        game.sendAction(new PinochleActionGoSet(this));
+                        game.sendAction(new PinochleActionVoteGoSet(this));
                     }
                     // Otherwise, it doesn't.
                     break;

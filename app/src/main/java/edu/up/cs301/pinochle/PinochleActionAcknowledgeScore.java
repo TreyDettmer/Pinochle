@@ -12,16 +12,18 @@ import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
  * @author Kai Vickers
  * @version March 2020
  */
-public class PinochleActionGoSet extends GameAction {
+public class PinochleActionAcknowledgeScore extends GameAction {
 
-    private static final long serialVersionUID = 54356363464368849L;
+    private static final long serialVersionUID = 885344576533789L;
 
     /**
      * constructor for GameAction
      *
      * @param player the player who created the action
      */
-    public PinochleActionGoSet(GamePlayer player) {
+    public PinochleActionAcknowledgeScore(GamePlayer player) {
         super(player);
     }
+
+
 }

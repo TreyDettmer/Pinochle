@@ -34,6 +34,7 @@ public class PinochleGameState extends GameState {
     private int firstBidder;    // Player number of the first bidder.
     private int[] bids; // Bids of each player.
     private boolean[] passed;   // Which players have passed.
+    private boolean[] voteGoSet;
     private int wonBid; // Number of player who won the bid.
     private Suit trumpSuit; // Trump suit.
     private ArrayList<Meld>[] melds;    // Melds of each player.
@@ -41,8 +42,10 @@ public class PinochleGameState extends GameState {
     private Deck[] allPlayerDecks;  // Decks of each player.
     private Deck mainDeck;  // Deck of all cards.
     private Deck centerDeck;    // Deck in the center of play.
-    private Deck[] teamTricksDeck;  // Trick decks of each team.
-    private int lastTrick;  // Number of the team that won the last trick.
+    private Deck[] tricksDeck;  // Trick decks of each team.
+    private Card leadTrick;
+    private int lastTrick;  // Number of the player that won the last trick.
+    private int trickRound;
 
     // Constructor:
     public PinochleGameState() {
@@ -50,13 +53,15 @@ public class PinochleGameState extends GameState {
         firstBidder = -1;
         bids = new int[NUM_PLAYERS];
         passed = new boolean[NUM_PLAYERS];
+        voteGoSet = new boolean[NUM_PLAYERS];
         melds = new ArrayList[NUM_PLAYERS];
         Arrays.fill(melds, new ArrayList<Meld>());
         allPlayerDecks = new Deck[NUM_PLAYERS];
         mainDeck = new Deck();
         centerDeck = new Deck();
-        teamTricksDeck = new Deck[NUM_PLAYERS];
+        tricksDeck = new Deck[NUM_PLAYERS];
         lastTrick = -1;
+        trickRound = 0;
 
 
         // initialize the main deck and deal
@@ -70,14 +75,17 @@ public class PinochleGameState extends GameState {
         firstBidder = gameState.getFirstBidder();
         bids = gameState.getBids();
         passed = gameState.getPassed();
+        voteGoSet = gameState.getVoteGoSet();
         wonBid = gameState.getWonBid();
         trumpSuit = gameState.getTrumpSuit();
         melds = gameState.getMelds();
         allPlayerDecks = gameState.getAllPlayerDecks();
         mainDeck = gameState.getMainDeck();
         centerDeck = gameState.getCenterDeck();
-        teamTricksDeck = gameState.getAllTricksDecks();
+        tricksDeck = gameState.getAllTricksDecks();
+        leadTrick = gameState.getLeadTrick();
         lastTrick = gameState.getLastTrick();
+        trickRound = gameState.getTrickRound();
     }
 
     /**
@@ -168,6 +176,14 @@ public class PinochleGameState extends GameState {
         }
     }
 
+    public int[] getTeammates(int team) {
+        int[] teammates = new int[NUM_PLAYERS/NUM_TEAMS];
+        for (int i = 0; i < NUM_PLAYERS/NUM_TEAMS; i++) {
+            teammates[i] = team + 2 * i;
+        }
+        return teammates;
+    }
+
     /**
      * Returns whether the player is a teammate to a specified one.
      *
@@ -234,7 +250,7 @@ public class PinochleGameState extends GameState {
      */
     public void addBid(int player, int bid) {
         if (isValidPlayer(player)) {
-            bids[player] += bid;
+            bids[player] = getMaxBid() + bid;
         }
     }
 
@@ -246,6 +262,12 @@ public class PinochleGameState extends GameState {
     public void setPassed(int player) {
         if (isValidPlayer(player)) {
             passed[player] = true;
+        }
+    }
+
+    public void setVoteGoSet(int player) {
+        if (isValidPlayer(player)) {
+            voteGoSet[player] = true;
         }
     }
 
@@ -338,17 +360,23 @@ public class PinochleGameState extends GameState {
     }
 
     /**
-     * Adds cards from the trick to team's trick deck.
+     * Adds cards from the trick to player's trick deck.
      *
-     * @param team the number of the team.
-     * @param trick the cards of the trick won.
+     * @param player the number of the player.
      */
-    public void addTrickToTeam(int team, Card[] trick) {
-        if (isValidTeam(team)) {
-            teamTricksDeck[team].add(trick);
+    public void addTrickToPlayer(int player) {
+        if (isValidPlayer(player)) {
+            tricksDeck[player].add((Card[]) centerDeck.getCards().toArray());
         }
     }
 
+    public boolean playerHasSuit(int player, Suit suit) {
+        Deck deck = allPlayerDecks[player];
+        for (Card card : deck.getCards()) {
+            if (card.getSuit().equals(suit)) return true;
+        }
+        return false;
+    }
     /**
      * Denotes the team that won the last trick.
      *
@@ -358,6 +386,10 @@ public class PinochleGameState extends GameState {
         if (isValidTeam(team)) {
             lastTrick = team;
         }
+    }
+
+    public void nextTrickRound() {
+        trickRound++;
     }
 
     /**
@@ -377,7 +409,7 @@ public class PinochleGameState extends GameState {
         allPlayerDecks = new Deck[NUM_PLAYERS];
         mainDeck = new Deck();
         centerDeck = new Deck();
-        teamTricksDeck = new Deck[NUM_TEAMS];
+        tricksDeck = new Deck[NUM_PLAYERS];
         lastTrick = -1;
     }
 
@@ -419,13 +451,14 @@ public class PinochleGameState extends GameState {
         return scoreboard.clone();
     }
 
-    public boolean biddingTeamHadLowPoints() {
-            //get bid winning team
-            //get teammates
-            //get score of each team and add the two
-            //see if score is 250 less than teams bid only if the team won bid
-        return false; //temp
-
+    public boolean canGoSet(int team) {
+        int bidWinner = getWonBid();
+        int getMaxBid = getMaxBid();
+        int bidWinnerTeam = getTeam(bidWinner);
+        if (team != bidWinnerTeam) return false;
+        int totalPoints = getScoreboard()[bidWinnerTeam];
+        if ((getMaxBid - totalPoints) > 250) return true;
+        return false;
     }
 
     /**
@@ -461,6 +494,10 @@ public class PinochleGameState extends GameState {
      */
     public boolean[] getPassed() {
         return passed.clone();
+    }
+
+    public boolean[] getVoteGoSet() {
+        return voteGoSet.clone();
     }
 
     /**
@@ -547,26 +584,30 @@ public class PinochleGameState extends GameState {
     /**
      * Returns all the tricks decks.
      *
-     * @return the array of Decks for team's tricks Deck.
+     * @return the array of Decks for each player's tricks Deck.
      */
     private Deck[] getAllTricksDecks(){
-        Deck[] clone = new Deck[teamTricksDeck.length];
-        for (int i = 0; i < teamTricksDeck.length; i++) {
-            clone[i] = new Deck(teamTricksDeck[i]);
+        Deck[] clone = new Deck[tricksDeck.length];
+        for (int i = 0; i < tricksDeck.length; i++) {
+            clone[i] = new Deck(tricksDeck[i]);
         }
         return clone;
     }
 
     /**
-     * Returns the tricks deck of the team.
+     * Returns the tricks deck of the player.
      *
-     * @param team the number of the team.
-     * @return the tricks deck of that team.
+     * @param player the number of the player.
+     * @return the tricks deck of that player.
      */
-    public Deck getTeamTricksDeck(int team) {
-        if (isValidTeam(team))
-            return new Deck(teamTricksDeck[team]);
+    public Deck getTricksDeck(int player) {
+        if (isValidPlayer(player))
+            return new Deck(tricksDeck[player]);
         else return null;
+    }
+
+    public Card getLeadTrick() {
+        return new Card(leadTrick);
     }
 
     /**
@@ -577,4 +618,13 @@ public class PinochleGameState extends GameState {
     public int getLastTrick() {
         return lastTrick;
     }
+
+    public int getTrickRound() {
+        return trickRound;
+    }
+
+    public int getTrickWinner() {
+        return -1;//TODO
+    }
+
 }

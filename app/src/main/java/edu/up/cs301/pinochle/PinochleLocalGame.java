@@ -3,7 +3,6 @@ package edu.up.cs301.pinochle;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Meld;
@@ -49,7 +48,7 @@ public class PinochleLocalGame extends LocalGame {
 
     @Override
     protected boolean canMove(int playerIdx) {
-        return playerIdx == gameState.getTurn();
+        return (playerIdx == gameState.getTurn());
     }
 
     @Override
@@ -59,12 +58,11 @@ public class PinochleLocalGame extends LocalGame {
         int teamIdx = gameState.getTeam(playerIdx);
         if (action instanceof PinochleActionBid) {
             if (gameState.getPhase() != 1) return false;
+            if (gameState.getPassed(playerIdx)) return false;
             PinochleActionBid actionBid = (PinochleActionBid) action;
             int bid = actionBid.getBid();
             if (bid != 10 && bid != 20) return false;
-            int maxBid = gameState.getMaxBid();
-            bid += maxBid;
-            gameState.setBid(playerIdx, bid);
+            gameState.addBid(playerIdx, bid);
             int nextPlayer;
             do {
                 nextPlayer = gameState.nextPlayerTurn();
@@ -102,11 +100,21 @@ public class PinochleLocalGame extends LocalGame {
                 gameState.setPlayerTurn(bidWinner);
             }
             return true;
-
-        } else if (action instanceof PinochleActionGoSet) {
+        } else if (action instanceof PinochleActionVoteGoSet) {
             if (gameState.getPhase() != 5) return false;
-            if (gameState.biddingTeamHadLowPoints()) return true;
-
+            PinochleActionVoteGoSet actionVoteGoSet = (PinochleActionVoteGoSet) action;
+            boolean returnValue;
+            if (gameState.canGoSet(teamIdx)) {
+                if (actionVoteGoSet.getVote()) {
+                    gameState.setVoteGoSet(playerIdx);
+                }
+                returnValue = true;
+            } else returnValue = !actionVoteGoSet.getVote();
+            if (gameState.isLastPlayer(playerIdx)) {
+                gameState.setPlayerTurn(gameState.getWonBid());
+                gameState.nextPhase();
+            } else gameState.nextPlayerTurn();
+            return returnValue;
         } else if (action instanceof PinochleActionPass) {
             if (gameState.getPhase() != 1) return false;
             gameState.setPassed(playerIdx);
@@ -126,6 +134,42 @@ public class PinochleLocalGame extends LocalGame {
         } else if (action instanceof PinochleActionPlayTrick) {
             if (gameState.getPhase() != 6) return false;
 
+            PinochleActionPlayTrick actionPlayTrick = (PinochleActionPlayTrick) action;
+            Card trick = actionPlayTrick.getTrick();
+            Card leadTrick = gameState.getLeadTrick();
+
+            Suit leadTrickSuit = leadTrick.getSuit();
+            Suit trumpSuit = gameState.getTrumpSuit();
+            Suit trickSuit = trick.getSuit();
+
+            if (!trickSuit.equals(leadTrickSuit) && gameState.playerHasSuit(playerIdx, leadTrickSuit)) return false;
+            if (!trickSuit.equals(trumpSuit) && gameState.playerHasSuit(playerIdx, trumpSuit)) return false;
+
+            gameState.addCardToCenter(trick); //need some way to track whose trick is whose
+            gameState.removeCardFromPlayer(playerIdx, trick);
+
+            if (gameState.isLastPlayer(playerIdx)) {
+                int trickWinner = gameState.getTrickWinner();
+
+                if (gameState.getTrickRound() == 11) {
+                    gameState.setLastTrick(trickWinner);
+                    gameState.removeAllCardsFromCenter();
+                    gameState.nextPhase();
+                    gameState.setPlayerTurn(0);
+                } else {
+                    gameState.addTrickToPlayer(playerIdx);
+                    gameState.removeAllCardsFromCenter();
+                }
+                gameState.nextTrickRound();
+            } else {
+                gameState.nextPlayerTurn();
+            }
+
+            return true;
+
+
+        } else if (action instanceof PinochleActionAcknowledgeScore) {
+            if (gameState.getPhase() != 7) return false;
         }
         return false;
     }
