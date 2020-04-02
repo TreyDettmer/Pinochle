@@ -34,6 +34,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private Activity myActivity;
     private AnimationSurface surface;
     private int backgroundColor;
+    private int teammatePlayerNum;
     static Paint p;
 
     public PinochleHumanPlayer(String name)
@@ -42,6 +43,21 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         backgroundColor = Color.rgb(0,230,61);
         p = new Paint();
         p.setColor(Color.RED);
+        switch (playerNum)
+        {
+            case 0:
+                teammatePlayerNum = 1;
+                break;
+            case 1:
+                teammatePlayerNum = 0;
+                break;
+            case 2:
+                teammatePlayerNum = 3;
+                break;
+            case 4:
+                teammatePlayerNum = 2;
+                break;
+        }
 
     }
 
@@ -66,7 +82,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
         // Load the layout resource for the new configuration
         activity.setContentView(R.layout.pinochle_human_player);
-
+        Card.initImages(activity);
         // link the animator (this object) to the animation surface
         surface = (AnimationSurface) myActivity
                 .findViewById(R.id.animation_surface);
@@ -106,7 +122,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         {
             return;
         }
-        Deck hand = null; //null hand since we currently don't distribute the hands
+        Deck hand = state.getPlayerDeck(playerNum);
+
+        Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
+        //for now all other players' hands are teammates hand
+        drawPlayerHands(canvas,teammateHand);
         drawHand(canvas,hand);
     }
 
@@ -144,22 +164,59 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
      * 		the hand
      */
     private static void drawHand(Canvas g, Deck hand){
-        int cardOffset = 90;
+        int cardOffset = 60;
 
-        RectF initalRect = new RectF(240,720,410,970);
+        RectF initalRect = new RectF(490,770,640,1000);
         if (hand != null) {
-            for (int i = 0; i < hand.size(); i++) {
-                drawCard(g, new RectF(initalRect.left * (i + 1), initalRect.top, initalRect.right, initalRect.bottom), null);
+
+            for (int i = 0; i < hand.size();i++){//hand.size(); i++) {
+                drawCard(g, new RectF(initalRect.left + (cardOffset * (i + 1)), initalRect.top, initalRect.right + (cardOffset * (i + 1)), initalRect.bottom), hand.getCards().get(i));
             }
         }
-        else
-        {
-            for (int i = 0; i < 12; i++)
-            {
-                drawCard(g, new RectF(initalRect.left + (cardOffset * (i + 1)), initalRect.top, initalRect.right + (cardOffset * (i + 1)), initalRect.bottom), null);
-            }
-        }
+
     }
+
+    /**
+     * draw the player's hand
+     *
+     * @param g
+     * 		the canvas object
+     * @param hand
+     * 		the hand
+     */
+    private static void drawPlayerHands(Canvas g, Deck hand){
+        int cardOffset = 40;
+
+        if (hand != null)
+        {
+            RectF initialRect;
+
+            //left
+            initialRect = new RectF(70,190,210,270);
+            for (int i = 0; i < hand.size();i++)
+            {
+                drawCard(g, new RectF(initialRect.left, initialRect.top + (cardOffset * (i + 1)), initialRect.right , initialRect.bottom + (cardOffset * (i + 1))), null);
+            }
+
+            // right
+            initialRect = new RectF(1710,190,1850,270);
+            for (int i = 0; i < hand.size();i++)
+            {
+                drawCard(g, new RectF(initialRect.left, initialRect.top + (cardOffset * (i + 1)), initialRect.right , initialRect.bottom + (cardOffset * (i + 1))), null);
+            }
+            //top
+            initialRect = new RectF(640,30,720,170);
+            for (int i = 0; i < hand.size();i++)
+            {
+                drawCard(g, new RectF(initialRect.left + (cardOffset * (i + 1)), initialRect.top , initialRect.right + (cardOffset * (i + 1)) , initialRect.bottom ), null);
+            }
+
+
+
+        }
+
+    }
+
 
     /**
      * draws a card on the canvas; if the card is null, draw a card-back

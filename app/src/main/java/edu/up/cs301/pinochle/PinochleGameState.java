@@ -67,6 +67,14 @@ public class PinochleGameState extends GameState {
 
 
         // initialize the main deck and deal
+        mainDeck.reset();
+        mainDeck.shuffle();
+        for (int i = 0; i < NUM_PLAYERS;i++)
+        {
+            allPlayerDecks[i] = new Deck();
+
+            allPlayerDecks[i].add(dealCards());
+        }
     }
 
     // Copy Constructor:

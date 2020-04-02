@@ -77,19 +77,19 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
                     if (num == 0) {
                         // TODO: Need to send "Club" with the action.
-                        game.sendAction(new PinochleActionChooseTrump(this));
+                        //game.sendAction(new PinochleActionChooseTrump(this));
 
                     } else if (num == 1) {
                         // TODO: Need to send "Diamond" with the action.
-                        game.sendAction(new PinochleActionChooseTrump(this));
+                        //game.sendAction(new PinochleActionChooseTrump(this));
 
                     } else if (num == 2) {
                         // TODO: Need to send "Heart" with the action.
-                        game.sendAction(new PinochleActionChooseTrump(this));
+                        //game.sendAction(new PinochleActionChooseTrump(this));
 
                     } else {
                         // TODO: Need to send "Spade" with the action.
-                        game.sendAction(new PinochleActionChooseTrump(this));
+                        //game.sendAction(new PinochleActionChooseTrump(this));
                     }
                     break;
 
@@ -116,7 +116,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     }
 
                     // TODO: Need to send the Card[] with the action.
-                    game.sendAction(new PinochleActionExchangeCards(this));
+                    //game.sendAction(new PinochleActionExchangeCards(this));
                     break;
 
                 case 4:
@@ -131,7 +131,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
                     // If the random number is 0, the player votes to go set.
                     if (num == 0) {
-                        game.sendAction(new PinochleActionVoteGoSet(this));
+                        //game.sendAction(new PinochleActionVoteGoSet(this));
                     }
                     // Otherwise, it doesn't.
                     break;
@@ -191,7 +191,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             playCard = suitCards.get(num);
 
                             // TODO: Need to send the card to play with the action.
-                            game.sendAction(new PinochleActionPlayTrick(this));
+                            //game.sendAction(new PinochleActionPlayTrick(this));
 
                             // Removes the card from the array to avoid duplicates.
                             suitCards.remove(playCard);
@@ -214,7 +214,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             playCard = trumpCards.get(num);
 
                             // TODO: Need to send the card to play with the action.
-                            game.sendAction(new PinochleActionPlayTrick(this));
+                            //game.sendAction(new PinochleActionPlayTrick(this));
 
                             // Removes the card from the array to avoid duplicates.
                             trumpCards.remove(playCard);
@@ -231,7 +231,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             playCard = backUpCards.get(num);
 
                             // TODO: Need to send the card to play with the action.
-                            game.sendAction(new PinochleActionPlayTrick(this));
+                            //game.sendAction(new PinochleActionPlayTrick(this));
 
                             // Removes the card from the array to avoid duplicates.
                             backUpCards.remove(playCard);
