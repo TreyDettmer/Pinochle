@@ -170,17 +170,19 @@ public class Deck implements Serializable {
 
 
     /**
-     * remove a card
+     * remove cards
      *
-     * @param c
-     * 		the card to remove
+     * @param card
+     * 		the cards to remove
      */
-    public void remove(Card c) {
+    public void remove(Card... card) {
         // synchronize so that the underlying ArrayList is not accessed
         // inconsistently
         synchronized(this.cards) {
-            if (cards.indexOf(c) != -1) {
-                cards.remove(c);
+            for (Card c : card) {
+                if (cards.indexOf(c) != -1) {
+                    cards.remove(c);
+                }
             }
         }
     }

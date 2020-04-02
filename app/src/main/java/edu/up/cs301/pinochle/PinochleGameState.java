@@ -336,12 +336,12 @@ public class PinochleGameState extends GameState {
     }
 
     /**
-     * Removes a specific card from a player's deck.
+     * Removes cards from a player's deck.
      *
      * @param player the number of the player.
      * @param card the card to be removed.
      */
-    public void removeCardFromPlayer(int player, Card card) {
+    public void removeCardsFromPlayer(int player, Card... card) {
         if (isValidPlayer(player)) {
             allPlayerDecks[player].remove(card);
         }
