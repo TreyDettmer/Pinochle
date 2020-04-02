@@ -32,4 +32,8 @@ public class PinochleActionVoteGoSet extends GameAction {
         return vote;
     }
 
+    public String toString() {
+        return String.format("vote=%s", true);
+    }
+
 }

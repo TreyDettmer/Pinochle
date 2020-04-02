@@ -16,4 +16,8 @@ public class PinochleActionCalculateMelds extends GameAction {
     public PinochleActionCalculateMelds(GamePlayer player) {
         super(player);
     }
+
+    public String toString() {
+        return "";
+    }
 }

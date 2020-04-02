@@ -56,6 +56,7 @@ public class PinochleLocalGame extends LocalGame {
         int playerIdx = getPlayerIdx(action.getPlayer());
         int teammateIdx = gameState.getTeammate(playerIdx);
         int teamIdx = gameState.getTeam(playerIdx);
+        System.out.println(String.format("Player %d, Teamate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), action.toString()));
         if (action instanceof PinochleActionBid) {
             if (gameState.getPhase() != 1) return false;
             if (gameState.getPassed(playerIdx)) return false;
@@ -79,12 +80,28 @@ public class PinochleLocalGame extends LocalGame {
             if (gameState.isLastPlayer(playerIdx)) {
                 gameState.nextPhase();
             }
+            return true;
         } else if (action instanceof PinochleActionChooseTrump) {
             if (gameState.getPhase() != 2) return false;
+            System.out.println("Won bid: " + gameState.getWonBid());
             if (gameState.getWonBid() != playerIdx) return false;
             PinochleActionChooseTrump actionChooseTrump = (PinochleActionChooseTrump) action;
             Suit trump = actionChooseTrump.getTrump();
             gameState.setTrumpSuit(trump);
+            gameState.setPlayerTurn(teammateIdx);
+            gameState.nextPhase();
+            System.out.println("Next turn: " + gameState.getTurn());
+            System.out.println("Next phase: " + gameState.getPhase());
+
+            return true;
+        } else if (action instanceof PinochleActionDealCards) {
+            if (gameState.getPhase() != 0) return false;
+            gameState.addCardsToPlayer(playerIdx, gameState.dealCards());
+            if (gameState.isLastPlayer(playerIdx)) {
+                gameState.setFirstBidder((gameState.getFirstBidder() + 1) % PinochleGameState.NUM_PLAYERS);
+                gameState.nextPhase();
+            }
+            gameState.nextPlayerTurn();
             return true;
         } else if (action instanceof PinochleActionExchangeCards) {
             if (gameState.getPhase() != 3) return false;
@@ -112,6 +129,7 @@ public class PinochleLocalGame extends LocalGame {
             } else returnValue = !actionVoteGoSet.getVote();
             if (gameState.isLastPlayer(playerIdx)) {
                 gameState.setPlayerTurn(gameState.getWonBid());
+                gameState.setPreviousTrickWinner(gameState.getWonBid());
                 gameState.nextPhase();
             } else gameState.nextPlayerTurn();
             return returnValue;
@@ -122,11 +140,14 @@ public class PinochleLocalGame extends LocalGame {
             do {
                 nextPlayer = gameState.nextPlayerTurn();
             } while (gameState.getPassed(nextPlayer));
+            System.out.println("Next play not passed: " + gameState.getTurn());
             if (gameState.countPassed() == 3) {
                 int maxBid = gameState.getMaxBid();
+                System.out.println("Max bid: " + maxBid);
                 if (maxBid == 0) {
                     gameState.setBid(gameState.getFirstBidder(), 250);
                     gameState.setWonBid(gameState.getFirstBidder());
+                    gameState.setPlayerTurn(gameState.getFirstBidder());
                 } else {
                     gameState.setWonBid(gameState.getTurn());
                 }
@@ -135,14 +156,20 @@ public class PinochleLocalGame extends LocalGame {
             return true;
         } else if (action instanceof PinochleActionPlayTrick) {
             if (gameState.getPhase() != 6) return false;
+            System.out.println("Trick round: " + gameState.getTrickRound());
 
             PinochleActionPlayTrick actionPlayTrick = (PinochleActionPlayTrick) action;
             Card trick = actionPlayTrick.getTrick();
+
+            if (gameState.getPreviousTrickWinner() == playerIdx) gameState.setLeadTrick(trick);
+
             Card leadTrick = gameState.getLeadTrick();
 
             Suit leadTrickSuit = leadTrick.getSuit();
             Suit trumpSuit = gameState.getTrumpSuit();
             Suit trickSuit = trick.getSuit();
+
+            System.out.println("Last Player: " +  (gameState.getPreviousTrickWinner() - 1 + PinochleGameState.NUM_PLAYERS) % PinochleGameState.NUM_PLAYERS);
 
             if (!trickSuit.equals(leadTrickSuit) && gameState.playerHasSuit(playerIdx, leadTrickSuit)) return false;
             if (!trickSuit.equals(trumpSuit) && gameState.playerHasSuit(playerIdx, trumpSuit)) return false;
@@ -150,8 +177,10 @@ public class PinochleLocalGame extends LocalGame {
             gameState.addTrickToCenter(playerIdx, trick);
             gameState.removeCardFromPlayer(playerIdx, trick);
 
-            if (playerIdx == (gameState.getPreviousTrickWinner() - 1) % PinochleGameState.NUM_PLAYERS) {
+
+            if (playerIdx == (gameState.getPreviousTrickWinner() - 1 + PinochleGameState.NUM_PLAYERS) % PinochleGameState.NUM_PLAYERS) {
                 int trickWinner = gameState.getTrickWinner();
+                System.out.println("Trick winner: " + trickWinner);
                 gameState.setPreviousTrickWinner(trickWinner);
                 if (gameState.getTrickRound() == 11) {
                     gameState.setLastTrick(trickWinner);
@@ -166,11 +195,9 @@ public class PinochleLocalGame extends LocalGame {
                 }
             } else {
                 gameState.nextPlayerTurn();
+                System.out.println("Next turn: " + gameState.getTurn());
             }
-
             return true;
-
-
         } else if (action instanceof PinochleActionAcknowledgeScore) {
             if (gameState.getPhase() != 7) return false;
         }

@@ -32,4 +32,8 @@ public class PinochleActionChooseTrump extends GameAction {
     public Suit getTrump() {
         return trump;
     }
+
+    public String toString() {
+        return String.format("trump=%s", trump.toString());
+    }
 }

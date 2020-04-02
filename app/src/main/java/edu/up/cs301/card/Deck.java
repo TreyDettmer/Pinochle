@@ -2,6 +2,7 @@ package edu.up.cs301.card;
 
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -192,7 +193,7 @@ public class Deck implements Serializable {
         // synchronize so that the underlying ArrayList is not accessed
         // inconsistently
         synchronized(this.cards) {
-            Card[] clone = (Card[]) cards.toArray();
+            Card[] clone = cards.toArray(new Card[0]);
             cards.clear();
             return clone;
         }

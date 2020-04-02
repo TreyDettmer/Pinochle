@@ -22,7 +22,7 @@ import edu.up.cs301.game.GameFramework.infoMessage.GameState;
  */
 public class PinochleGameState extends GameState {
     private static final long serialVersionUID = 545884920868735343L;
-    public static final int NUM_PHASES = 6;
+    public static final int NUM_PHASES = 8;
     public static final int NUM_TEAMS = 2;
     public static final int NUM_PLAYERS = 4;
     public static final int DEAL_CARDS = 12;
@@ -35,6 +35,7 @@ public class PinochleGameState extends GameState {
     private int[] bids; // Bids of each player.
     private boolean[] passed;   // Which players have passed.
     private boolean[] voteGoSet;
+    private boolean[] voted;
     private int wonBid; // Number of player who won the bid.
     private Suit trumpSuit; // Trump suit.
     private ArrayList<Meld>[] melds;    // Melds of each player.
@@ -55,26 +56,27 @@ public class PinochleGameState extends GameState {
         bids = new int[NUM_PLAYERS];
         passed = new boolean[NUM_PLAYERS];
         voteGoSet = new boolean[NUM_PLAYERS];
+        voted = new boolean[NUM_PLAYERS];
         melds = new ArrayList[NUM_PLAYERS];
         Arrays.fill(melds, new ArrayList<Meld>());
         allPlayerDecks = new Deck[NUM_PLAYERS];
+        for (int i = 0; i < allPlayerDecks.length; i++) {
+            allPlayerDecks[i] = new Deck();
+        }
         mainDeck = new Deck();
         centerDeck = new Deck();
         tricksDeck = new Deck[NUM_PLAYERS];
+        for (int i = 0; i < tricksDeck.length; i++) {
+            tricksDeck[i] = new Deck();
+        }
         lastTrick = -1;
         trickRound = 0;
         previousTrickWinner = -1;
 
-
-        // initialize the main deck and deal
+        // initialize the main deck
         mainDeck.reset();
         mainDeck.shuffle();
-        for (int i = 0; i < NUM_PLAYERS;i++)
-        {
-            allPlayerDecks[i] = new Deck();
 
-            allPlayerDecks[i].add(dealCards());
-        }
     }
 
     // Copy Constructor:
@@ -86,6 +88,7 @@ public class PinochleGameState extends GameState {
         bids = gameState.getBids();
         passed = gameState.getPassed();
         voteGoSet = gameState.getVoteGoSet();
+        voted = gameState.getVoted();
         wonBid = gameState.getWonBid();
         trumpSuit = gameState.getTrumpSuit();
         melds = gameState.getMelds();
@@ -282,6 +285,12 @@ public class PinochleGameState extends GameState {
         }
     }
 
+    public void setVoted(int player) {
+        if (isValidPlayer(player)) {
+            voted[player] = true;
+        }
+    }
+
     /**
      * Denotes the player that won the bid.
      *
@@ -289,7 +298,7 @@ public class PinochleGameState extends GameState {
      */
     public void setWonBid(int player) {
         if (isValidPlayer(player)) {
-            passed[player] = true;
+            wonBid = player;
         }
     }
 
@@ -348,7 +357,9 @@ public class PinochleGameState extends GameState {
         Card[] deal = new Card[DEAL_CARDS];
         for (int i = 0; i < deal.length; i++) {
             deal[i] = mainDeck.removeTopCard();
+
         }
+
         return deal;
     }
 
@@ -379,7 +390,7 @@ public class PinochleGameState extends GameState {
      */
     public void addTrickToPlayer(int player) {
         if (isValidPlayer(player)) {
-            tricksDeck[player].add((Card[]) centerDeck.getCards().toArray());
+            tricksDeck[player].add(centerDeck.getCards().toArray(new Card[0]));
         }
     }
 
@@ -390,6 +401,11 @@ public class PinochleGameState extends GameState {
         }
         return false;
     }
+
+    public void setLeadTrick(Card leadTrick) {
+        this.leadTrick = leadTrick;
+    }
+
     /**
      * Denotes the team that won the last trick.
      *
@@ -517,6 +533,21 @@ public class PinochleGameState extends GameState {
         return voteGoSet.clone();
     }
 
+    public boolean[] getVoted() {
+        return voted.clone();
+    }
+
+    public boolean getVoted(int player) {
+        return voted[player];
+    }
+
+    public boolean allHasVoted() {
+        for (boolean hasVoted : voted) {
+            if (!hasVoted) return false;
+        }
+        return true;
+    }
+
     /**
      * Returns if the player has passed.
      *
@@ -624,6 +655,7 @@ public class PinochleGameState extends GameState {
     }
 
     public Card getLeadTrick() {
+        if (leadTrick == null) return null;
         return new Card(leadTrick);
     }
 
@@ -641,7 +673,7 @@ public class PinochleGameState extends GameState {
     }
 
     public int getTrickWinner() {
-        return -1;//TODO
+        return 0;//TODO
     }
 
     public int getPreviousTrickWinner() {

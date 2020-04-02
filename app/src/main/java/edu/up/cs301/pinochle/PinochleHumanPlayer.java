@@ -41,8 +41,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
         super(name);
         backgroundColor = Color.rgb(0,230,61);
+
         p = new Paint();
         p.setColor(Color.RED);
+
+        // I already have a method to find someone's teammate. also 0's teammate is 2 and 1's teammate is 3
+        /*
         switch (playerNum)
         {
             case 0:
@@ -57,16 +61,27 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             case 4:
                 teammatePlayerNum = 2;
                 break;
-        }
+        }*/
+
 
     }
 
     @Override
     public void receiveInfo(GameInfo info) {
-
         if (info instanceof PinochleGameState)
         {
-            this.state = (PinochleGameState)info;
+            state = (PinochleGameState) info;
+            teammatePlayerNum = state.getTeammate(playerNum);
+            int phase = state.getPhase();
+            switch (phase) {
+                case 0:
+                    game.sendAction(new PinochleActionDealCards(this));
+                    break;
+                case 1:
+                    break;
+
+            }
+
         }
         else
         {

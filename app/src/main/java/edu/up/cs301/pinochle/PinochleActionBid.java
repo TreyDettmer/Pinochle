@@ -28,10 +28,15 @@ public class PinochleActionBid extends GameAction {
      */
     public PinochleActionBid(GamePlayer player, int bid) {
         super(player);
+        this.bid = bid;
     }
 
     public int getBid() {
         return bid;
+    }
+
+    public String toString() {
+        return String.format("bid=%s", bid);
     }
 
 }

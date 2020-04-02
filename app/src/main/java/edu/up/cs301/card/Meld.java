@@ -57,11 +57,11 @@ public enum Meld implements Serializable {
 
 
     public static ArrayList<Meld> checkMelds(Deck deck, Suit trump) {
-        return null;
+        return new ArrayList<Meld>();
     }
 
     public static int totalPoints(ArrayList<Meld> melds) {
-        return -1;
+        return (int) (Math.random() * 700) + 100;
     }
 
 }

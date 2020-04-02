@@ -34,4 +34,8 @@ public class PinochleActionPlayTrick extends GameAction {
         return trick;
     }
 
+    public String toString() {
+        return String.format("trick=%s", trick.toString());
+    }
+
 }

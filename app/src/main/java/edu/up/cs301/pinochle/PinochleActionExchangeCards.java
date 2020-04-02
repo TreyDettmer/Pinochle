@@ -1,6 +1,7 @@
 package edu.up.cs301.pinochle;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import edu.up.cs301.card.Card;
 import edu.up.cs301.game.GameFramework.GamePlayer;
@@ -35,4 +36,7 @@ public class PinochleActionExchangeCards extends GameAction {
         return cards;
     }
 
+    public String toString() {
+        return String.format("cards=%s", Arrays.toString(cards));
+    }
 }

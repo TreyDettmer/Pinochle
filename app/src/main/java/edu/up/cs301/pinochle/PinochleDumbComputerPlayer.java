@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import edu.up.cs301.card.Card;
+import edu.up.cs301.card.Suit;
 import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
+import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
+import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
 
 /*
  * Description
@@ -31,7 +34,9 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
     @Override
     protected void receiveInfo(GameInfo info) {
-
+        if (info instanceof IllegalMoveInfo) {
+            System.out.println("Illegal move");
+        }
         int phase;
         int num;
 
@@ -42,8 +47,11 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
             ArrayList<Card> cards;
 
             switch(phase){
-
-                    // If it is the bidding phase:
+                // If it is the dealing phase:
+                case 0:
+                    game.sendAction(new PinochleActionDealCards(this));
+                    break;
+                // If it is the bidding phase:
                 case 1:
 
                     /*
@@ -76,20 +84,15 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     num = rnd.nextInt(4);
 
                     if (num == 0) {
-                        // TODO: Need to send "Club" with the action.
-                        //game.sendAction(new PinochleActionChooseTrump(this));
-
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Club));
                     } else if (num == 1) {
-                        // TODO: Need to send "Diamond" with the action.
-                        //game.sendAction(new PinochleActionChooseTrump(this));
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Diamond));
 
                     } else if (num == 2) {
-                        // TODO: Need to send "Heart" with the action.
-                        //game.sendAction(new PinochleActionChooseTrump(this));
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Heart));
 
                     } else {
-                        // TODO: Need to send "Spade" with the action.
-                        //game.sendAction(new PinochleActionChooseTrump(this));
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Spade));
                     }
                     break;
 
@@ -115,11 +118,11 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                         cards.remove(num);
                     }
 
-                    // TODO: Need to send the Card[] with the action.
-                    //game.sendAction(new PinochleActionExchangeCards(this));
+                    game.sendAction(new PinochleActionExchangeCards(this, exchangeCards));
                     break;
 
                 case 4:
+                    game.sendAction(new PinochleActionCalculateMelds(this));
                     // calculate melds
                     break;
 
@@ -130,14 +133,18 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     num = rnd.nextInt(2);
 
                     // If the random number is 0, the player votes to go set.
-                    if (num == 0) {
-                        //game.sendAction(new PinochleActionVoteGoSet(this));
+                    if (num == 0 && state.canGoSet(state.getTeam(playerNum))) {
+                        game.sendAction(new PinochleActionVoteGoSet(this, true));
+                    } else {
+                        // Otherwise, it doesn't.
+                        game.sendAction(new PinochleActionVoteGoSet(this, false));
                     }
-                    // Otherwise, it doesn't.
+
                     break;
 
                     // If it is the trick-taking phase:
                 case 6:
+
                     // The cards from the player's deck.
                     cards = state.getPlayerDeck(playerNum).getCards();
 
@@ -166,7 +173,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             // TODO: Need to fix the if statements to make them more readable.
 
                             // Checks if the card is the same suit as the suit of the trick.
-                            if (card.getSuit().equals(state.getCenterDeck().getCards().get(0).getSuit())){
+                            if (state.getLeadTrick() != null && card.getSuit().equals(state.getLeadTrick().getSuit())){
                                suitCards.add(card);
                             }
 
@@ -176,9 +183,14 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             }
 
                             // Checks if the suit of the card is neither the suit of the trick or the trump suit.
-                            if (!card.getSuit().equals(state.getTrumpSuit()) && !card.getSuit().equals(state.getCenterDeck().getCards().get(0).getSuit())){
+                            if (state.getLeadTrick() == null && !card.getSuit().equals(state.getTrumpSuit())) {
                                 backUpCards.add(card);
                             }
+
+                            if (state.getLeadTrick() != null && !card.getSuit().equals(state.getTrumpSuit()) && !card.getSuit().equals(state.getLeadTrick().getSuit())){
+                                backUpCards.add(card);
+                            }
+
                         }
 
                         /*
@@ -190,8 +202,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             num = rnd.nextInt(suitCards.size());
                             playCard = suitCards.get(num);
 
-                            // TODO: Need to send the card to play with the action.
-                            //game.sendAction(new PinochleActionPlayTrick(this));
+                            game.sendAction(new PinochleActionPlayTrick(this, playCard));
 
                             // Removes the card from the array to avoid duplicates.
                             suitCards.remove(playCard);
@@ -213,8 +224,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             num = rnd.nextInt(trumpCards.size());
                             playCard = trumpCards.get(num);
 
-                            // TODO: Need to send the card to play with the action.
-                            //game.sendAction(new PinochleActionPlayTrick(this));
+                            game.sendAction(new PinochleActionPlayTrick(this, playCard));
 
                             // Removes the card from the array to avoid duplicates.
                             trumpCards.remove(playCard);
@@ -230,8 +240,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                             num = rnd.nextInt(backUpCards.size());
                             playCard = backUpCards.get(num);
 
-                            // TODO: Need to send the card to play with the action.
-                            //game.sendAction(new PinochleActionPlayTrick(this));
+                            game.sendAction(new PinochleActionPlayTrick(this, playCard));
 
                             // Removes the card from the array to avoid duplicates.
                             backUpCards.remove(playCard);

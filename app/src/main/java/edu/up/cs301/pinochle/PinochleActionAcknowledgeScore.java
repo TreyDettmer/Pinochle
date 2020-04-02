@@ -25,5 +25,9 @@ public class PinochleActionAcknowledgeScore extends GameAction {
         super(player);
     }
 
+    public String toString() {
+        return "";
+    }
+
 
 }
