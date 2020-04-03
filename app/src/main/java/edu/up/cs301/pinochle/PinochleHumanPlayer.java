@@ -77,37 +77,31 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     public void receiveInfo(GameInfo info) {
         if (info instanceof PinochleGameState)
         {
-            Log.i("Human","Receivedinfo");
             state = (PinochleGameState) info;
             teammatePlayerNum = state.getTeammate(playerNum);
-            int phase = state.getPhase();
+            PinochleGamePhase phase = state.getPhase();
             myActivity.leftPlayerNameTextView.setText(allPlayerNames[playerToLeftIndex]);
             myActivity.rightPlayerNameTextView.setText(allPlayerNames[playerToRightIndex]);
             myActivity.topPlayerNameTextView.setText(allPlayerNames[teammatePlayerNum]);
 
             switch (phase) {
-                case 0:
-                    myActivity.phaseTextView.setText("Phase: Deal");
-                    game.sendAction(new PinochleActionDealCards(this));
-
-                    break;
-                case 1:
+                case BIDDING:
                     myActivity.phaseTextView.setText("Phase: Bid");
                     break;
-                case 2:
+                case CHOOSE_TRUMP:
                     myActivity.phaseTextView.setText("Phase: Choose Trump");
                     break;
-                case 3:
+                case EXCHANGE_CARDS:
                     myActivity.phaseTextView.setText("Phase: Card Exchange");
                     myActivity.trumpSuitTextView.setText(state.getTrumpSuit().getName());
                     break;
-                case 4:
+                case MELDING:
                     myActivity.phaseTextView.setText("Phase: Calculate Melds");
                     break;
-                case 5:
+                case VOTE_GO_SET:
                     myActivity.phaseTextView.setText("Phase: Go Set?");
                     break;
-                case 6:
+                case TRICK_TAKING:
                     myActivity.phaseTextView.setText("Phase: Trick");
 
             }
@@ -176,7 +170,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
         //for now all other players' hands are teammates hand
         drawPlayerHands(canvas,teammateHand);
-
         drawHand(canvas,hand);
     }
 
@@ -240,7 +233,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         if (hand != null)
         {
             RectF initialRect;
-
 
             //left
             initialRect = new RectF(70,190,210,270);

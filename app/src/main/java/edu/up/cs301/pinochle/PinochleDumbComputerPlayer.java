@@ -30,26 +30,23 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
     @Override
     protected void receiveInfo(GameInfo info) {
+
         if (info instanceof IllegalMoveInfo) {
             System.out.println("Illegal move");
         }
-        int phase;
+        PinochleGamePhase phase;
         int num;
 
         if (info instanceof PinochleGameState) {
+            sleep((int)(1));
 
             state = (PinochleGameState) info;
             phase = state.getPhase();
             ArrayList<Card> cards;
 
             switch(phase){
-                // If it is the dealing phase:
-                case 0:
-                    game.sendAction(new PinochleActionDealCards(this));
-
-                    break;
                 // If it is the bidding phase:
-                case 1:
+                case BIDDING:
 
                     /*
                      * A random number is generated to determine whether the player
@@ -72,7 +69,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     break;
 
                     // If it is the trump suit selection phase.
-                case 2:
+                case CHOOSE_TRUMP:
 
                     // Generates a random number between 0 and excluding 4.
                     num = rnd.nextInt(4);
@@ -96,7 +93,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     break;
 
                     // If it is the exchanging phase:
-                case 3:
+                case EXCHANGE_CARDS:
                     // An array of the cards to be exchanged.
                     Card[] exchangeCards = new Card[4];
 
@@ -120,13 +117,13 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     game.sendAction(new PinochleActionExchangeCards(this, exchangeCards));
                     break;
 
-                case 4:
+                case MELDING:
                     game.sendAction(new PinochleActionCalculateMelds(this));
                     // calculate melds
                     break;
 
                     // If it is the go set phase:
-                case 5:
+                case VOTE_GO_SET:
 
                     // Generates either 1 or 0 (50% chance to vote to go set)
                     num = rnd.nextInt(2);
@@ -142,7 +139,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     break;
 
                     // If it is the trick-taking phase:
-                case 6:
+                case TRICK_TAKING:
 
                     // The cards from the player's deck.
                     cards = state.getPlayerDeck(playerNum).getCards();
@@ -249,10 +246,10 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                         }
                     }
                     break;
+                case ACKNOWLEDGE_SCORE:
+                    game.sendAction(new PinochleActionAcknowledgeScore(this));
             }
 
-        } else {
-            return;
         }
     }
 }
