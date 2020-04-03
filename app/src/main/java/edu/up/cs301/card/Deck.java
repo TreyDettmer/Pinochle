@@ -1,6 +1,8 @@
 package edu.up.cs301.card;
 
 
+import android.widget.ArrayAdapter;
+
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -101,10 +103,29 @@ public class Deck implements Serializable {
         return this;
     }
 
+    /**
+     * Sorts the deck based on ranking order from lowest to highest.
+     */
     public void sort() {
+        // Temporary ArrayList to store the cards before updating the deck.
+        ArrayList<Card> temp = new ArrayList<>();
+
+        // Converts the deck ArrayList to an array.
         Object[] cardArray = cards.toArray();
+
+        // Sorts the deck array.
         Arrays.sort(cardArray);
-        cards = new ArrayList<>(Arrays.asList((Card[]) cardArray));
+
+        /*
+         * For loop used to convert the deck array back to
+         * an ArrayList form. Adds each element in the array
+         * to the temp ArrayList.
+         */
+        for (int i = 0; i < cardArray.length; i++) {
+            temp.add((Card) cardArray[i]);
+        }
+        // Sets the cards of the temp ArrayList to the cards of the deck.
+        cards = temp;
     }
 
     /**

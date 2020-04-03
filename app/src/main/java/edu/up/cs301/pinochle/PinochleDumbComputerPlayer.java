@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import edu.up.cs301.card.Card;
+import edu.up.cs301.card.Deck;
 import edu.up.cs301.card.Suit;
 import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
 
 /*
- * Description
+ * A dumb computer player that plays based off of random decisions.
  *
  * @author Trey Dettmer
  * @author Justin Lee
@@ -119,9 +120,10 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                     game.sendAction(new PinochleActionExchangeCards(this, exchangeCards));
                     break;
 
+                    // If it is the melding phase:
                 case MELDING:
+                    // Calculates the melds.
                     game.sendAction(new PinochleActionCalculateMelds(this));
-                    // calculate melds
                     break;
 
                     // If it is the go set phase:
@@ -137,47 +139,71 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                         // Otherwise, it doesn't.
                         game.sendAction(new PinochleActionVoteGoSet(this, false));
                     }
-
                     break;
 
                     // If it is the trick-taking phase:
                 case TRICK_TAKING:
-
-                    // The cards from the player's deck.
+                    // The cards from the player's deck but shuffled to randomize the order.
                     cards = state.getPlayerDeck(playerNum).shuffle().getCards();
 
                     // The card to play.
                     Card playCard = null;
 
+                    // If the lead suit has been determined
                     boolean hasLeadSuit = false;
                     boolean hasTrumpSuit;
+
+                    // If there is a lead trick, sets the hasLeadSuit to true
                     if (state.getLeadTrick() != null) {
                         hasLeadSuit = state.playerHasSuit(playerNum, state.getLeadTrick().getSuit());
                     }
+
+                    // Determines if it has the trump suit.
                     hasTrumpSuit = state.playerHasSuit(playerNum, state.getTrumpSuit());
 
+                    /*
+                     * For loop used to go through each card and determine if it
+                     * is playable based on its suit.
+                     */
                     for (Card card : cards) {
+                        // Checks if it has the suit of the leading trick.
                         if (hasLeadSuit) {
+
+                            // Checks if the card's suit is the same as the leading trick suit.
                             if (card.getSuit() == state.getLeadTrick().getSuit()) {
+
+                                // Sets the card to play to the card of the loop.
                                 playCard = card;
                                 break;
                             }
+                            // Else checks if it has the trump suit.
                         } else if (hasTrumpSuit) {
+
+                            // Checks if the card's suit is the same as the trump suit.
                             if (card.getSuit() == state.getTrumpSuit()) {
+
+                                // Sets the card to play to the card of the loop.
                                 playCard = card;
                                 break;
                             }
+                            // Otherwise, it plays the next random card.
                         } else {
+
+                            // Sets the card to play to the card of the loop.
                             playCard = card;
                             break;
                         }
                     }
 
+                    // Sends the card to be played.
                     game.sendAction(new PinochleActionPlayTrick(this, playCard));
-
                     break;
+
+                    // If it is the scoring phase:
                 case ACKNOWLEDGE_SCORE:
+                    // Acknowledges the player score.
                     game.sendAction(new PinochleActionAcknowledgeScore(this));
+                    break;
             }
 
         }

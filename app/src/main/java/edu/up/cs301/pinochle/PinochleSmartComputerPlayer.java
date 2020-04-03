@@ -48,6 +48,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
             phase = state.getPhase();
 
             deck = state.getPlayerDeck(playerNum);
+            deck.sort();
             theoreticalDeck = findTheoreticalDeck(deck);
             losingCards = findLosingCards(deck);
 
@@ -73,6 +74,8 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
     private Card[] findLosingCards(Deck deck) {
 
         Card[] losingCards = new Card[4];
+        deck.sort();
+
         /*
         ArrayList<Card> cards = deck.getCards();
 
