@@ -1,5 +1,11 @@
 package edu.up.cs301.pinochle;
 
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 import edu.up.cs301.game.GameFramework.GameMainActivity;
@@ -7,6 +13,7 @@ import edu.up.cs301.game.GameFramework.GamePlayer;
 import edu.up.cs301.game.GameFramework.LocalGame;
 import edu.up.cs301.game.GameFramework.gameConfiguration.GameConfig;
 import edu.up.cs301.game.GameFramework.gameConfiguration.GamePlayerType;
+import edu.up.cs301.game.R;
 
 /*
  * Description
@@ -19,6 +26,18 @@ import edu.up.cs301.game.GameFramework.gameConfiguration.GamePlayerType;
  */
 public class PinochleMainActivity extends GameMainActivity {
     public static final int PORT_NUMBER = 8753;
+    public TextView leftPlayerInfoTextView;
+    public TextView leftPlayerNameTextView;
+    public TextView rightPlayerInfoTextView;
+    public TextView rightPlayerNameTextView;
+    public TextView topPlayerInfoTextView;
+    public TextView topPlayerNameTextView;
+    public TextView phaseTextView;
+    public TextView trumpSuitTextView;
+
+
+
+
 
     /** a pinochle game for four players. The default is human vs. computer */
     @Override
@@ -61,5 +80,27 @@ public class PinochleMainActivity extends GameMainActivity {
     @Override
     public LocalGame createLocalGame() {
         return new PinochleLocalGame();
+    }
+
+    /** initialize text views **/
+    public void initializeGui()
+    {
+        leftPlayerInfoTextView = findViewById(R.id.leftPlayerInfo);
+        leftPlayerNameTextView = findViewById(R.id.leftPlayerName);
+        rightPlayerInfoTextView = findViewById(R.id.rightPlayerInfo);
+        rightPlayerNameTextView = findViewById(R.id.rightPlayerName);
+        topPlayerInfoTextView = findViewById(R.id.topPlayerInfo);
+        topPlayerNameTextView = findViewById(R.id.topPlayerName);
+        trumpSuitTextView = findViewById(R.id.trumpSuitTextView);
+        phaseTextView = findViewById(R.id.phaseTextView);
+
+    }
+
+
+    public void showMelds(View v)
+    {
+        PopupMenu meldsMenu = new PopupMenu(this,v);
+        meldsMenu.inflate(R.menu.melds_menu);
+        meldsMenu.show();
     }
 }

@@ -43,7 +43,20 @@ public class PinochleLocalGame extends LocalGame {
         if (gameState == null) {
             return;
         }
-        p.sendInfo(gameState);
+        PinochleGameState copiedGameState = new PinochleGameState(gameState);
+
+        //nullify all cards in other players' hands
+        for (int i = 0; i < 4;i++)
+        {
+            if (i != getPlayerIdx(p))
+            {
+                for (int c = 0; c < copiedGameState.getPlayerDeck(i).getCards().size();c++)
+                {
+                    copiedGameState.getPlayerDeck(i).getCards().set(c,null);
+                }
+            }
+        }
+        p.sendInfo(copiedGameState);
     }
 
     @Override
@@ -219,4 +232,5 @@ public class PinochleLocalGame extends LocalGame {
         }
         return false;
     }
+
 }

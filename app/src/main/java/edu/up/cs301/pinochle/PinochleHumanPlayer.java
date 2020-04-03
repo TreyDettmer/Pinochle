@@ -31,10 +31,13 @@ import edu.up.cs301.game.R;
 public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     private PinochleGameState state;
-    private Activity myActivity;
+    private PinochleMainActivity myActivity;
+
     private AnimationSurface surface;
     private int backgroundColor;
     private int teammatePlayerNum;
+    private int playerToLeftIndex;
+    private int playerToRightIndex;
     static Paint p;
 
     public PinochleHumanPlayer(String name)
@@ -45,23 +48,27 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         p = new Paint();
         p.setColor(Color.RED);
 
-        // I already have a method to find someone's teammate. also 0's teammate is 2 and 1's teammate is 3
-        /*
-        switch (playerNum)
+
+        if (playerNum == 0)
         {
-            case 0:
-                teammatePlayerNum = 1;
-                break;
-            case 1:
-                teammatePlayerNum = 0;
-                break;
-            case 2:
-                teammatePlayerNum = 3;
-                break;
-            case 4:
-                teammatePlayerNum = 2;
-                break;
-        }*/
+            playerToRightIndex = 3;
+            playerToLeftIndex = 1;
+        }
+        else if (playerNum == 1)
+        {
+            playerToRightIndex = 0;
+            playerToLeftIndex = 2;
+        }
+        else if (playerNum == 2)
+        {
+            playerToLeftIndex = 3;
+            playerToRightIndex = 1;
+        }
+        else
+        {
+            playerToLeftIndex = 0;
+            playerToRightIndex = 2;
+        }
 
 
     }
@@ -70,15 +77,38 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     public void receiveInfo(GameInfo info) {
         if (info instanceof PinochleGameState)
         {
+            Log.i("Human","Receivedinfo");
             state = (PinochleGameState) info;
             teammatePlayerNum = state.getTeammate(playerNum);
             int phase = state.getPhase();
+            myActivity.leftPlayerNameTextView.setText(allPlayerNames[playerToLeftIndex]);
+            myActivity.rightPlayerNameTextView.setText(allPlayerNames[playerToRightIndex]);
+            myActivity.topPlayerNameTextView.setText(allPlayerNames[teammatePlayerNum]);
+
             switch (phase) {
                 case 0:
+                    myActivity.phaseTextView.setText("Phase: Deal");
                     game.sendAction(new PinochleActionDealCards(this));
+
                     break;
                 case 1:
+                    myActivity.phaseTextView.setText("Phase: Bid");
                     break;
+                case 2:
+                    myActivity.phaseTextView.setText("Phase: Choose Trump");
+                    break;
+                case 3:
+                    myActivity.phaseTextView.setText("Phase: Card Exchange");
+                    myActivity.trumpSuitTextView.setText(state.getTrumpSuit().getName());
+                    break;
+                case 4:
+                    myActivity.phaseTextView.setText("Phase: Calculate Melds");
+                    break;
+                case 5:
+                    myActivity.phaseTextView.setText("Phase: Go Set?");
+                    break;
+                case 6:
+                    myActivity.phaseTextView.setText("Phase: Trick");
 
             }
 
@@ -93,10 +123,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     public void setAsGui(GameMainActivity activity)
     {
         // remember the activity
-        myActivity = activity;
+        myActivity = (PinochleMainActivity)activity;
 
         // Load the layout resource for the new configuration
         activity.setContentView(R.layout.pinochle_human_player);
+        myActivity.initializeGui();
+
+
+
         Card.initImages(activity);
         // link the animator (this object) to the animation surface
         surface = (AnimationSurface) myActivity
@@ -142,6 +176,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
         //for now all other players' hands are teammates hand
         drawPlayerHands(canvas,teammateHand);
+
         drawHand(canvas,hand);
     }
 
@@ -199,29 +234,30 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
      * @param hand
      * 		the hand
      */
-    private static void drawPlayerHands(Canvas g, Deck hand){
+    private void drawPlayerHands(Canvas g, Deck hand){
         int cardOffset = 40;
 
         if (hand != null)
         {
             RectF initialRect;
 
+
             //left
             initialRect = new RectF(70,190,210,270);
-            for (int i = 0; i < hand.size();i++)
+            for (int i = 0; i < state.getPlayerDeck(playerToLeftIndex).size();i++)
             {
                 drawCard(g, new RectF(initialRect.left, initialRect.top + (cardOffset * (i + 1)), initialRect.right , initialRect.bottom + (cardOffset * (i + 1))), null);
             }
 
             // right
             initialRect = new RectF(1710,190,1850,270);
-            for (int i = 0; i < hand.size();i++)
+            for (int i = 0; i < state.getPlayerDeck(playerToRightIndex).size();i++)
             {
                 drawCard(g, new RectF(initialRect.left, initialRect.top + (cardOffset * (i + 1)), initialRect.right , initialRect.bottom + (cardOffset * (i + 1))), null);
             }
             //top
             initialRect = new RectF(640,30,720,170);
-            for (int i = 0; i < hand.size();i++)
+            for (int i = 0; i < state.getPlayerDeck(state.getTeammate(playerNum)).size();i++)
             {
                 drawCard(g, new RectF(initialRect.left + (cardOffset * (i + 1)), initialRect.top , initialRect.right + (cardOffset * (i + 1)) , initialRect.bottom ), null);
             }

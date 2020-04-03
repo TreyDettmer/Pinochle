@@ -11,4 +11,90 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
 
+    <Button
+        android:id="@+id/meldsMenuButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1000px"
+        android:onClick="showMelds"
+        android:paddingLeft="100px"
+        android:paddingRight="100px"
+        android:text="Melds" />
+
+    <TextView
+        android:id="@+id/phaseTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phase: Deal"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/trumpSuitTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50px"
+        android:textColor="#FFFFFF"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/leftPlayerInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="290px"
+        android:layout_marginTop="530px"
+        android:text="[info]"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/leftPlayerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="250px"
+        android:layout_marginTop="440px"
+        android:text="KaiVickers"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/rightPlayerInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="1490px"
+        android:layout_marginTop="530px"
+        android:text="[info]"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/rightPlayerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="1450px"
+        android:layout_marginTop="440px"
+        android:text="AlexMak"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/topPlayerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="840px"
+        android:layout_marginTop="180px"
+        android:text="JustinLee"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
+    <TextView
+        android:id="@+id/topPlayerInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="880px"
+        android:layout_marginTop="270px"
+        android:text="[info]"
+        android:textColor="#FFFFFF"
+        android:textSize="30sp" />
+
 </RelativeLayout>

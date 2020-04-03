@@ -76,7 +76,6 @@ public class PinochleGameState extends GameState {
         // initialize the main deck
         mainDeck.reset();
         mainDeck.shuffle();
-
     }
 
     // Copy Constructor:
