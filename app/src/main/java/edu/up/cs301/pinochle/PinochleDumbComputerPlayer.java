@@ -38,7 +38,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
         int num;
 
         if (info instanceof PinochleGameState) {
-            //sleep((int)(1));
+            sleep(0.2);
 
             state = (PinochleGameState) info;
             phase = state.getPhase();

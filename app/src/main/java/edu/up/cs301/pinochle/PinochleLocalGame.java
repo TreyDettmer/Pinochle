@@ -59,6 +59,7 @@ public class PinochleLocalGame extends LocalGame {
                 return String.format(winningMessage, teamIdx, gameState.getScoreboard()[teamIdx]);
             } else {
                 int bidWinner = gameState.getTeam(gameState.getWonBid());
+                System.out.println("Bid winner team: " + bidWinner);
                 int teamIdx = 0;
                 for (int i = 0; i < winningCandidates.size(); i++) {
                     if (winningCandidates.get(i) == bidWinner) teamIdx = winningCandidates.get(i);
