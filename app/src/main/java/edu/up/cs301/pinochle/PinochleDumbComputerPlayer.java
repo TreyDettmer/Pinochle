@@ -8,7 +8,6 @@ import edu.up.cs301.card.Suit;
 import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
-import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
 
 /*
  * Description
@@ -23,9 +22,6 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
     private Random rnd = new Random();
     private PinochleGameState state;
-
-    private static final int BID_10 = 10;
-    private static final int BID_20 = 20;
     
     public PinochleDumbComputerPlayer(String name)
     {
@@ -42,7 +38,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
         if (info instanceof PinochleGameState) {
 
-            this.state = (PinochleGameState) info;
+            state = (PinochleGameState) info;
             phase = state.getPhase();
             ArrayList<Card> cards;
 
@@ -50,6 +46,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                 // If it is the dealing phase:
                 case 0:
                     game.sendAction(new PinochleActionDealCards(this));
+
                     break;
                 // If it is the bidding phase:
                 case 1:
@@ -62,35 +59,37 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
                     // If the random number is 0, the player bids 10.
                     if (num == 0) {
-                        // TODO: Need to send BID_10 with the action.
                         game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_10));
 
                         // Else if the random number is 1, the player bids 20.
                     } else if (num == 1) {
-                        // TODO: Need to send BID_20 with the action.
                         game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_20));
 
                         // Otherwise the player passes.
                     } else {
-
                         game.sendAction(new PinochleActionPass(this));
                     }
-
                     break;
 
-                    // If it is the trump suit selection phase
+                    // If it is the trump suit selection phase.
                 case 2:
 
+                    // Generates a random number between 0 and excluding 4.
                     num = rnd.nextInt(4);
 
+                    // If the random number is 0, the trump suit is Club.
                     if (num == 0) {
                         game.sendAction(new PinochleActionChooseTrump(this, Suit.Club));
+
+                        // Else if the random number is 1, the trump suit is Diamond.
                     } else if (num == 1) {
                         game.sendAction(new PinochleActionChooseTrump(this, Suit.Diamond));
 
+                        // Else if the random number is 2, the trump suit is Heart.
                     } else if (num == 2) {
                         game.sendAction(new PinochleActionChooseTrump(this, Suit.Heart));
 
+                        // Otherwise, the trump suit is Spade.
                     } else {
                         game.sendAction(new PinochleActionChooseTrump(this, Suit.Spade));
                     }

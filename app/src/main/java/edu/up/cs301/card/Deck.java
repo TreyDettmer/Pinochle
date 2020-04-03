@@ -101,6 +101,12 @@ public class Deck implements Serializable {
         return this;
     }
 
+    public void sort() {
+        Object[] cardArray = cards.toArray();
+        Arrays.sort(cardArray);
+        cards = new ArrayList<>(Arrays.asList((Card[]) cardArray));
+    }
+
     /**
      * Moves the top card the current deck to the top of another; does nothing if
      * the first deck is empty

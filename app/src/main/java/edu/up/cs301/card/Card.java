@@ -29,7 +29,7 @@ import android.graphics.RectF;
  * @author Kai Vickers
  * @version March 2020
  */
-public class Card implements Serializable {
+public class Card implements Serializable, Comparable<Card> {
 
 	// to satisfy the Serializable interface
 	private static final long serialVersionUID = 893542931190030342L;
@@ -256,5 +256,10 @@ public class Card implements Serializable {
     		}
     	}
     }
+
+    @Override
+	public int compareTo(Card card) {
+		return this.rank.compareTo(card.rank);
+	}
 
 }
