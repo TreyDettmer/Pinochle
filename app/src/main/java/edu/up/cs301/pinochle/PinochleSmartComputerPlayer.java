@@ -41,7 +41,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
         if (info instanceof IllegalMoveInfo) {
             System.out.println("Illegal move");
         }
-        int phase;
+        PinochleGamePhase phase;
 
         if (info instanceof PinochleGameState){
             state = (PinochleGameState) info;
@@ -56,8 +56,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
             switch(phase) {
                 // If it is the dealing phase:
-                case 0:
-                    game.sendAction(new PinochleActionDealCards(this));
+                case BIDDING:
                     break;
 
             }

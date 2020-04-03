@@ -72,12 +72,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         {
             state = (PinochleGameState) info;
             teammatePlayerNum = state.getTeammate(playerNum);
-            int phase = state.getPhase();
+            PinochleGamePhase phase = state.getPhase();
             switch (phase) {
-                case 0:
-                    game.sendAction(new PinochleActionDealCards(this));
-                    break;
-                case 1:
+                case BIDDING:
                     break;
 
             }

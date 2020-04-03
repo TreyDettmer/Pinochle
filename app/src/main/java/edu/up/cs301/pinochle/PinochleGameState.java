@@ -9,6 +9,8 @@ import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
 import edu.up.cs301.card.Meld;
 import edu.up.cs301.card.Suit;
+import edu.up.cs301.game.GameFramework.GameMainActivity;
+import edu.up.cs301.game.GameFramework.LocalGame;
 import edu.up.cs301.game.GameFramework.infoMessage.GameState;
 
 /*
@@ -22,13 +24,12 @@ import edu.up.cs301.game.GameFramework.infoMessage.GameState;
  */
 public class PinochleGameState extends GameState {
     private static final long serialVersionUID = 545884920868735343L;
-    public static final int NUM_PHASES = 8;
+
     public static final int NUM_TEAMS = 2;
     public static final int NUM_PLAYERS = 4;
     public static final int DEAL_CARDS = 12;
 
-    // Phases: 0 - Dealing, 1 - Bidding, 2 - Suit, 3 - Exchanging, 4 - Melding, 5 - Go set. 6 - Trick-taking
-    private int phase;  // Number of the phase the game is on.
+    private PinochleGamePhase phase;  // The phase the game is on.
     private int turn;   // Number of player whose turn it is.
     private int[] scoreboard;   // Array of player scores.
     private int firstBidder;    // Player number of the first bidder.
@@ -51,32 +52,7 @@ public class PinochleGameState extends GameState {
 
     // Constructor:
     public PinochleGameState() {
-        scoreboard = new int[NUM_TEAMS];
-        firstBidder = -1;
-        bids = new int[NUM_PLAYERS];
-        passed = new boolean[NUM_PLAYERS];
-        voteGoSet = new boolean[NUM_PLAYERS];
-        voted = new boolean[NUM_PLAYERS];
-        melds = new ArrayList[NUM_PLAYERS];
-        Arrays.fill(melds, new ArrayList<Meld>());
-        allPlayerDecks = new Deck[NUM_PLAYERS];
-        for (int i = 0; i < allPlayerDecks.length; i++) {
-            allPlayerDecks[i] = new Deck();
-        }
-        mainDeck = new Deck();
-        centerDeck = new Deck();
-        tricksDeck = new Deck[NUM_PLAYERS];
-        for (int i = 0; i < tricksDeck.length; i++) {
-            tricksDeck[i] = new Deck();
-        }
-        lastTrick = -1;
-        trickRound = 0;
-        previousTrickWinner = -1;
-
-        // initialize the main deck
-        mainDeck.reset();
-        mainDeck.shuffle();
-
+        reset();
     }
 
     // Copy Constructor:
@@ -136,7 +112,9 @@ public class PinochleGameState extends GameState {
      * Updates the phase of the game.
      */
     public void nextPhase() {
-        phase = (phase + 1) % NUM_PHASES;
+        PinochleGamePhase[] phases = PinochleGamePhase.values();
+        phase = phases[(phase.ordinal() + 1) % phases.length];
+        System.out.println("New phase: " + phase.name());
     }
 
 
@@ -150,6 +128,7 @@ public class PinochleGameState extends GameState {
      */
     public int nextPlayerTurn() {
         turn = (turn + 1) % NUM_PLAYERS;
+        //System.out.println("New turn: " + turn);
         return turn;
     }
 
@@ -426,13 +405,12 @@ public class PinochleGameState extends GameState {
     }
 
     /**
-     * Resets the Game State.
+     * New round if teams have yet to win the game
      */
-    public void reset() {
-        phase = 0;
-        turn = 0;
-        scoreboard = new int[NUM_TEAMS];
-        firstBidder = 0;
+    public void newRound() {
+        phase = PinochleGamePhase.BIDDING;
+        firstBidder = (firstBidder + 1) % PinochleGameState.NUM_PLAYERS;
+        turn = firstBidder;
         bids = new int[NUM_PLAYERS];
         passed = new boolean[NUM_PLAYERS];
         wonBid = -1;
@@ -440,10 +418,35 @@ public class PinochleGameState extends GameState {
         melds = new ArrayList[NUM_PLAYERS];
         Arrays.fill(melds, new ArrayList<Meld>());
         allPlayerDecks = new Deck[NUM_PLAYERS];
+        for (int i = 0; i < allPlayerDecks.length; i++) {
+            allPlayerDecks[i] = new Deck();
+        }
         mainDeck = new Deck();
+        mainDeck.reset();
+        mainDeck.shuffle();
+        for (int i = 0; i < allPlayerDecks.length; i++) {
+            allPlayerDecks[i].add(dealCards());
+        }
         centerDeck = new Deck();
         tricksDeck = new Deck[NUM_PLAYERS];
+        for (int i = 0; i < tricksDeck.length; i++) {
+            tricksDeck[i] = new Deck();
+        }
+        leadTrick = null;
         lastTrick = -1;
+        trickRound = 0;
+        previousTrickWinner = -1;
+    }
+
+    /**
+     * Resets the Game State.
+     */
+    public void reset() {
+        newRound();
+        firstBidder = 0;
+        turn = firstBidder;
+        scoreboard = new int[NUM_TEAMS];
+
     }
 
     /**
@@ -471,7 +474,7 @@ public class PinochleGameState extends GameState {
      *
      * @return the number of the phase.
      */
-    public int getPhase() {
+    public PinochleGamePhase getPhase() {
         return phase;
     }
 
@@ -680,4 +683,13 @@ public class PinochleGameState extends GameState {
         return previousTrickWinner;
     }
 
+    public int getWinner() {
+        for (int i = 0; i < scoreboard.length; i++) {
+            System.out.println(String.format("Team %s has %s points", i, scoreboard[i]));
+            if (scoreboard[i] >= 1500) {
+                return i;
+            }
+        }
+        return -1;
+    }
 }
