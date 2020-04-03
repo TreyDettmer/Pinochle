@@ -1,6 +1,8 @@
 package edu.up.cs301.pinochle;
 
-public enum PinochleGamePhase {
+import java.io.Serializable;
+
+public enum PinochleGamePhase implements Serializable {
     BIDDING,
     CHOOSE_TRUMP,
     EXCHANGE_CARDS,

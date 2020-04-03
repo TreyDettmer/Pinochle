@@ -32,16 +32,18 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
     protected void receiveInfo(GameInfo info) {
 
         if (info instanceof IllegalMoveInfo) {
-            System.out.println("Illegal move");
+            //System.out.println("Illegal move");
         }
         PinochleGamePhase phase;
         int num;
 
         if (info instanceof PinochleGameState) {
-            sleep((int)(1));
+            //sleep((int)(1));
 
             state = (PinochleGameState) info;
             phase = state.getPhase();
+
+
             ArrayList<Card> cards;
 
             switch(phase){
@@ -142,109 +144,37 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                 case TRICK_TAKING:
 
                     // The cards from the player's deck.
-                    cards = state.getPlayerDeck(playerNum).getCards();
+                    cards = state.getPlayerDeck(playerNum).shuffle().getCards();
 
                     // The card to play.
-                    Card playCard;
+                    Card playCard = null;
 
-                    ArrayList<Card> suitCards = new ArrayList<>();
-                    ArrayList<Card> trumpCards = new ArrayList<>();
-                    ArrayList<Card> backUpCards = new ArrayList<>();
+                    boolean hasLeadSuit = false;
+                    boolean hasTrumpSuit;
+                    if (state.getLeadTrick() != null) {
+                        hasLeadSuit = state.playerHasSuit(playerNum, state.getLeadTrick().getSuit());
+                    }
+                    hasTrumpSuit = state.playerHasSuit(playerNum, state.getTrumpSuit());
 
-                    boolean validCard = false;
-
-                    // While loop used to find a valid card to play.
-                    // TODO: Check if the while loop is necessary and if helper method is needed.
-                    while(!validCard) {
-
-                        /*
-                         * For loop used to go through each card in the player's deck
-                         * and sort them into array lists, depending on if they match the
-                         * suit of the trick, the trump suit, or neither.
-                         *
-                         * If the suit of the trick and trump suit are the same, a card with
-                         * the suit of both gets added to both array lists.
-                         */
-                        for (Card card : cards) {
-                            // TODO: Need to fix the if statements to make them more readable.
-
-                            // Checks if the card is the same suit as the suit of the trick.
-                            if (state.getLeadTrick() != null && card.getSuit().equals(state.getLeadTrick().getSuit())){
-                               suitCards.add(card);
+                    for (Card card : cards) {
+                        if (hasLeadSuit) {
+                            if (card.getSuit() == state.getLeadTrick().getSuit()) {
+                                playCard = card;
+                                break;
                             }
-
-                            // Checks if the card is the same suit as the trump suit.
-                            if (card.getSuit().equals(state.getTrumpSuit())) {
-                                trumpCards.add(card);
+                        } else if (hasTrumpSuit) {
+                            if (card.getSuit() == state.getTrumpSuit()) {
+                                playCard = card;
+                                break;
                             }
-
-                            // Checks if the suit of the card is neither the suit of the trick or the trump suit.
-                            if (state.getLeadTrick() == null && !card.getSuit().equals(state.getTrumpSuit())) {
-                                backUpCards.add(card);
-                            }
-
-                            if (state.getLeadTrick() != null && !card.getSuit().equals(state.getTrumpSuit()) && !card.getSuit().equals(state.getLeadTrick().getSuit())){
-                                backUpCards.add(card);
-                            }
-
-                        }
-
-                        /*
-                         * If there are cards with the same suit as the trick, one is randomly
-                         * selected from the array lis to be played.
-                         */
-                        if (suitCards.size() != 0) {
-                            // Selects a random card.
-                            num = rnd.nextInt(suitCards.size());
-                            playCard = suitCards.get(num);
-
-                            game.sendAction(new PinochleActionPlayTrick(this, playCard));
-
-                            // Removes the card from the array to avoid duplicates.
-                            suitCards.remove(playCard);
-
-                            // If the card is also in the trump suit array, it is removed from there.
-                            if (trumpCards.equals(suitCards)) {
-                                trumpCards.remove(playCard);
-                            }
-
-                            // Ends the loop.
-                            validCard = true;
-
-                            /*
-                             * Else if there are cards with the same suit as the trump suit, one is
-                             * randomly selected from the array list to be played.
-                             */
-                        } else if (trumpCards.size() != 0) {
-                            // Selects a random card.
-                            num = rnd.nextInt(trumpCards.size());
-                            playCard = trumpCards.get(num);
-
-                            game.sendAction(new PinochleActionPlayTrick(this, playCard));
-
-                            // Removes the card from the array to avoid duplicates.
-                            trumpCards.remove(playCard);
-
-                            // Ends the loop.
-                            validCard = true;
-
-                            /*
-                             * Otherwise, a random card is selected to be played.
-                             */
                         } else {
-                            // Selects a random card.
-                            num = rnd.nextInt(backUpCards.size());
-                            playCard = backUpCards.get(num);
-
-                            game.sendAction(new PinochleActionPlayTrick(this, playCard));
-
-                            // Removes the card from the array to avoid duplicates.
-                            backUpCards.remove(playCard);
-
-                            // Ends the loop.
-                            validCard = true;
+                            playCard = card;
+                            break;
                         }
                     }
+
+                    game.sendAction(new PinochleActionPlayTrick(this, playCard));
+
                     break;
                 case ACKNOWLEDGE_SCORE:
                     game.sendAction(new PinochleActionAcknowledgeScore(this));

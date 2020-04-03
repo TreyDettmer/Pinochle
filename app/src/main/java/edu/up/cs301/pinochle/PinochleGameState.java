@@ -32,6 +32,7 @@ public class PinochleGameState extends GameState {
     private PinochleGamePhase phase;  // The phase the game is on.
     private int turn;   // Number of player whose turn it is.
     private int[] scoreboard;   // Array of player scores.
+    private int[] lastTrickRoundPlayed;
     private int firstBidder;    // Player number of the first bidder.
     private int[] bids; // Bids of each player.
     private boolean[] passed;   // Which players have passed.
@@ -62,6 +63,7 @@ public class PinochleGameState extends GameState {
         scoreboard = gameState.getScoreboard();
         firstBidder = gameState.getFirstBidder();
         bids = gameState.getBids();
+        lastTrickRoundPlayed = gameState.getLastTrickRoundPlayed();
         passed = gameState.getPassed();
         voteGoSet = gameState.getVoteGoSet();
         voted = gameState.getVoted();
@@ -415,6 +417,8 @@ public class PinochleGameState extends GameState {
         passed = new boolean[NUM_PLAYERS];
         wonBid = -1;
         trumpSuit = null;
+        voteGoSet = new boolean[NUM_PLAYERS];
+        voted = new boolean[NUM_PLAYERS];
         melds = new ArrayList[NUM_PLAYERS];
         Arrays.fill(melds, new ArrayList<Meld>());
         allPlayerDecks = new Deck[NUM_PLAYERS];
@@ -432,6 +436,8 @@ public class PinochleGameState extends GameState {
         for (int i = 0; i < tricksDeck.length; i++) {
             tricksDeck[i] = new Deck();
         }
+        lastTrickRoundPlayed = new int[NUM_PLAYERS];
+        Arrays.fill(lastTrickRoundPlayed, -1);
         leadTrick = null;
         lastTrick = -1;
         trickRound = 0;
@@ -677,6 +683,23 @@ public class PinochleGameState extends GameState {
 
     public int getTrickWinner() {
         return 0;//TODO
+    }
+
+    public int getLastTrickRoundPlayed(int player) {
+        if (isValidPlayer(player)) {
+            return lastTrickRoundPlayed[player];
+        }
+        return -1;
+    }
+
+    public void setLastTrickRoundPlayed(int player) {
+        if (isValidPlayer(player)) {
+            lastTrickRoundPlayed[player] = trickRound;
+        }
+    }
+
+    public int[] getLastTrickRoundPlayed() {
+        return lastTrickRoundPlayed.clone();
     }
 
     public int getPreviousTrickWinner() {

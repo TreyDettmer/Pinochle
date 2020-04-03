@@ -78,7 +78,7 @@ public class Deck implements Serializable {
      * @return an array list of the cards in the deck.
      */
     public ArrayList<Card> getCards() {
-        return cards;
+        return (ArrayList<Card>) cards.clone();
     }
 
     /**
