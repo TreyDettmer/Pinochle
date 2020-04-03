@@ -227,7 +227,7 @@ public class PinochleLocalGame extends LocalGame {
                 int trickWinner = gameState.getTrickWinner();
                 System.out.println("Trick winner: " + trickWinner);
                 gameState.setPreviousTrickWinner(trickWinner);
-                if (gameState.getTrickRound() == 1) {
+                if (gameState.getTrickRound() == 10) {
                     gameState.setLastTrick(trickWinner);
                     gameState.removeAllCardsFromCenter();
                     gameState.nextPhase();
