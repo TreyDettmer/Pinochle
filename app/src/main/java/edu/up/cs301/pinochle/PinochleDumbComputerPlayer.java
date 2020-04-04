@@ -38,10 +38,14 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
         int num;
 
         if (info instanceof PinochleGameState) {
-            sleep(0.2);
+
 
             state = (PinochleGameState) info;
             phase = state.getPhase();
+            if (state.getTurn() == playerNum)
+            {
+                sleep(2);
+            }
 
 
             ArrayList<Card> cards;

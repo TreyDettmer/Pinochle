@@ -32,6 +32,7 @@ public class PinochleMainActivity extends GameMainActivity {
     public TextView rightPlayerNameTextView;
     public TextView topPlayerInfoTextView;
     public TextView topPlayerNameTextView;
+    public TextView humanPlayerInfoTextView;
     public TextView phaseTextView;
     public TextView trumpSuitTextView;
 
@@ -91,8 +92,10 @@ public class PinochleMainActivity extends GameMainActivity {
         rightPlayerNameTextView = findViewById(R.id.rightPlayerName);
         topPlayerInfoTextView = findViewById(R.id.topPlayerInfo);
         topPlayerNameTextView = findViewById(R.id.topPlayerName);
+        humanPlayerInfoTextView = findViewById(R.id.humanPlayerInfo);
         trumpSuitTextView = findViewById(R.id.trumpSuitTextView);
         phaseTextView = findViewById(R.id.phaseTextView);
+
 
     }
 

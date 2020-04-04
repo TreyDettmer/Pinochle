@@ -76,6 +76,7 @@ public class PinochleGameState extends GameState {
         tricksDeck = gameState.getAllTricksDecks();
         leadTrick = gameState.getLeadTrick();
         lastTrick = gameState.getLastTrick();
+        lastTrick = gameState.getLastTrick();
         trickRound = gameState.getTrickRound();
         previousTrickWinner = gameState.getPreviousTrickWinner();
     }

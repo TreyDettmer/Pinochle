@@ -1,9 +1,12 @@
 package edu.up.cs301.pinochle;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -11,6 +14,7 @@ import android.view.View;
 
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
+import edu.up.cs301.card.Suit;
 import edu.up.cs301.game.GameFramework.GameHumanPlayer;
 import edu.up.cs301.game.GameFramework.GameMainActivity;
 import edu.up.cs301.game.GameFramework.animation.AnimationSurface;
@@ -32,21 +36,27 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     private PinochleGameState state;
     private PinochleMainActivity myActivity;
-
     private AnimationSurface surface;
     private int backgroundColor;
     private int teammatePlayerNum;
     private int playerToLeftIndex;
     private int playerToRightIndex;
-    static Paint p;
+    private static RectF handFirstCardRect;
+    private static RectF biddingButtonRect;
+    private static RectF trumpSuitChoiceRect;
+    private static int handCardOffset;
+    private static Deck myHand;
+    static Paint buttonPaint;
+    static Paint biddingTextPaint;
+    static Paint trumpChoiceTextPaint;
+    static Paint blackPaint;
+    static Bitmap[] suits;
 
     public PinochleHumanPlayer(String name)
     {
         super(name);
-        backgroundColor = Color.rgb(0,230,61);
+        initializeGUI();
 
-        p = new Paint();
-        p.setColor(Color.RED);
 
 
         if (playerNum == 0)
@@ -73,6 +83,28 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     }
 
+    public void initializeGUI()
+    {
+        blackPaint = new Paint();
+        blackPaint.setColor(Color.BLACK);
+        backgroundColor = Color.rgb(1,143,39);
+        buttonPaint = new Paint();
+        biddingTextPaint = new Paint();
+        trumpChoiceTextPaint = new Paint();
+        trumpChoiceTextPaint.setColor(Color.WHITE);
+        trumpChoiceTextPaint.setTextSize(60);
+        buttonPaint.setColor(Color.rgb(97,97,97));
+        biddingTextPaint.setColor(Color.WHITE);
+        biddingTextPaint.setTextSize(50);
+        handFirstCardRect = new RectF(490,770,640,1000);
+        biddingButtonRect = new RectF(660,640,820,750);
+        trumpSuitChoiceRect = new RectF(550,600,700,750);
+        handCardOffset = 60;
+        suits = new Bitmap[4];
+
+    }
+
+
     @Override
     public void receiveInfo(GameInfo info) {
         if (info instanceof PinochleGameState)
@@ -83,17 +115,19 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             myActivity.leftPlayerNameTextView.setText(allPlayerNames[playerToLeftIndex]);
             myActivity.rightPlayerNameTextView.setText(allPlayerNames[playerToRightIndex]);
             myActivity.topPlayerNameTextView.setText(allPlayerNames[teammatePlayerNum]);
+            updateGUI(phase);
 
             switch (phase) {
                 case BIDDING:
                     myActivity.phaseTextView.setText("Phase: Bid");
+
                     break;
                 case CHOOSE_TRUMP:
                     myActivity.phaseTextView.setText("Phase: Choose Trump");
                     break;
                 case EXCHANGE_CARDS:
                     myActivity.phaseTextView.setText("Phase: Card Exchange");
-                    myActivity.trumpSuitTextView.setText(state.getTrumpSuit().getName());
+                    myActivity.trumpSuitTextView.setText("Trump: " + state.getTrumpSuit().getName());
                     break;
                 case MELDING:
                     myActivity.phaseTextView.setText("Phase: Calculate Melds");
@@ -122,7 +156,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         // Load the layout resource for the new configuration
         activity.setContentView(R.layout.pinochle_human_player);
         myActivity.initializeGui();
-
+        initSuitImages();
 
 
         Card.initImages(activity);
@@ -137,6 +171,247 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    /**
+     * updates the GUI
+     *
+     */
+    protected void updateGUI(PinochleGamePhase phase)
+    {
+        if (state != null)
+        {
+            int turn = state.getTurn();
+            if (turn == playerToLeftIndex)
+            {
+                myActivity.leftPlayerInfoTextView.setText("[my turn]");
+            }
+            else if (turn == teammatePlayerNum)
+            {
+                myActivity.topPlayerInfoTextView.setText("[my turn]");
+            }
+            else if (turn == playerToRightIndex)
+            {
+                myActivity.rightPlayerInfoTextView.setText("[my turn]");
+            }
+            else
+            {
+                myActivity.humanPlayerInfoTextView.setText("[your turn]");
+            }
+            if (phase == PinochleGamePhase.BIDDING || phase == PinochleGamePhase.CHOOSE_TRUMP)
+            {
+                if (state.getPassed(playerToRightIndex))
+                {
+                    myActivity.rightPlayerInfoTextView.setText("[passed]");
+                }
+                else
+                {
+                    if (turn != playerToRightIndex)
+                    {
+                        if (state.getBids()[playerToRightIndex] != 0) {
+                            myActivity.rightPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToRightIndex] + "]");
+                        }
+                    }
+                }
+                if (state.getPassed(teammatePlayerNum))
+                {
+                    myActivity.topPlayerInfoTextView.setText("[passed]");
+                }
+                else
+                {
+                    if (turn != teammatePlayerNum)
+                    {
+                        if (state.getBids()[teammatePlayerNum] != 0) {
+                            myActivity.topPlayerInfoTextView.setText("[Bid " + state.getBids()[teammatePlayerNum] + "]");
+                        }
+                    }
+                }
+                if (state.getPassed(playerToLeftIndex))
+                {
+                    myActivity.leftPlayerInfoTextView.setText("[passed]");
+                }
+                else
+                {
+                    if (turn != playerToLeftIndex)
+                    {
+                        if (state.getBids()[playerToLeftIndex] != 0) {
+                            myActivity.leftPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToLeftIndex] + "]");
+                        }
+                    }
+                }
+                if (state.getPassed(playerNum))
+                {
+                    myActivity.humanPlayerInfoTextView.setText("[passed]");
+                }
+                else
+                {
+                    if (turn != playerNum)
+                    {
+                        if (state.getBids()[playerNum] != 0) {
+                            myActivity.humanPlayerInfoTextView.setText("[Bid " + state.getBids()[playerNum] + "]");
+                        }
+                    }
+                }
+
+
+
+            }
+
+        }
+
+    }
+
+    /**
+     * draws bidding GUI
+     *
+     * @param c
+     *          canvas to draw on
+     *
+     **/
+    protected void drawBiddingOptions(Canvas c)
+    {
+
+
+
+
+        if (state.getTurn() == playerNum) {
+            for (int i = 0; i < 3; i++) {
+                RectF rect = new RectF(biddingButtonRect.left + (200 * i), biddingButtonRect.top, biddingButtonRect.right + (200 * i), biddingButtonRect.bottom);
+                c.drawRect(rect, buttonPaint);
+                if (i == 0) {
+                    c.drawText("Bid " + (state.getMaxBid() + 10), 670 + (200 * i), 710, biddingTextPaint);
+                }
+                else if (i == 1)
+                {
+                    c.drawText("Bid " + (state.getMaxBid() + 20), 670 + (200 * i), 710, biddingTextPaint);
+                }
+                else
+                {
+                    c.drawText("Pass", 670 + (200 * i), 710, biddingTextPaint);
+                }
+            }
+        }
+
+
+    }
+
+    /**
+     * draws the card suits
+     *
+     * @param c
+     * 		canvas to draw on
+     */
+    protected void drawTrumpChoice(Canvas c)
+    {
+        if (state.getTurn() == playerNum)
+        {
+            c.drawText("Choose Trump Suit", 650, 530, trumpChoiceTextPaint);
+            for (int i = 0; i < 4; i++) {
+                RectF rect = new RectF(trumpSuitChoiceRect.left + (200 * i), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * i), trumpSuitChoiceRect.bottom);
+                Rect r = new Rect(0,0, suits[i].getWidth(), suits[i].getHeight());
+                c.drawBitmap(suits[i],r,rect,blackPaint);
+            }
+        }
+    }
+
+    /**
+     * checks if a card in the player's hand was touched
+     *
+     * @param x
+     * 		the x coordinate of the touch
+     * @param y
+     * 		the y coordinate of the touch
+     * @return
+     *      the touched card
+     */
+    protected void checkIfTouchedSuit(int x, int y)
+    {
+
+        RectF clubsRect = new RectF(trumpSuitChoiceRect.left + (200 * 0), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * 0), trumpSuitChoiceRect.bottom);
+        if (clubsRect.contains(x,y))
+        {
+            game.sendAction(new PinochleActionChooseTrump(this, Suit.Club));
+        }
+        else if (new RectF(trumpSuitChoiceRect.left + (200 * 1), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * 1), trumpSuitChoiceRect.bottom).contains(x,y))
+        {
+            game.sendAction(new PinochleActionChooseTrump(this, Suit.Diamond));
+        }
+        else if (new RectF(trumpSuitChoiceRect.left + (200 * 2), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * 2), trumpSuitChoiceRect.bottom).contains(x,y))
+        {
+            game.sendAction(new PinochleActionChooseTrump(this, Suit.Heart));
+        }
+        else if (new RectF(trumpSuitChoiceRect.left + (200 * 3), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * 3), trumpSuitChoiceRect.bottom).contains(x,y))
+        {
+            game.sendAction(new PinochleActionChooseTrump(this, Suit.Spade));
+        }
+
+    }
+
+
+    /**
+     * checks if a card in the player's hand was touched
+     *
+     * @param x
+     * 		the x coordinate of the touch
+     * @param y
+     * 		the y coordinate of the touch
+     * @return
+     *      the touched card
+     */
+    protected Card checkIfTouchedCard(int x, int y)
+    {
+        if (myHand != null)
+        {
+            for (int i = myHand.size() - 1; i >= 0; i--)
+            {
+                RectF cardRect = new RectF(handFirstCardRect.left + (handCardOffset * (i + 1)), handFirstCardRect.top, handFirstCardRect.right + (handCardOffset * (i + 1)), handFirstCardRect.bottom);
+                if (cardRect.contains(x,y))
+                {
+                    return myHand.getCards().get(i);
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * checks if a bid button was touched
+     *
+     * @param x
+     * 		the x coordinate of the touch
+     * @param y
+     * 		the y coordinate of the touch
+     **/
+    protected void checkIfBidButtonTouched(int x, int y)
+    {
+        if (state != null)
+        {
+            if (state.getPhase() == PinochleGamePhase.BIDDING)
+            {
+                if (state.getTurn() == playerNum)
+                {
+                    if (biddingButtonRect.contains(x,y))
+                    {
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_10));
+                    }
+                    else if (new RectF(biddingButtonRect.left + (200), biddingButtonRect.top, biddingButtonRect.right + (200), biddingButtonRect.bottom).contains(x,y))
+                    {
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_20));
+                    }
+                    else if (new RectF(biddingButtonRect.left + (200 * 2), biddingButtonRect.top, biddingButtonRect.right + (200 * 2), biddingButtonRect.bottom).contains(x,y))
+                    {
+                        game.sendAction(new PinochleActionPass(this));
+                    }
+                }
+            }
+        }
+    }
+
+    protected void initSuitImages()
+    {
+        suits[0] = BitmapFactory.decodeResource(myActivity.getResources(), R.drawable.suit_c);
+        suits[1] = BitmapFactory.decodeResource(myActivity.getResources(), R.drawable.suit_d);
+        suits[2] = BitmapFactory.decodeResource(myActivity.getResources(), R.drawable.suit_h);
+        suits[3] = BitmapFactory.decodeResource(myActivity.getResources(), R.drawable.suit_s);
+    }
     @Override
     public View getTopView() {
         return null;
@@ -165,12 +440,25 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         {
             return;
         }
-        Deck hand = state.getPlayerDeck(playerNum);
+        canvas.drawColor(backgroundColor);
+        myHand = state.getPlayerDeck(playerNum);
 
         Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
         //for now all other players' hands are teammates hand
         drawPlayerHands(canvas,teammateHand);
-        drawHand(canvas,hand);
+        drawHand(canvas,myHand);
+        switch (state.getPhase())
+        {
+            case BIDDING:
+                drawBiddingOptions(canvas);
+                break;
+            case CHOOSE_TRUMP:
+                drawTrumpChoice(canvas);
+                break;
+
+        }
+
+
     }
 
     @Override
@@ -195,7 +483,32 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     @Override
     public void onTouch(MotionEvent event) {
+        // ignore everything except down-touch events
+        if (event.getAction() != MotionEvent.ACTION_DOWN) return;
 
+        // get the location of the touch on the surface
+        int x = (int) event.getX();
+        int y = (int) event.getY();
+        if (state != null)
+        {
+            if (state.getPhase() == PinochleGamePhase.EXCHANGE_CARDS)
+            {
+                Card touchedCard = checkIfTouchedCard(x, y);
+                if (touchedCard != null) {
+                    Log.i("human player", "touched " + (touchedCard.toString()));
+                }
+            }
+            else if (state.getPhase() == PinochleGamePhase.BIDDING) {
+                checkIfBidButtonTouched(x, y);
+            }
+            else if (state.getPhase() == PinochleGamePhase.CHOOSE_TRUMP)
+            {
+                if (state.getTurn() == playerNum)
+                {
+                    checkIfTouchedSuit(x,y);
+                }
+            }
+        }
     }
 
     /**
@@ -207,13 +520,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
      * 		the hand
      */
     private static void drawHand(Canvas g, Deck hand){
-        int cardOffset = 60;
 
-        RectF initalRect = new RectF(490,770,640,1000);
         if (hand != null) {
 
             for (int i = 0; i < hand.size();i++){//hand.size(); i++) {
-                drawCard(g, new RectF(initalRect.left + (cardOffset * (i + 1)), initalRect.top, initalRect.right + (cardOffset * (i + 1)), initalRect.bottom), hand.getCards().get(i));
+                drawCard(g, new RectF(handFirstCardRect.left + (handCardOffset * (i + 1)), handFirstCardRect.top, handFirstCardRect.right + (handCardOffset * (i + 1)), handFirstCardRect.bottom), hand.getCards().get(i));
             }
         }
 
@@ -294,6 +605,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             c.drawOn(g, rect);
         }
     }
+
+
 
     /**
      * scales a rectangle, moving all edges with respect to its center

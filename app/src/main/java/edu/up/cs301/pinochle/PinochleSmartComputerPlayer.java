@@ -58,7 +58,10 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
             theoreticalDeck = findTheoreticalDeck(deck);
             losingCards = findLosingCards(deck);
 
-
+            if (state.getTurn() == playerNum)
+            {
+                sleep(2);
+            }
             switch (phase) {
                 // If it is the dealing phase:
                 case BIDDING:
