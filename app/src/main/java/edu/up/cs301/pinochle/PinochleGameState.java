@@ -301,7 +301,13 @@ public class PinochleGameState extends GameState {
      */
     public void setPlayerMelds(int player, ArrayList<Meld> melds) {
         if (isValidPlayer(player)) {
-            this.melds[player] = (ArrayList<Meld>) melds.clone();
+            if (melds != null) {
+                this.melds[player] = (ArrayList<Meld>) melds.clone();
+            }
+            else
+            {
+                this.melds[player] = null;
+            }
         }
     }
 

@@ -44,7 +44,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
             phase = state.getPhase();
             if (state.getTurn() == playerNum)
             {
-                sleep(2);
+                sleep(1);
             }
 
 

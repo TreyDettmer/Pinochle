@@ -88,6 +88,7 @@ public class PinochleLocalGame extends LocalGame {
             if (i != getPlayerIdx(p))
             {
                 copiedGameState.getPlayerDeck(i).nullifyDeck();
+                copiedGameState.setPlayerMelds(i,null);
             }
         }
         p.sendInfo(copiedGameState);

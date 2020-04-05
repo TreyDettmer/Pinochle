@@ -35,6 +35,7 @@ public class PinochleMainActivity extends GameMainActivity {
     public TextView humanPlayerInfoTextView;
     public TextView phaseTextView;
     public TextView trumpSuitTextView;
+    public ArrayList<String> melds;
 
 
 
@@ -95,6 +96,8 @@ public class PinochleMainActivity extends GameMainActivity {
         humanPlayerInfoTextView = findViewById(R.id.humanPlayerInfo);
         trumpSuitTextView = findViewById(R.id.trumpSuitTextView);
         phaseTextView = findViewById(R.id.phaseTextView);
+        melds = new ArrayList<>();
+
 
 
     }
@@ -104,6 +107,12 @@ public class PinochleMainActivity extends GameMainActivity {
     {
         PopupMenu meldsMenu = new PopupMenu(this,v);
         meldsMenu.inflate(R.menu.melds_menu);
+        meldsMenu.getMenu().clear();
+        for (String meld : melds)
+        {
+            meldsMenu.getMenu().add(meld);
+        }
         meldsMenu.show();
     }
+
 }
