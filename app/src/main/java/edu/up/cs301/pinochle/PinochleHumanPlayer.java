@@ -24,6 +24,8 @@ import edu.up.cs301.game.GameFramework.GameMainActivity;
 import edu.up.cs301.game.GameFramework.animation.AnimationSurface;
 import edu.up.cs301.game.GameFramework.animation.Animator;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
+import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
+import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
 import edu.up.cs301.game.R;
 
 /*
@@ -51,6 +53,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private static RectF exchangeButtonRect;
     private static RectF voteYesButtonRect;
     private static RectF voteNoButtonRect;
+    private static RectF centerDeckRect;
     private static int handCardOffset;
     private static Deck myHand;
     private static ArrayList<Meld> melds;
@@ -121,6 +124,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         exchangeButtonRect = new RectF(1100,600,1300,700);
         voteYesButtonRect = new RectF(1000,600,1150,700);
         voteNoButtonRect = new RectF(1180,600,1330,700);
+        centerDeckRect = new RectF(800,400,950,630);
 
         handCardOffset = 60;
         suits = new Bitmap[4];
@@ -158,6 +162,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case VOTE_GO_SET:
                     melds = Meld.checkMelds(myHand, state.getTrumpSuit());
+                    if (state.getWonBid() != playerNum && state.getWonBid() != teammatePlayerNum)
+                    {
+                        game.sendAction(new PinochleActionVoteGoSet(this,false));
+                    }
                     myActivity.phaseTextView.setText("Phase: Go Set?");
                     break;
                 case TRICK_TAKING:
@@ -166,10 +174,16 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
 
         }
-        else
+        else if (info instanceof IllegalMoveInfo || info instanceof NotYourTurnInfo)
         {
-            return;
+
+            if (surface != null)
+            {
+                surface.flash(Color.RED,50); //why doesn't this work????
+            }
+
         }
+
     }
 
     @Override
@@ -286,6 +300,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 myActivity.rightPlayerInfoTextView.setText("[info]");
                 myActivity.humanPlayerInfoTextView.setText("[info]");
             }
+            else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING)
+            {
+                if (state.getTurn() != playerToLeftIndex) {myActivity.leftPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != playerToRightIndex) {myActivity.rightPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != teammatePlayerNum) {myActivity.topPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != playerNum) {myActivity.humanPlayerInfoTextView.setText("[info]");}
+
+            }
 
         }
 
@@ -319,6 +341,21 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+
+    protected void drawTrickTakingPrompt(Canvas c)
+    {
+        int offset = 50;
+        for (int i = 0; i < state.getCenterDeck().size();i++)
+        {
+            RectF cardRect = new RectF(centerDeckRect.left + (offset * i),centerDeckRect.top,centerDeckRect.right + (offset * i),centerDeckRect.bottom);
+            drawCard(c,cardRect,state.getCenterDeck().getCards().get(i));
+        }
+        if (state.getTurn() == playerNum)
+        {
+            c.drawText("Choose a card to play.", 660, 680, biddingTextPaint);
+        }
+    }
+
     /**
      * draws the vote to go set prompt
      *
@@ -329,19 +366,20 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
 
 
-        if (state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum)
-        {
+        if ((state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum) && state.getTurn() == playerNum) {
             int meldPoints = Meld.totalPoints(melds);
             int maxBid = state.getMaxBid();
-            c.drawText("Your team bid " + maxBid + " points.",560,470,biddingTextPaint);
-            c.drawText("Your team scored " + 100 + " points.",560,540,biddingTextPaint);
-            c.drawText("Do you want to go set?",460,670,biddingTextPaint);
-            c.drawRect(voteYesButtonRect,buttonPaint);
-            c.drawRect(voteNoButtonRect,buttonPaint);
-            c.drawText("Yes",1030,670,biddingTextPaint);
-            c.drawText("No",1225,670,biddingTextPaint);
+            c.drawText("Your team bid " + maxBid + " points.", 560, 470, biddingTextPaint);
+            c.drawText("Your team scored " + 100 + " points.", 560, 540, biddingTextPaint);
+            c.drawText("Do you want to go set?", 460, 670, biddingTextPaint);
+            c.drawRect(voteYesButtonRect, buttonPaint);
+            c.drawRect(voteNoButtonRect, buttonPaint);
+            c.drawText("Yes", 1030, 670, biddingTextPaint);
+            c.drawText("No", 1225, 670, biddingTextPaint);
 
         }
+
+
 
     }
 
@@ -443,21 +481,39 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     Card chosenCard = myHand.getCards().get(i);
                     if (state.getPhase() == PinochleGamePhase.EXCHANGE_CARDS)
                     {
-                        if (!exchangeCards.contains(chosenCard))
+
+                        int xPoint = (int)cardRect.left + 20;
+                        int yPoint = (int)cardRect.top - 20;
+                        boolean validCard = true;
+                        for (Path p : highlightMarkers)
                         {
-                            exchangeCards.add(chosenCard);
-                            if (exchangeCards.size() > 4)
+                            RectF bounds = new RectF();
+                            p.computeBounds(bounds,false);
+                            if (bounds.contains(xPoint,yPoint))
                             {
-                                exchangeCards.remove(0);
-                                highlightMarkers.remove(0);
+                                validCard = false;
+                                break;
                             }
+                        }
+                        if (validCard) {
+
                             Path highlightMarker = new Path();
                             highlightMarker.moveTo(cardRect.left + 10,cardRect.top - 30);
                             highlightMarker.rLineTo(20,20);
                             highlightMarker.rLineTo(20,-20);
                             highlightMarkers.add(highlightMarker);
+                            exchangeCards.add(chosenCard);
+                            if (exchangeCards.size() > 4) {
+                                exchangeCards.remove(0);
+                                highlightMarkers.remove(0);
+                            }
                         }
 
+
+                    }
+                    else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING)
+                    {
+                        game.sendAction(new PinochleActionPlayTrick(this,chosenCard));
                     }
                     return chosenCard;
 
@@ -587,6 +643,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             case VOTE_GO_SET:
                 drawVoteGoSetPrompt(canvas);
                 break;
+            case TRICK_TAKING:
+                drawTrickTakingPrompt(canvas);
+                break;
 
         }
 
@@ -637,6 +696,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case VOTE_GO_SET:
                     checkIfTouchedVoteButton(x,y);
+                    break;
+                case TRICK_TAKING:
+                    Card touchedCard1 = checkIfTouchedCard(x,y);
+                    break;
             }
         }
     }
