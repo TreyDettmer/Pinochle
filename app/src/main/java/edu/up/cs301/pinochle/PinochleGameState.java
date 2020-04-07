@@ -37,7 +37,6 @@ public class PinochleGameState extends GameState {
     private int[] bids; // Bids of each player.
     private boolean[] passed;   // Which players have passed.
     private boolean[] voteGoSet;
-    private boolean[] voted;
     private int wonBid; // Number of player who won the bid.
     private Suit trumpSuit; // Trump suit.
     private ArrayList<Meld>[] melds;    // Melds of each player.
@@ -66,7 +65,6 @@ public class PinochleGameState extends GameState {
         lastTrickRoundPlayed = gameState.getLastTrickRoundPlayed();
         passed = gameState.getPassed();
         voteGoSet = gameState.getVoteGoSet();
-        voted = gameState.getVoted();
         wonBid = gameState.getWonBid();
         trumpSuit = gameState.getTrumpSuit();
         melds = gameState.getMelds();
@@ -117,6 +115,11 @@ public class PinochleGameState extends GameState {
     public void nextPhase() {
         PinochleGamePhase[] phases = PinochleGamePhase.values();
         phase = phases[(phase.ordinal() + 1) % phases.length];
+        System.out.println("New phase: " + phase.name());
+    }
+
+    public void setPhase(PinochleGamePhase phase) {
+        this.phase = phase;
         System.out.println("New phase: " + phase.name());
     }
 
@@ -264,12 +267,6 @@ public class PinochleGameState extends GameState {
     public void setVoteGoSet(int player) {
         if (isValidPlayer(player)) {
             voteGoSet[player] = true;
-        }
-    }
-
-    public void setVoted(int player) {
-        if (isValidPlayer(player)) {
-            voted[player] = true;
         }
     }
 
@@ -425,7 +422,6 @@ public class PinochleGameState extends GameState {
         wonBid = -1;
         trumpSuit = null;
         voteGoSet = new boolean[NUM_PLAYERS];
-        voted = new boolean[NUM_PLAYERS];
         melds = new ArrayList[NUM_PLAYERS];
         Arrays.fill(melds, new ArrayList<Meld>());
         allPlayerDecks = new Deck[NUM_PLAYERS];
@@ -469,8 +465,7 @@ public class PinochleGameState extends GameState {
      * @return the number of the team.
      */
     public int getTeam(int player) {
-        if (player <= 1) return 0;
-        else return 1;
+        return player % NUM_TEAMS;
     }
 
     /**
@@ -504,8 +499,13 @@ public class PinochleGameState extends GameState {
         int bidWinner = getWonBid();
         int getMaxBid = getMaxBid();
         int bidWinnerTeam = getTeam(bidWinner);
-        if (team != bidWinnerTeam) return false;
+        if (team != bidWinnerTeam) {
+            return false;
+        }
+
         int totalPoints = getScoreboard()[bidWinnerTeam];
+        totalPoints = 0;
+        System.out.println("Team " + team + " bid difference: " + (getMaxBid - totalPoints));
         if ((getMaxBid - totalPoints) > 250) return true;
         return false;
     }
@@ -549,20 +549,13 @@ public class PinochleGameState extends GameState {
         return voteGoSet.clone();
     }
 
-    public boolean[] getVoted() {
-        return voted.clone();
-    }
-
-    public boolean getVoted(int player) {
-        return voted[player];
-    }
-
-    public boolean allHasVoted() {
-        for (boolean hasVoted : voted) {
-            if (!hasVoted) return false;
+    public boolean getVoteGoSet(int player) {
+        if (isValidPlayer(player)) {
+            return voteGoSet[player];
         }
-        return true;
+        return false;
     }
+
 
     /**
      * Returns if the player has passed.
@@ -689,7 +682,20 @@ public class PinochleGameState extends GameState {
     }
 
     public int getTrickWinner() {
-        return 0;//TODO
+        Card winningCard = centerDeck.getCards().get(0);
+        for (Card card : centerDeck.getCards()) {
+            if (card.getRank().ordinal() > winningCard.getRank().ordinal()) winningCard = card;
+            if (card.getRank().equals(winningCard.getRank())) {
+                if (!card.getSuit().equals(winningCard.getSuit())) {
+                    if (card.getSuit().equals(trumpSuit)) {
+                        winningCard = card;
+                    } else if (card.getSuit().equals(leadTrick.getSuit()) && !winningCard.getSuit().equals(trumpSuit)) {
+                        winningCard = card;
+                    }
+                }
+            }
+        }
+        return winningCard.getPlayer();
     }
 
     public int getLastTrickRoundPlayed(int player) {
@@ -721,5 +727,10 @@ public class PinochleGameState extends GameState {
             }
         }
         return -1;
+    }
+
+    public void calculateFinalScore() {
+        //tally up trick points
+        //add to score if ..
     }
 }

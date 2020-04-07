@@ -109,10 +109,10 @@ public class PinochleLocalGame extends LocalGame {
             if (phase != PinochleGamePhase.BIDDING) return false;
             if (gameState.getPassed(playerIdx)) return false;
             System.out.println(String.format("Player %d, Teamate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), action.toString()));
-
             PinochleActionBid actionBid = (PinochleActionBid) action;
             int bid = actionBid.getBid();
             if (bid != 10 && bid != 20) return false;
+            if (gameState.getMaxBid() == 0) gameState.addBid(playerIdx, 250);
             gameState.addBid(playerIdx, bid);
             int nextPlayer;
             do {
@@ -131,7 +131,11 @@ public class PinochleLocalGame extends LocalGame {
             System.out.println("Player " + playerIdx + " has " + meldPoints + " meld points.");
             gameState.nextPlayerTurn();
             if (gameState.isLastPlayer(playerIdx)) {
-                gameState.nextPhase();
+                if (gameState.canGoSet(gameState.getTeam(gameState.getWonBid()))) {
+                    gameState.nextPhase();
+                } else {
+                    gameState.setPhase(PinochleGamePhase.TRICK_TAKING);
+                }
             }
             return true;
         } else if (action instanceof PinochleActionChooseTrump) {
@@ -168,21 +172,34 @@ public class PinochleLocalGame extends LocalGame {
             return true;
         } else if (action instanceof PinochleActionVoteGoSet) {
             if (phase != PinochleGamePhase.VOTE_GO_SET) return false;
-            System.out.println(String.format("Player %d, Teamate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), action.toString()));
+            System.out.println(String.format("Player %d, Teammate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), ((PinochleActionVoteGoSet) action).getVote()));
 
             PinochleActionVoteGoSet actionVoteGoSet = (PinochleActionVoteGoSet) action;
+            int bidWinner = gameState.getWonBid();
+            int bidWinnerTeammate = gameState.getTeammate(bidWinner);
+            int bidWinnerTeam = gameState.getTeam(bidWinner);
+
             boolean returnValue;
-            if (gameState.canGoSet(teamIdx)) {
+            if (teamIdx == bidWinnerTeam) {
                 if (actionVoteGoSet.getVote()) {
                     gameState.setVoteGoSet(playerIdx);
                 }
                 returnValue = true;
             } else returnValue = !actionVoteGoSet.getVote();
             if (gameState.isLastPlayer(playerIdx)) {
-                gameState.setPlayerTurn(gameState.getWonBid());
-                gameState.setPreviousTrickWinner(gameState.getWonBid());
-                System.out.println("Previous Trick Winner: " + gameState.getPreviousTrickWinner());
-                gameState.nextPhase();
+                boolean vote0 = gameState.getVoteGoSet(bidWinner);
+                boolean vote1 = gameState.getVoteGoSet(bidWinnerTeammate);
+                if (vote0 && vote1) {
+                    System.out.println("Team " + bidWinnerTeam + ": Going set...");
+                    gameState.setPhase(PinochleGamePhase.ACKNOWLEDGE_SCORE);
+                } else {
+                    gameState.setPlayerTurn(gameState.getWonBid());
+                    gameState.setPreviousTrickWinner(gameState.getWonBid());
+                    System.out.println("Previous Trick Winner: " + gameState.getPreviousTrickWinner());
+                    gameState.nextPhase();
+                }
+
+
             } else gameState.nextPlayerTurn();
             return returnValue;
         } else if (action instanceof PinochleActionPass) {
@@ -258,6 +275,7 @@ public class PinochleLocalGame extends LocalGame {
                 if (gameState.getTrickRound() == 11) {
                     gameState.setLastTrick(trickWinner);
                     gameState.removeAllCardsFromCenter();
+                    gameState.calculateFinalScore();
                     gameState.nextPhase();
                     gameState.setPlayerTurn(0);
                 } else {
