@@ -1,5 +1,7 @@
 package edu.up.cs301.pinochle;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -146,6 +148,16 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
                 // If it is the trick-taking phase:
                 case TRICK_TAKING:
+                    if (state.getTurn() == playerNum) {
+
+                        if (state.getCenterDeck().getCards().size() == 4)
+                        {
+                            sleep(1);
+                            game.sendAction(new PinochleActionPlayTrick(this,null));
+                            break;
+                        }
+                    }
+
                     // The cards from the player's deck but shuffled to randomize the order.
                     cards = state.getPlayerDeck(playerNum).shuffle().getCards();
 

@@ -27,6 +27,7 @@ import edu.up.cs301.game.GameFramework.animation.Animator;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
+import edu.up.cs301.game.GameFramework.utilities.Logger;
 import edu.up.cs301.game.R;
 
 /*
@@ -211,6 +212,13 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case TRICK_TAKING:
                     myActivity.phaseTextView.setText("Phase: Trick-taking");
+                    if (state.getTurn() == playerNum) {
+                        if (state.getCenterDeck().getCards().size() == 4) {
+                            sleep(1);
+                            game.sendAction(new PinochleActionPlayTrick(this, null));
+                            break;
+                        }
+                    }
                     acknowledgePressed = false;
                     break;
                 case ACKNOWLEDGE_SCORE:
@@ -1035,6 +1043,28 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     private void showSnackbar(String message) {
         Snackbar.make(myActivity.findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).show();
+    }
+
+    /**
+     * Sleeps for a particular amount of time. Utility method.
+     *
+     * @param seconds
+     * 			the number of seconds to sleep for
+     */
+    protected void sleep(double seconds) {
+        long milliseconds;
+
+        //Since Thread.sleep takes in milliseconds, convert from seconds to milliseconds
+        milliseconds = (long)(seconds * 1000);
+
+        try {
+
+            Thread.sleep(milliseconds);
+
+        }
+        catch (InterruptedException e) {
+
+        }
     }
 
 }

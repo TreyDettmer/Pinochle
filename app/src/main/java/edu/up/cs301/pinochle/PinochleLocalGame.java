@@ -237,6 +237,29 @@ public class PinochleLocalGame extends LocalGame {
             PinochleActionPlayTrick actionPlayTrick = (PinochleActionPlayTrick) action;
             Card trick = actionPlayTrick.getTrick();
 
+            if (trick == null)
+            {
+                if (gameState.getCenterDeck().size() == 4)
+                {
+                    int trickWinner = gameState.getTrickWinner();
+                    System.out.println("Trick winner: " + trickWinner);
+                    gameState.setPreviousTrickWinner(trickWinner);
+                    if (gameState.getTrickRound() == 11) {
+                        gameState.setLastTrick(trickWinner);
+                        gameState.removeAllCardsFromCenter();
+                        gameState.calculateFinalScore();
+                        gameState.nextPhase();
+                        gameState.setPlayerTurn(0);
+                    } else {
+                        gameState.addTrickToPlayer(playerIdx);
+                        gameState.removeAllCardsFromCenter();
+                        gameState.nextTrickRound();
+                        gameState.setPlayerTurn(trickWinner);
+                    }
+                }
+                return true;
+            }
+
             if (gameState.getPreviousTrickWinner() == playerIdx) {
                 gameState.setLeadTrick(trick);
             }
@@ -269,8 +292,8 @@ public class PinochleLocalGame extends LocalGame {
             System.out.println("Trump: " + gameState.getTrumpSuit());
             System.out.println("Trick is valid");
             System.out.println("Player " + playerIdx + ": Deck size: " + gameState.getPlayerDeck(playerIdx).size());
-
-
+            gameState.nextPlayerTurn();
+            /*
             if (playerIdx == (gameState.getPreviousTrickWinner() - 1 + players.length) % players.length) {
                 int trickWinner = gameState.getTrickWinner();
                 System.out.println("Trick winner: " + trickWinner);
@@ -291,6 +314,8 @@ public class PinochleLocalGame extends LocalGame {
                 gameState.nextPlayerTurn();
 
             }
+            */
+
             return true;
         } else if (action instanceof PinochleActionAcknowledgeScore) {
             if (phase != PinochleGamePhase.ACKNOWLEDGE_SCORE) return false;
