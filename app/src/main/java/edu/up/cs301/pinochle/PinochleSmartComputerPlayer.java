@@ -1,6 +1,7 @@
 package edu.up.cs301.pinochle;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
@@ -33,6 +34,9 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
     private PinochleGameState state;
     private boolean hasFoundTheoretical = false;
 
+    // Temporary:
+    private Random rnd = new Random();
+
     /**
      * Constructor:
      *
@@ -49,6 +53,10 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
         }
         PinochleGamePhase phase;
 
+        // TODO: Temporary:
+        int num;
+        ArrayList<Card> cards;
+
         if (info instanceof PinochleGameState) {
             state = (PinochleGameState) info;
             phase = state.getPhase();
@@ -56,7 +64,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
             deck = state.getPlayerDeck(playerNum);
             deck.sort();
             theoreticalDeck = findTheoreticalDeck(deck);
-            losingCards = findLosingCards(deck);
+            //losingCards = findLosingCards(deck);
 
             if (state.getTurn() == playerNum)
             {
@@ -65,9 +73,52 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
             switch (phase) {
                 // If it is the dealing phase:
                 case BIDDING:
+                    // TODO: Temporary:
+
+                    /*
+                     * A random number is generated to determine whether the player
+                     * bids 10, 20, or passes.
+                     */
+                    num = rnd.nextInt(3);
+
+                    // If the random number is 0, the player bids 10.
+                    if (num == 0) {
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_10));
+
+                        // Else if the random number is 1, the player bids 20.
+                    } else if (num == 1) {
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_20));
+
+                        // Otherwise the player passes.
+                    } else {
+                        game.sendAction(new PinochleActionPass(this));
+                    }
                     break;
 
                 case CHOOSE_TRUMP:
+                    // TODO: Temporary:
+                    losingCards = findLosingCards(deck);
+
+                    // Generates a random number between 0 and excluding 4.
+                    num = rnd.nextInt(4);
+
+                    // If the random number is 0, the trump suit is Club.
+                    if (num == 0) {
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Club));
+
+                        // Else if the random number is 1, the trump suit is Diamond.
+                    } else if (num == 1) {
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Diamond));
+
+                        // Else if the random number is 2, the trump suit is Heart.
+                    } else if (num == 2) {
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Heart));
+
+                        // Otherwise, the trump suit is Spade.
+                    } else {
+                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Spade));
+                    }
+
                     break;
 
                 // If it is the exchanging phase:
@@ -79,7 +130,11 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                         // Else the player exchanges the highest cards in its deck.
                     } else {
                         // The cards of the player's deck.
-                        ArrayList<Card> cards = deck.getCards();
+                        cards = deck.getCards();
+
+                        for (int i = 0; i < 4; i++ ) {
+                            cards.remove(losingCards[i]);
+                        }
 
                         // Card array for the highest ranking cards.
                         Card[] winningCards = new Card[4];
@@ -88,8 +143,8 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                          * For loop used to go through the last 4 cards of the
                          * player's deck and adds them to the winning card array.
                          */
-                        for (int i = deck.size() - 1; i >= 8; i--) {
-                            winningCards[i] = cards.get(i);
+                        for (int i = 0; i < 4; i++) {
+                            winningCards[i] = cards.get(cards.size() - 1 - i);
                         }
 
                         // Exchanges the winning cards.
@@ -103,7 +158,80 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                     game.sendAction(new PinochleActionCalculateMelds(this));
                     break;
 
+                // If it is the go set phase:
+                case VOTE_GO_SET:
+                    // TODO: Temporary:
+
+                    // Generates either 1 or 0 (50% chance to vote to go set)
+                    num = rnd.nextInt(2);
+
+                    // If the random number is 0, the player votes to go set.
+                    if (num == 0 && state.canGoSet(state.getTeam(playerNum))) {
+                        game.sendAction(new PinochleActionVoteGoSet(this, true));
+                    } else {
+                        // Otherwise, it doesn't.
+                        game.sendAction(new PinochleActionVoteGoSet(this, false));
+                    }
+                    break;
+
+
                 case TRICK_TAKING:
+                    // TODO: Temporary:
+
+                    // The cards from the player's deck but shuffled to randomize the order.
+                    cards = state.getPlayerDeck(playerNum).shuffle().getCards();
+
+                    // The card to play.
+                    Card playCard = null;
+
+                    // If the lead suit has been determined
+                    boolean hasLeadSuit = false;
+                    boolean hasTrumpSuit;
+
+                    // If there is a lead trick, sets the hasLeadSuit to true
+                    if (state.getLeadTrick() != null) {
+                        hasLeadSuit = state.playerHasSuit(playerNum, state.getLeadTrick().getSuit());
+                    }
+
+                    // Determines if it has the trump suit.
+                    hasTrumpSuit = state.playerHasSuit(playerNum, state.getTrumpSuit());
+
+                    /*
+                     * For loop used to go through each card and determine if it
+                     * is playable based on its suit.
+                     */
+                    for (Card card : cards) {
+                        // Checks if it has the suit of the leading trick.
+                        if (hasLeadSuit) {
+
+                            // Checks if the card's suit is the same as the leading trick suit.
+                            if (card.getSuit() == state.getLeadTrick().getSuit()) {
+
+                                // Sets the card to play to the card of the loop.
+                                playCard = card;
+                                break;
+                            }
+                            // Else checks if it has the trump suit.
+                        } else if (hasTrumpSuit) {
+
+                            // Checks if the card's suit is the same as the trump suit.
+                            if (card.getSuit() == state.getTrumpSuit()) {
+
+                                // Sets the card to play to the card of the loop.
+                                playCard = card;
+                                break;
+                            }
+                            // Otherwise, it plays the next random card.
+                        } else {
+
+                            // Sets the card to play to the card of the loop.
+                            playCard = card;
+                            break;
+                        }
+                    }
+
+                    // Sends the card to be played.
+                    game.sendAction(new PinochleActionPlayTrick(this, playCard));
                     break;
 
                 // If it is the scoring phase:
