@@ -1,1 +1,3 @@
 Log stuff
+
+Snackbars 4/7/19 - https://material.io/develop/android/docs/getting-started/

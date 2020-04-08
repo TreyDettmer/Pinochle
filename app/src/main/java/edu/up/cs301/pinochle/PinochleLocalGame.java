@@ -134,6 +134,9 @@ public class PinochleLocalGame extends LocalGame {
                 if (gameState.canGoSet(gameState.getTeam(gameState.getWonBid()))) {
                     gameState.nextPhase();
                 } else {
+                    gameState.setPlayerTurn(gameState.getWonBid());
+                    gameState.setPreviousTrickWinner(gameState.getWonBid());
+                    System.out.println("Previous Trick Winner: " + gameState.getPreviousTrickWinner());
                     gameState.setPhase(PinochleGamePhase.TRICK_TAKING);
                 }
             }
@@ -232,7 +235,7 @@ public class PinochleLocalGame extends LocalGame {
             PinochleActionPlayTrick actionPlayTrick = (PinochleActionPlayTrick) action;
             Card trick = actionPlayTrick.getTrick();
 
-            if (gameState.getPreviousTrickWinner() == playerIdx || gameState.getLeadTrick() == null) {
+            if (gameState.getPreviousTrickWinner() == playerIdx) {
                 gameState.setLeadTrick(trick);
             }
 
@@ -250,8 +253,6 @@ public class PinochleLocalGame extends LocalGame {
                 return false;
             }
 
-
-
             int initSize = gameState.getPlayerDeck(playerIdx).size();
             gameState.addTrickToCenter(playerIdx, trick);
             gameState.removeCardsFromPlayer(playerIdx, trick);
@@ -262,7 +263,7 @@ public class PinochleLocalGame extends LocalGame {
 
             System.out.println("Trick round: " + gameState.getTrickRound());
             System.out.println("Last Player: " +  (gameState.getPreviousTrickWinner() - 1 + players.length) % players.length);
-            System.out.println("Leading trick: " + trick);
+            System.out.println("Leading trick: " + leadTrick);
             System.out.println("Trump: " + gameState.getTrumpSuit());
             System.out.println("Trick is valid");
             System.out.println("Player " + playerIdx + ": Deck size: " + gameState.getPlayerDeck(playerIdx).size());

@@ -1,5 +1,7 @@
 package edu.up.cs301.pinochle;
 
+import android.annotation.SuppressLint;
+import android.content.pm.ActivityInfo;
 import android.view.View;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -85,8 +87,10 @@ public class PinochleMainActivity extends GameMainActivity {
     }
 
     /** initialize text views **/
+    @SuppressLint("SourceLockedOrientationActivity")
     public void initializeGui()
     {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         leftPlayerInfoTextView = findViewById(R.id.leftPlayerInfo);
         leftPlayerNameTextView = findViewById(R.id.leftPlayerName);
         rightPlayerInfoTextView = findViewById(R.id.rightPlayerInfo);
@@ -97,6 +101,7 @@ public class PinochleMainActivity extends GameMainActivity {
         trumpSuitTextView = findViewById(R.id.trumpSuitTextView);
         phaseTextView = findViewById(R.id.phaseTextView);
         melds = new ArrayList<>();
+
 
 
 

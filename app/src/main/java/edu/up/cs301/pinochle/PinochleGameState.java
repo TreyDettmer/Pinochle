@@ -504,7 +504,6 @@ public class PinochleGameState extends GameState {
         }
 
         int totalPoints = getScoreboard()[bidWinnerTeam];
-        totalPoints = 0;
         System.out.println("Team " + team + " bid difference: " + (getMaxBid - totalPoints));
         if ((getMaxBid - totalPoints) > 250) return true;
         return false;
