@@ -19,7 +19,8 @@
         android:onClick="showMelds"
         android:paddingLeft="100px"
         android:paddingRight="100px"
-        android:text="Melds" />
+        android:text="Melds"
+        android:visibility="invisible" />
 
     <TextView
         android:id="@+id/phaseTextView"
