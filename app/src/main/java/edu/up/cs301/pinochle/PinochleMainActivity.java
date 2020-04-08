@@ -60,9 +60,9 @@ public class PinochleMainActivity extends GameMainActivity {
             public GamePlayer createPlayer(String name) {
                 return new PinochleDumbComputerPlayer(name);
             }});
-        playerTypes.add(new GamePlayerType("Dumb Computer Player") {
+        playerTypes.add(new GamePlayerType("Smart Computer Player") {
             public GamePlayer createPlayer(String name) {
-                return new PinochleDumbComputerPlayer(name);
+                return new PinochleSmartComputerPlayer(name);
             }});
 
         // Create a game configuration class for Pinochle
