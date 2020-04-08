@@ -398,6 +398,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    protected void drawMeldingPrompt(Canvas c)
+    {
+        c.drawText("Calculating melds...", 960, 660, biddingTextPaint);
+    }
 
     protected void drawTrickTakingPrompt(Canvas c)
     {
@@ -776,6 +780,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 break;
             case EXCHANGE_CARDS:
                 drawExchangeCardsPrompt(canvas);
+                break;
+            case MELDING:
+                drawMeldingPrompt(canvas);
                 break;
             case VOTE_GO_SET:
                 drawVoteGoSetPrompt(canvas);
