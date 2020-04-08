@@ -9,3 +9,7 @@ Human player name on top of [info]
 Add a waiting for players... in between turns.
 Show if teammate voted go set
 Timer during Acknowlege score and go set
+
+
+4/7/2020 Trey
+Fixed issue with initial bid (showed "bid 10" and "bid 20" instead of "bid 260" and "bid 270")

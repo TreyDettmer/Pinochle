@@ -384,11 +384,23 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 RectF rect = new RectF(biddingButtonRect.left + (200 * i), biddingButtonRect.top, biddingButtonRect.right + (200 * i), biddingButtonRect.bottom);
                 c.drawRect(rect, buttonPaint);
                 if (i == 0) {
-                    c.drawText("Bid " + (state.getMaxBid() + 10), 740 + (200 * i), 710, biddingTextPaint);
+                    if (state.getMaxBid() == 0)
+                    {
+                        c.drawText("Bid " + (260), 740 + (200 * i), 710, biddingTextPaint);
+                    }
+                    else {
+                        c.drawText("Bid " + (state.getMaxBid() + 10), 740 + (200 * i), 710, biddingTextPaint);
+                    }
                 }
                 else if (i == 1)
                 {
-                    c.drawText("Bid " + (state.getMaxBid() + 20), 740 + (200 * i), 710, biddingTextPaint);
+                    if (state.getMaxBid() == 0)
+                    {
+                        c.drawText("Bid " + (270), 740 + (200 * i), 710, biddingTextPaint);
+                    }
+                    else {
+                        c.drawText("Bid " + (state.getMaxBid() + 20), 740 + (200 * i), 710, biddingTextPaint);
+                    }
                 }
                 else
                 {
@@ -406,10 +418,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     protected void drawTrickTakingPrompt(Canvas c)
     {
         int offset = 50;
-        for (int i = 0; i < state.getCenterDeck().size();i++)
+        for (int i = 0; i < state.getCenterDeck().getCards().size();i++)
         {
             RectF cardRect = new RectF(centerDeckRect.left + (offset * i),centerDeckRect.top,centerDeckRect.right + (offset * i),centerDeckRect.bottom);
-            drawCard(c,cardRect,state.getCenterDeck().getCards().get(i));
+            if (state.getCenterDeck().getCards().size() > i) {
+                drawCard(c, cardRect, state.getCenterDeck().getCards().get(i));
+            }
         }
         if (state.getTurn() == playerNum)
         {
