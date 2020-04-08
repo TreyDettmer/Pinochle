@@ -112,7 +112,7 @@ public class PinochleLocalGame extends LocalGame {
             PinochleActionBid actionBid = (PinochleActionBid) action;
             int bid = actionBid.getBid();
             if (bid != 10 && bid != 20) return false;
-            if (gameState.getMaxBid() == 0) gameState.addBid(playerIdx, 250);
+            if (gameState.getMaxBid() == 0) gameState.addBid(playerIdx, 240);
             gameState.addBid(playerIdx, bid);
             int nextPlayer;
             do {

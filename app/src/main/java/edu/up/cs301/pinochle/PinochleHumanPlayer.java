@@ -398,7 +398,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 if (i == 0) {
                     if (state.getMaxBid() == 0)
                     {
-                        c.drawText("Bid " + (260), 740 + (200 * i), 710, biddingTextPaint);
+                        c.drawText("Bid " + (250), 740 + (200 * i), 710, biddingTextPaint);
                     }
                     else {
                         c.drawText("Bid " + (state.getMaxBid() + 10), 740 + (200 * i), 710, biddingTextPaint);
@@ -408,7 +408,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 {
                     if (state.getMaxBid() == 0)
                     {
-                        c.drawText("Bid " + (270), 740 + (200 * i), 710, biddingTextPaint);
+                        c.drawText("Bid " + (260), 740 + (200 * i), 710, biddingTextPaint);
                     }
                     else {
                         c.drawText("Bid " + (state.getMaxBid() + 20), 740 + (200 * i), 710, biddingTextPaint);
