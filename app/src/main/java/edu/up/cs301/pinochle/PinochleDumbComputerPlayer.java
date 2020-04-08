@@ -134,7 +134,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
 
                     // Generates either 1 or 0 (50% chance to vote to go set)
                     num = rnd.nextInt(2);
-                    
+
                     // If the random number is 0, the player votes to go set.
                     if (num == 0 && state.canGoSet(state.getTeam(playerNum))) {
                         game.sendAction(new PinochleActionVoteGoSet(this, true));

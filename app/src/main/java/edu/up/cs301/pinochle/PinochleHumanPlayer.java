@@ -210,7 +210,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
                     break;
                 case TRICK_TAKING:
-                    myActivity.phaseTextView.setText("Phase: Trick");
+                    myActivity.phaseTextView.setText("Phase: Trick-taking");
                     acknowledgePressed = false;
                     break;
                 case ACKNOWLEDGE_SCORE:
