@@ -52,6 +52,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private static RectF biddingButtonRect;
     private static RectF trumpSuitChoiceRect;
     private static RectF exchangeButtonRect;
+    private static RectF okButtonRect;
     private static RectF voteYesButtonRect;
     private static RectF voteNoButtonRect;
     private static RectF centerDeckRect;
@@ -64,6 +65,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private static Paint blackPaint;
     private static Paint highlightPaint;
     private static Paint exchangeButtonTextPaint;
+    private static Paint okButtonTextPaint;
+
     private static Bitmap[] suits;
     private static ArrayList<Card> exchangeCards;
     private static ArrayList<Path> highlightMarkers;
@@ -125,12 +128,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         exchangeButtonTextPaint.setTextSize(40);
         exchangeButtonTextPaint.setColor(Color.WHITE);
         exchangeButtonTextPaint.setTextAlign(Paint.Align.CENTER);
+        okButtonTextPaint = new Paint(exchangeButtonTextPaint);
         handFirstCardRect = new RectF(490,770,640,1000);
         biddingButtonRect = new RectF(650,640,830,750);
         trumpSuitChoiceRect = new RectF(550,600,700,750);
         exchangeButtonRect = new RectF(860,600,1060,700);
-        voteYesButtonRect = new RectF(1000,600,1150,700);
-        voteNoButtonRect = new RectF(1180,600,1330,700);
+        okButtonRect = new RectF(860,600,1060,700);
+        voteYesButtonRect = new RectF(700,640,860,740);
+        voteNoButtonRect = new RectF(1060,640,1220,740);
         centerDeckRect = new RectF(800,400,950,630);
 
         handCardOffset = 60;
@@ -146,7 +151,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             String message = null;
             switch (state.getPhase()) {
                 case TRICK_TAKING:
-                    Suit leadTrickSuit = state.getLeadTrick().getSuit();
+                    Card leadTrick = state.getLeadTrick();
+                    if (leadTrick == null) return;
+                    Suit leadTrickSuit = leadTrick.getSuit();
                     Suit trumpSuit = state.getTrumpSuit();
                     if (state.playerHasSuit(playerNum, leadTrickSuit)) {
                         message = "You have a " + leadTrickSuit + " (lead trick suit), so you have to play it.";
@@ -173,9 +180,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             switch (phase) {
                 case BIDDING:
                     myActivity.phaseTextView.setText("Phase: Bidding");
+                    myActivity.trumpSuitTextView.setText("");
                     break;
                 case CHOOSE_TRUMP:
                     myActivity.phaseTextView.setText("Phase: Choose Trump");
+                    myActivity.trumpSuitTextView.setText("");
                     break;
                 case EXCHANGE_CARDS:
                     myActivity.phaseTextView.setText("Phase: Card Exchange");
@@ -187,6 +196,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     voted = false;
                     break;
                 case VOTE_GO_SET:
+                    myActivity.phaseTextView.setText("Phase: Go Set?");
                     melds = Meld.checkMelds(myHand, state.getTrumpSuit());
 
                     if (state.getWonBid() != playerNum && state.getWonBid() != teammatePlayerNum)
@@ -197,7 +207,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     if (voted) {
                         game.sendAction(new PinochleActionVoteGoSet(this, voteGoSet));
                     }
-                    myActivity.phaseTextView.setText("Phase: Go Set?");
+
                     break;
                 case TRICK_TAKING:
                     myActivity.phaseTextView.setText("Phase: Trick");
@@ -205,6 +215,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case ACKNOWLEDGE_SCORE:
                     myActivity.phaseTextView.setText("Phase: Scoring");
+                    myActivity.trumpSuitTextView.setText("");
                     if (acknowledgePressed) {
                         game.sendAction(new PinochleActionAcknowledgeScore(this));
                     }
@@ -247,6 +258,23 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
         if (state != null)
         {
+            if (phase == PinochleGamePhase.VOTE_GO_SET || phase == PinochleGamePhase.ACKNOWLEDGE_SCORE) {
+                myActivity.humanPlayerInfoTextView.setVisibility(View.INVISIBLE);
+                myActivity.leftPlayerNameTextView.setVisibility(View.INVISIBLE);
+                myActivity.leftPlayerInfoTextView.setVisibility(View.INVISIBLE);
+                myActivity.topPlayerNameTextView.setVisibility(View.INVISIBLE);
+                myActivity.topPlayerInfoTextView.setVisibility(View.INVISIBLE);
+                myActivity.rightPlayerNameTextView.setVisibility(View.INVISIBLE);
+                myActivity.rightPlayerInfoTextView.setVisibility(View.INVISIBLE);
+            } else {
+                myActivity.humanPlayerInfoTextView.setVisibility(View.VISIBLE);
+                myActivity.leftPlayerNameTextView.setVisibility(View.VISIBLE);
+                myActivity.leftPlayerInfoTextView.setVisibility(View.VISIBLE);
+                myActivity.topPlayerNameTextView.setVisibility(View.VISIBLE);
+                myActivity.topPlayerInfoTextView.setVisibility(View.VISIBLE);
+                myActivity.rightPlayerNameTextView.setVisibility(View.VISIBLE);
+                myActivity.rightPlayerInfoTextView.setVisibility(View.VISIBLE);
+            }
             int turn = state.getTurn();
             if (turn == playerToLeftIndex)
             {
@@ -393,28 +421,34 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         int teamScore = state.getScoreboard()[team];
         int opposingScore = state.getScoreboard()[opposingTeam];
 
-        c.drawText("Your team's (team score: " + teamScore, 960, 460, biddingTextPaint);
-        c.drawText("Other team's score: " + opposingScore, 960, 560, biddingTextPaint);
+        boolean teamWentSet = state.getVoteGoSet(bidWinnerTeam) && state.getVoteGoSet(state.getTeammate(bidWinnerTeam));
 
-        if (!acknowledgePressed) {
-            c.drawRect(exchangeButtonRect,buttonPaint);
-            c.drawText("OK",960,660,exchangeButtonTextPaint);
-        } else {
-            c.drawText("Waiting for other players...", 960, 660, biddingTextPaint);
+        if (teamWentSet) {
+            if (team == bidWinnerTeam) c.drawText("Your teammate also voted to go set.", 960, 350, biddingTextPaint);
+            else c.drawText("The other team voted to go set.", 960, 350, biddingTextPaint);
         }
+        c.drawText("Your team's score: " + teamScore, 960, 420, biddingTextPaint);
+        c.drawText("Other team's score: " + opposingScore, 960, 490, biddingTextPaint);
 
         if (teamScore >= 1500 && opposingScore < 1500) {
-            c.drawText("Game over! Your team wins!", 960, 760, biddingTextPaint);
+            c.drawText("Game over! Your team wins!", 960, 560, biddingTextPaint);
         } else if (teamScore < 1500 && opposingScore >= 1500) {
-            c.drawText("Game over! Your team looses.", 960, 760, biddingTextPaint);
+            c.drawText("Game over! Your team looses.", 960, 560, biddingTextPaint);
         } else if (teamScore >= 1500 && opposingScore >= 1500) {
             if (team == bidWinnerTeam) {
-                c.drawText("Game over! Your team wins because your team won the bid! ", 960, 760, biddingTextPaint);
+                c.drawText("Game over! Your team wins because your team won the bid! ", 960, 560, biddingTextPaint);
             } else {
-                c.drawText("Game over! Your team looses because your team lost the bid! ", 960, 760, biddingTextPaint);
+                c.drawText("Game over! Your team looses because your team lost the bid! ", 960, 560, biddingTextPaint);
             }
         } else {
-            c.drawText("No team has won at least 1500 points. Starting new round...", 960, 760, biddingTextPaint);
+            c.drawText("No team has won at least 1500 points. Starting new round...", 960, 560, biddingTextPaint);
+        }
+
+        if (!acknowledgePressed) {
+            c.drawRect(okButtonRect, buttonPaint);
+            c.drawText("OK",960,660, okButtonTextPaint);
+        } else {
+            c.drawText("Waiting for other players...", 960, 660, biddingTextPaint);
         }
 
 
@@ -428,26 +462,24 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
      */
     protected void drawVoteGoSetPrompt(Canvas c)
     {
-
-
-        if ((state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum) && state.getTurn() == playerNum) {
+        if (state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum) {
             int meldPoints = Meld.totalPoints(melds);
             int maxBid = state.getMaxBid();
-            c.drawText("Your team bid " + maxBid + " points.", 560, 470, biddingTextPaint);
-            c.drawText("Your team scored " + 100 + " points.", 560, 540, biddingTextPaint);
-            c.drawText("Do you want to go set?", 460, 670, biddingTextPaint);
-
+            c.drawText("Your team bid " + maxBid + " points.", 960, 370, biddingTextPaint);
+            c.drawText("Your team scored " + state.getScoreboard()[state.getTeam(playerNum)] + " points.", 960, 440, biddingTextPaint);
+            c.drawText("Do you want to go set?", 960, 510, biddingTextPaint);
+            c.drawText("NOTE: The game continues only if both teammate votes yes.", 960, 580, biddingTextPaint);
             if (!voted) {
                 c.drawRect(voteYesButtonRect, buttonPaint);
                 c.drawRect(voteNoButtonRect, buttonPaint);
-                c.drawText("Yes", 1030, 670, biddingTextPaint);
-                c.drawText("No", 1225, 670, biddingTextPaint);
+                c.drawText("Yes", 780, 710, biddingTextPaint);
+                c.drawText("No", 1140, 710, biddingTextPaint);
             } else {
                 c.drawText("Waiting for other players...", 960, 670, biddingTextPaint);
             }
 
-
-
+        } else {
+            c.drawText("Waiting for other players...", 960, 670, biddingTextPaint);
         }
 
 
@@ -469,6 +501,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             {
                 c.drawPath(marker,highlightPaint);
             }
+            if (playerNum == state.getWonBid()) c.drawText("You won the bid!",960,480,biddingTextPaint);
+            else c.drawText("Your teammate won the bid!",960,480,biddingTextPaint);
             c.drawText("Choose four cards to exchange.",960,550,biddingTextPaint);
             c.drawRect(exchangeButtonRect,buttonPaint);
             c.drawText("Exchange",960,660,exchangeButtonTextPaint);

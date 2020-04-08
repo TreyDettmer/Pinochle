@@ -194,7 +194,9 @@ public class PinochleLocalGame extends LocalGame {
                 boolean vote1 = gameState.getVoteGoSet(bidWinnerTeammate);
                 if (vote0 && vote1) {
                     System.out.println("Team " + bidWinnerTeam + ": Going set...");
+                    gameState.goSet(bidWinnerTeam);
                     gameState.setPhase(PinochleGamePhase.ACKNOWLEDGE_SCORE);
+                    gameState.setPlayerTurn(0);
                 } else {
                     gameState.setPlayerTurn(gameState.getWonBid());
                     gameState.setPreviousTrickWinner(gameState.getWonBid());
@@ -296,6 +298,7 @@ public class PinochleLocalGame extends LocalGame {
 
             if (gameState.isLastPlayer(playerIdx)) {
                 gameState.nextPhase();
+                gameState.setPlayerTurn(0);
             }
             gameState.nextPlayerTurn();
             return true;

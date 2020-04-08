@@ -497,15 +497,14 @@ public class PinochleGameState extends GameState {
 
     public boolean canGoSet(int team) {
         int bidWinner = getWonBid();
-        int getMaxBid = getMaxBid();
         int bidWinnerTeam = getTeam(bidWinner);
         if (team != bidWinnerTeam) {
             return false;
         }
 
         int totalPoints = getScoreboard()[bidWinnerTeam];
-        System.out.println("Team " + team + " bid difference: " + (getMaxBid - totalPoints));
-        if ((getMaxBid - totalPoints) > 250) return true;
+        System.out.println("Team " + team + " bid difference: " + (getMaxBid() - totalPoints));
+        if ((getMaxBid() - totalPoints) > 250) return true;
         return false;
     }
 
@@ -731,5 +730,11 @@ public class PinochleGameState extends GameState {
     public void calculateFinalScore() {
         //tally up trick points
         //add to score if ..
+    }
+
+    public void goSet(int team) {
+        if (team == getTeam(wonBid)) {
+            scoreboard[team] -= getMaxBid();
+        }
     }
 }

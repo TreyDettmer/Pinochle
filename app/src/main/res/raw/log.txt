@@ -1,3 +1,11 @@
 Log stuff
 
 Snackbars 4/7/19 - https://material.io/develop/android/docs/getting-started/
+
+Show my earned trick points
+Center playing cards
+During exchanging if received four cards and have 16, cards block [info]
+Human player name on top of [info]
+Add a waiting for players... in between turns.
+Show if teammate voted go set
+Timer during Acknowlege score and go set

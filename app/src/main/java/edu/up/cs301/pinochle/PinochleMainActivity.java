@@ -40,9 +40,6 @@ public class PinochleMainActivity extends GameMainActivity {
     public ArrayList<String> melds;
 
 
-
-
-
     /** a pinochle game for four players. The default is human vs. computer */
     @Override
     public GameConfig createDefaultConfig() {
@@ -51,10 +48,6 @@ public class PinochleMainActivity extends GameMainActivity {
         playerTypes.add(new GamePlayerType("Human Player") {
             public GamePlayer createPlayer(String name) {
                 return new PinochleHumanPlayer(name);
-            }});
-        playerTypes.add(new GamePlayerType("Dumb Computer Player") {
-            public GamePlayer createPlayer(String name) {
-                return new PinochleDumbComputerPlayer(name);
             }});
         playerTypes.add(new GamePlayerType("Dumb Computer Player") {
             public GamePlayer createPlayer(String name) {
@@ -71,8 +64,8 @@ public class PinochleMainActivity extends GameMainActivity {
         // Add the default players
         defaultConfig.addPlayer("Human", 0);
         defaultConfig.addPlayer("Computer 1", 1);
-        defaultConfig.addPlayer("Computer 2", 2);
-        defaultConfig.addPlayer("Computer 3", 3);
+        defaultConfig.addPlayer("Computer 2", 1);
+        defaultConfig.addPlayer("Computer 3", 1);
 
         // Set the initial information for the remote player
         defaultConfig.setRemoteData("Guest", "", 1);
