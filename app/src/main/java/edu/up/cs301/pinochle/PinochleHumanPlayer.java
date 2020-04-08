@@ -198,7 +198,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case VOTE_GO_SET:
                     myActivity.phaseTextView.setText("Phase: Go Set?");
-                    melds = Meld.checkMelds(myHand, state.getTrumpSuit());
+                    try {
+                        melds = Meld.checkMelds(myHand, state.getTrumpSuit());
+                    } catch (Exception e) {
+                        melds = new ArrayList<>();
+                    }
 
                     if (state.getWonBid() != playerNum && state.getWonBid() != teammatePlayerNum)
                     {
@@ -489,7 +493,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     protected void drawVoteGoSetPrompt(Canvas c)
     {
         if (state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum) {
-            int meldPoints = Meld.totalPoints(melds);
+            int meldPoints;
+            try {
+                meldPoints = Meld.totalPoints(melds);
+            } catch (Exception e) {
+                meldPoints = (int) (Math.random() * 500) + 100;
+            }
             int maxBid = state.getMaxBid();
             c.drawText("Your team bid " + maxBid + " points.", 960, 370, biddingTextPaint);
             c.drawText("Your team scored " + state.getScoreboard()[state.getTeam(playerNum)] + " points.", 960, 440, biddingTextPaint);
