@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.annotation.NonNull;
 
 /**
  * A playing card in the standard 52-card deck. The images, which have been
@@ -29,7 +30,7 @@ import android.graphics.RectF;
  * @author Kai Vickers
  * @version March 2020
  */
-public class Card implements Serializable, Comparable<Card> {
+public class Card implements Serializable {
 
 	// to satisfy the Serializable interface
 	private static final long serialVersionUID = 893542931190030342L;
@@ -37,7 +38,8 @@ public class Card implements Serializable, Comparable<Card> {
 	// instance variables: the card's rank and the suit
     private Rank rank;
     private Suit suit;
-    private int player;
+	private int player;
+
 
 	/**
 	 * Constructor for class card
@@ -191,8 +193,8 @@ public class Card implements Serializable, Comparable<Card> {
 	 *
 	 * @param player card's owner player id
 	 */
-    public void setPlayer(int player) {
-    	this.player = player;
+	public void setPlayer(int player) {
+		this.player = player;
 	}
 
 	/**
@@ -204,7 +206,7 @@ public class Card implements Serializable, Comparable<Card> {
 		return player;
 	}
 
-    // array that contains the android resource indices for the 52 card
+	// array that contains the android resource indices for the 52 card
     // images
     private static int[][] resIdx = {
     	{
@@ -256,10 +258,4 @@ public class Card implements Serializable, Comparable<Card> {
     		}
     	}
     }
-
-    @Override
-	public int compareTo(Card card) {
-		return this.rank.compareTo(card.rank);
-	}
-
 }

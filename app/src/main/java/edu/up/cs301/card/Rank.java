@@ -15,14 +15,15 @@ import java.util.ArrayList;
 public enum Rank implements Serializable {
 	
 	// nine
-	NINE {
+	NINE /*{
+		// Overriding the override: It's better to have everything be letters (comparing melds);
 		// override the getShortName behavior: the corresponding digit
 		@Override
 		public char getShortName() {
 			return '9';
 		}
-	},
-	
+	}*/
+	,
 	// ten
 	TEN,
 
