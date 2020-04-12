@@ -435,8 +435,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 drawCard(c, cardRect, state.getCenterDeck().getCards().get(i));
             }
         }
-        System.out.println(state.getCenterDeck().getCards().size());
-        if (state.getTurn() == playerNum)
+        if (state.getTurn() == playerNum && state.getCenterDeck().getCards().size() != 4)
         {
             c.drawText("Choose a card below to play.", 960, 680, biddingTextPaint);
         }
@@ -559,8 +558,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
         if (state.getTurn() == playerNum)
         {
-
-            c.drawText("Choose Trump Suit", 960, 530, trumpChoiceTextPaint);
+            c.drawText("You won the bid!", 960, 530, trumpChoiceTextPaint);
+            c.drawText("Choose Trump Suit", 960, 460, trumpChoiceTextPaint);
             for (int i = 0; i < 4; i++) {
                 RectF rect = new RectF(trumpSuitChoiceRect.left + (200 * i), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * i), trumpSuitChoiceRect.bottom);
                 Rect r = new Rect(0,0, suits[i].getWidth(), suits[i].getHeight());
