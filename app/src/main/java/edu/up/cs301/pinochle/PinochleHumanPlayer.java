@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
@@ -198,11 +199,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case VOTE_GO_SET:
                     myActivity.phaseTextView.setText("Phase: Go Set?");
-                    try {
-                        melds = Meld.checkMelds(myHand, state.getTrumpSuit());
-                    } catch (Exception e) {
-                        melds = new ArrayList<>();
-                    }
+
+                    melds = Meld.checkMelds(myHand, state.getTrumpSuit());
 
                     if (state.getWonBid() != playerNum && state.getWonBid() != teammatePlayerNum)
                     {
@@ -437,6 +435,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 drawCard(c, cardRect, state.getCenterDeck().getCards().get(i));
             }
         }
+        System.out.println(state.getCenterDeck().getCards().size());
         if (state.getTurn() == playerNum)
         {
             c.drawText("Choose a card below to play.", 960, 680, biddingTextPaint);
@@ -456,6 +455,16 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         if (teamWentSet) {
             if (team == bidWinnerTeam) c.drawText("Your teammate also voted to go set.", 960, 350, biddingTextPaint);
             else c.drawText("The other team voted to go set.", 960, 350, biddingTextPaint);
+        } else {
+            int meldScores = state.getMeldsScoreboard()[team];
+            int trickScores = state.getTricksScoreboard()[team];
+            if (team == bidWinnerTeam && (meldScores + trickScores) < state.getMaxBid()) {
+                c.drawText("Your team did not win enough points to meet your bid.", 960, 280, biddingTextPaint);
+                c.drawText("Your team went set.", 960, 350, biddingTextPaint);
+            } else {
+                c.drawText("Congratulations!", 960, 280, biddingTextPaint);
+                c.drawText("Your team won enough points to add the points earned to your score!", 960, 350, biddingTextPaint);
+            }
         }
         c.drawText("Your team's score: " + teamScore, 960, 420, biddingTextPaint);
         c.drawText("Other team's score: " + opposingScore, 960, 490, biddingTextPaint);
@@ -493,15 +502,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     protected void drawVoteGoSetPrompt(Canvas c)
     {
         if (state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum) {
-            int meldPoints;
-            try {
-                meldPoints = Meld.totalPoints(melds);
-            } catch (Exception e) {
-                meldPoints = (int) (Math.random() * 500) + 100;
-            }
+            int meldPoints = Meld.totalPoints(melds);
             int maxBid = state.getMaxBid();
             c.drawText("Your team bid " + maxBid + " points.", 960, 370, biddingTextPaint);
-            c.drawText("Your team scored " + state.getScoreboard()[state.getTeam(playerNum)] + " points.", 960, 440, biddingTextPaint);
+            c.drawText("Your team scored " + state.getMeldsScoreboard()[state.getTeam(playerNum)] + " points.", 960, 440, biddingTextPaint);
             c.drawText("Do you want to go set?", 960, 510, biddingTextPaint);
             c.drawText("NOTE: The game continues only if both teammate votes yes.", 960, 580, biddingTextPaint);
             if (!voted) {

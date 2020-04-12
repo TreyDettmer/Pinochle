@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Meld;
@@ -123,20 +124,11 @@ public class PinochleLocalGame extends LocalGame {
             if (phase != PinochleGamePhase.MELDING) return false;
             if (gameState.getMelds()[playerIdx].size() != 0) return false;
             System.out.println(String.format("Player %d, Teamate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), action.toString()));
-            ArrayList<Meld> melds;
-            try {
-                melds = Meld.checkMelds(gameState.getPlayerDeck(playerIdx), gameState.getTrumpSuit());
-            } catch (Exception e) {
-                melds = new ArrayList<>();
-            }
-            int meldPoints;
-            try {
-                meldPoints = Meld.totalPoints(melds);
-            } catch (Exception e) {
-                meldPoints = (int) (Math.random() * 500) + 100;
-            }
+            ArrayList<Meld> melds = Meld.checkMelds(gameState.getPlayerDeck(playerIdx), gameState.getTrumpSuit());
+            int meldPoints = Meld.totalPoints(melds);
+
             gameState.setPlayerMelds(playerIdx, melds);
-            gameState.addScore(teamIdx, meldPoints);
+            gameState.addMeldScore(teamIdx, meldPoints);
             System.out.println("Player " + playerIdx + " has " + meldPoints + " meld points.");
             gameState.nextPlayerTurn();
             if (gameState.isLastPlayer(playerIdx)) {
@@ -242,26 +234,27 @@ public class PinochleLocalGame extends LocalGame {
         } else if (action instanceof PinochleActionPlayTrick) {
             if (phase != PinochleGamePhase.TRICK_TAKING) return false;
 
-
             PinochleActionPlayTrick actionPlayTrick = (PinochleActionPlayTrick) action;
             Card trick = actionPlayTrick.getTrick();
 
-            if (trick == null)
-            {
-                if (gameState.getCenterDeck().size() == 4)
-                {
+            if (trick == null) {
+                if (gameState.getCenterDeck().size() == 4) {
                     int trickWinner = gameState.getTrickWinner();
+                    int trickWinnerTeam = gameState.getTeam(gameState.getTrickWinner());
                     System.out.println("Trick winner: " + trickWinner);
                     gameState.setPreviousTrickWinner(trickWinner);
+                    gameState.addTrickScore(trickWinnerTeam, gameState.getTrickPoints());
+                    gameState.addTrickToPlayer(playerIdx);
+                    gameState.removeAllCardsFromCenter();
+                    System.out.println(Arrays.toString(gameState.getScoreboard()));
+                    System.out.println(Arrays.toString(gameState.getMeldsScoreboard()));
+                    System.out.println(Arrays.toString(gameState.getTricksScoreboard()));
+
                     if (gameState.getTrickRound() == 11) {
-                        gameState.setLastTrick(trickWinner);
-                        gameState.removeAllCardsFromCenter();
                         gameState.calculateFinalScore();
                         gameState.nextPhase();
                         gameState.setPlayerTurn(0);
                     } else {
-                        gameState.addTrickToPlayer(playerIdx);
-                        gameState.removeAllCardsFromCenter();
                         gameState.nextTrickRound();
                         gameState.setPlayerTurn(trickWinner);
                     }
@@ -302,28 +295,6 @@ public class PinochleLocalGame extends LocalGame {
             System.out.println("Trick is valid");
             System.out.println("Player " + playerIdx + ": Deck size: " + gameState.getPlayerDeck(playerIdx).size());
             gameState.nextPlayerTurn();
-            /*
-            if (playerIdx == (gameState.getPreviousTrickWinner() - 1 + players.length) % players.length) {
-                int trickWinner = gameState.getTrickWinner();
-                System.out.println("Trick winner: " + trickWinner);
-                gameState.setPreviousTrickWinner(trickWinner);
-                if (gameState.getTrickRound() == 11) {
-                    gameState.setLastTrick(trickWinner);
-                    gameState.removeAllCardsFromCenter();
-                    gameState.calculateFinalScore();
-                    gameState.nextPhase();
-                    gameState.setPlayerTurn(0);
-                } else {
-                    gameState.addTrickToPlayer(playerIdx);
-                    gameState.removeAllCardsFromCenter();
-                    gameState.nextTrickRound();
-                    gameState.setPlayerTurn(trickWinner);
-                }
-            } else {
-                gameState.nextPlayerTurn();
-
-            }
-            */
 
             return true;
         } else if (action instanceof PinochleActionAcknowledgeScore) {

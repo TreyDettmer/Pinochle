@@ -32,6 +32,8 @@ public class PinochleGameState extends GameState {
     private PinochleGamePhase phase;  // The phase the game is on.
     private int turn;   // Number of player whose turn it is.
     private int[] scoreboard;   // Array of player scores.
+    private int[] meldsScoreboard;   // Array of player scores.
+    private int[] tricksScoreboard;   // Array of player scores.
     private int[] lastTrickRoundPlayed;
     private int firstBidder;    // Player number of the first bidder.
     private int[] bids; // Bids of each player.
@@ -60,6 +62,8 @@ public class PinochleGameState extends GameState {
         phase = gameState.getPhase();
         turn = gameState.getTurn();
         scoreboard = gameState.getScoreboard();
+        meldsScoreboard = gameState.getMeldsScoreboard();
+        tricksScoreboard = gameState.getTricksScoreboard();
         firstBidder = gameState.getFirstBidder();
         bids = gameState.getBids();
         lastTrickRoundPlayed = gameState.getLastTrickRoundPlayed();
@@ -205,6 +209,19 @@ public class PinochleGameState extends GameState {
             scoreboard[team] += score;
         }
     }
+
+    public void addMeldScore(int team, int score) {
+        if (team < meldsScoreboard.length) {
+            meldsScoreboard[team] += score;
+        }
+    }
+
+    public void addTrickScore(int team, int score) {
+        if (team < tricksScoreboard.length) {
+            tricksScoreboard[team] += score;
+        }
+    }
+
 
     /**
      * Removes points from a team's score.
@@ -417,6 +434,8 @@ public class PinochleGameState extends GameState {
         phase = PinochleGamePhase.BIDDING;
         firstBidder = (firstBidder + 1) % PinochleGameState.NUM_PLAYERS;
         turn = firstBidder;
+        meldsScoreboard = new int[NUM_TEAMS];
+        tricksScoreboard = new int[NUM_TEAMS];
         bids = new int[NUM_PLAYERS];
         passed = new boolean[NUM_PLAYERS];
         wonBid = -1;
@@ -495,6 +514,27 @@ public class PinochleGameState extends GameState {
         return scoreboard.clone();
     }
 
+    public int[] getMeldsScoreboard() {
+        return meldsScoreboard.clone();
+    }
+
+    public int[] getTricksScoreboard() {
+        return tricksScoreboard.clone();
+    }
+
+    public int getTrickPoints() {
+        int points = 0;
+        if (trickRound == 11) return 10;
+        for (Card card : centerDeck.getCards()) {
+            switch (card.getRank()) {
+                case TEN: case KING: case ACE:
+                    points += 10;
+                    break;
+            }
+        }
+        return points;
+    }
+
     public boolean canGoSet(int team) {
         int bidWinner = getWonBid();
         int bidWinnerTeam = getTeam(bidWinner);
@@ -502,7 +542,7 @@ public class PinochleGameState extends GameState {
             return false;
         }
 
-        int totalPoints = getScoreboard()[bidWinnerTeam];
+        int totalPoints = getMeldsScoreboard()[bidWinnerTeam];
         System.out.println("Team " + team + " bid difference: " + (getMaxBid() - totalPoints));
         if ((getMaxBid() - totalPoints) > 250) return true;
         return false;
@@ -696,18 +736,6 @@ public class PinochleGameState extends GameState {
         return winningCard.getPlayer();
     }
 
-    public int getLastTrickRoundPlayed(int player) {
-        if (isValidPlayer(player)) {
-            return lastTrickRoundPlayed[player];
-        }
-        return -1;
-    }
-
-    public void setLastTrickRoundPlayed(int player) {
-        if (isValidPlayer(player)) {
-            lastTrickRoundPlayed[player] = trickRound;
-        }
-    }
 
     public int[] getLastTrickRoundPlayed() {
         return lastTrickRoundPlayed.clone();
@@ -727,14 +755,28 @@ public class PinochleGameState extends GameState {
         return -1;
     }
 
+
     public void calculateFinalScore() {
-        //tally up trick points
-        //add to score if ..
+        for (int i = 0; i < NUM_TEAMS; i++) {
+            int meldPoints = getMeldsScoreboard()[i];
+            int trickPoints = getTricksScoreboard()[i];
+            if (i == getTeam(wonBid)) {
+                if (meldPoints + trickPoints >= getMaxBid()) {
+                    addScore(i, meldPoints + trickPoints);
+                } else {
+                    goSet(i);
+                }
+            } else {
+                if (trickPoints >= 10) {
+                    addScore(i, meldPoints + trickPoints);
+                }
+            }
+        }
     }
 
     public void goSet(int team) {
         if (team == getTeam(wonBid)) {
-            scoreboard[team] -= getMaxBid();
+            subtractScore(team, getMaxBid());
         }
     }
 }

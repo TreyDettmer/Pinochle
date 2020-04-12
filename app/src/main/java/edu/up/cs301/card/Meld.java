@@ -31,7 +31,7 @@ public enum Meld implements Serializable {
     KINGS_AROUND("Kings Around",  "One king of each suit", 80, 3),
     QUEENS_AROUND("Queens Around",  "One queen of each suit", 60, 3),
     JACKS_AROUND("Jacks Around",  "One jack of each suit", 40, 3);
-    
+
     // to satisfy Serializable interface
     private static final long serialVersionUID = 8673272710125325L;
 

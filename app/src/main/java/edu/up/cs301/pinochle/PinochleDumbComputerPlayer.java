@@ -195,7 +195,7 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
                         } else if (hasTrumpSuit) {
 
                             // Checks if the card's suit is the same as the trump suit.
-                            if (card.getSuit() == state.getTrumpSuit()) {
+                            if (card.getSuit().equals(state.getTrumpSuit())) {
 
                                 // Sets the card to play to the card of the loop.
                                 playCard = card;
