@@ -417,12 +417,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     c.drawText("Pass", 740 + (200 * i), 710, biddingTextPaint);
                 }
             }
+        } else {
+            c.drawText("Waiting for other players...", 960, 710, biddingTextPaint);
         }
     }
 
     protected void drawMeldingPrompt(Canvas c)
     {
-        c.drawText("Calculating melds...", 960, 660, biddingTextPaint);
+        c.drawText("Calculating melds...", 960, 710, biddingTextPaint);
     }
 
     protected void drawTrickTakingPrompt(Canvas c)
@@ -437,7 +439,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
         if (state.getTurn() == playerNum && state.getCenterDeck().getCards().size() != 4)
         {
-            c.drawText("Choose a card below to play.", 960, 680, biddingTextPaint);
+            c.drawText("Choose a card below to play.", 960, 710, biddingTextPaint);
+        } else {
+            c.drawText("Waiting for other players...", 960, 710, biddingTextPaint);
         }
     }
 
@@ -545,6 +549,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             c.drawRect(exchangeButtonRect,buttonPaint);
             c.drawText("Exchange",960,660,exchangeButtonTextPaint);
 
+        } else {
+            c.drawText("Waiting for other players...", 960, 710, biddingTextPaint);
         }
     }
 
@@ -565,6 +571,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 Rect r = new Rect(0,0, suits[i].getWidth(), suits[i].getHeight());
                 c.drawBitmap(suits[i],r,rect,blackPaint);
             }
+        } else {
+            c.drawText("Waiting for other players...", 960, 710, biddingTextPaint);
         }
     }
 
