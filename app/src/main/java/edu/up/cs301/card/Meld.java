@@ -2,48 +2,49 @@ package edu.up.cs301.card;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public enum Meld implements Serializable {
-
-    RUN("Run",  "Trump jack, queen, king, ten, ace", 150, "(,[DHCS]T)(,[DHCS]J)+(,[DHCS]Q)+(,[DHCS]K)+(,[DHCS]A)+"),
-    RUN_KING("Run + King",  "Run with another trump king", 190, "(,[DHCS]T)(,[DHCS]J)+(,[DHCS]Q)+(,[DHCS]K){2,}(,[DHCS]A)+"),
-    RUN_QUEEN("Run + Queen",  "Run with another trump queen", 190, "(,[DHCS]T)(,[DHCS]J)+(,[DHCS]Q){2,}(,[DHCS]K)+(,[DHCS]A)+"),
-    RUN_MARRIAGE("Run + Marraige",  "Run with another trump king and queen", 230, "(,[DHCS]T)(,[DHCS]J)+(,[DHCS]Q){2,}(,[DHCS]K){2,}(,[DHCS]A)+"),
-    DOUBLE_RUN("Double Run",  "Two runs", 1500, "(,[DHCS]T){2,}(,[DHCS]J){2,}(,[DHCS]Q){2,}(,[DHCS]K){2,}(,[DHCS]A){2,}"),
-    DIX("Dix",  "Trump nine", 10, "([DHCS]N"),
-    ROYAL_MARRIAGE("Royal Marriage",  "Trump king and queen", 40, "(,[DHCS]Q)+(,[DHCS]K)+"),
-    COMMON_MARRIAGE("Common Marriage",  "King and queen not in trump suit", 20, "(,[dhcs]Q)+(,[dhcs]K)+"),
-    PINOCHLE("Pinochle",  "One jack of diamonds and one queen of spades", 40, ",[dD][jJ],[sS][qQ]"),
-    DOUBLE_PINOCHLE("Double Pinochle",  "All jacks of diamonds and queen of spades", 300, ",[dD]J,[dD]J,[sS]Q,[sS]Q"),
-    ACES_AROUND("Aces Around",  "One ace of each suit", 100, "(?=.*[dD]A)(?=.*[hH]A)(?=.*[cC]A)(?=.*[sS]A)"),
-    ACES_ABOUND("Aces Abound",  "All eight aces", 1000, "(.*,.A){8}"),
-    KINGS_AROUND("Kings Around",  "One king of each suit", 80, "(?=.*[dD]K)(?=.*[hH]K)(?=.*[cC]K)(?=.*[sS]K)"),
-    KINGS_ABOUND("Kings Abound",  "All eight kings", 800, "(.*,.K){8}"),
-    QUEENS_AROUND("Queens Around",  "One queen of each suit", 60, "(?=.*[dD]Q)(?=.*[hH]Q)(?=.*[cC]Q)(?=.*[sS]Q)"),
-    QUEENS_ABOUND("Queens Abound",  "All eight queens", 600, "(.*,.Q){8}"),
-    JACKS_AROUND("Jacks Around",  "One jack of each suit", 40, "(?=.*[dD]J)(?=.*[hH]J)(?=.*[cC]J)(?=.*[sS]J)"),
-    JACKS_ABOUND("Jacks Abound",  "All eight jacks", 400, "(.*,.J){8}");
-
+    DOUBLE_RUN("Double Run",  "Two runs", 1500, 1),
+    RUN_MARRIAGE("Run + Marraige",  "Run with another trump king and queen", 230, 1),
+    RUN_KING("Run + King",  "Run with another trump king", 190, 1),
+    RUN_QUEEN("Run + Queen",  "Run with another trump queen", 190, 1),
+    RUN("Run",  "Trump jack, queen, king, ten, ace", 150, 1),
+    ROYAL_MARRIAGE("Royal Marriage",  "Trump king and queen", 40, 1),
+    COMMON_MARRIAGE("Common Marriage",  "King and queen not in trump suit", 20, 1),
+    DIX("Dix",  "Trump nine", 10, 1),
+    DOUBLE_PINOCHLE("Double Pinochle",  "All jacks of diamonds and queen of spades", 300, 2),
+    PINOCHLE("Pinochle",  "One jack of diamonds and one queen of spades", 40, 2),
+    ACES_ABOUND("Aces Abound",  "All eight aces", 1000, 3),
+    KINGS_ABOUND("Kings Abound",  "All eight kings", 800, 3),
+    QUEENS_ABOUND("Queens Abound",  "All eight queens", 600, 3),
+    JACKS_ABOUND("Jacks Abound",  "All eight jacks", 400, 3),
+    ACES_AROUND("Aces Around",  "One ace of each suit", 100, 3),
+    KINGS_AROUND("Kings Around",  "One king of each suit", 80, 3),
+    QUEENS_AROUND("Queens Around",  "One queen of each suit", 60, 3),
+    JACKS_AROUND("Jacks Around",  "One jack of each suit", 40, 3);
+    
     // to satisfy Serializable interface
     private static final long serialVersionUID = 8673272710125325L;
 
     private final String NAME;
     private final String DESCRIPTION;
     private final int POINTS;
-    private final String REGEX;
+    private final int TYPE;
 
-    Meld(String name, String description, int points, String regEx) {
+    Meld(String name, String description, int points, int type) {
         this.NAME = name;
         this.DESCRIPTION = description;
         this.POINTS = points;
-        this.REGEX = regEx;
+        this.TYPE = type;
     }
 
     public String getName() {
@@ -58,71 +59,149 @@ public enum Meld implements Serializable {
         return POINTS;
     }
 
-    public String getRegEx() {
-        return REGEX;
+    public int getType() {
+        return TYPE;
     }
 
-
-    public static ArrayList<Meld> checkMelds(Deck deck, Suit trump, int type) {
-        // 9 T J Q K A
-        // 9 A J K Q T
-        // C D H S
-
-        String trumpChar = "" + trump.getShortName();
-        String[] simplifiedDeckArr = deck.toString().split(" ");
-        List<String> list = new ArrayList<>();
-
-        //HashMap<String, Integer> helperMap = new HashMap<>();
-        for (String str : simplifiedDeckArr) {
-            String rank = str.substring(0, 1);
-            String suit = str.substring(1);
-            if (suit.equals(trumpChar)) {
-                list.add(suit + rank);
+    private static boolean isValidMeld(ArrayList<Card> cards, Card[] required) {
+        boolean valid = true;
+        ArrayList<Card> temp = (ArrayList<Card>) cards.clone();
+        for (Card card : required) {
+            if (!temp.contains(card)) {
+                valid = false;
+                break;
             } else {
-                list.add(suit.toLowerCase() + rank);
+                temp.remove(card);
             }
-            /*
-            if (helperMap.containsKey(str)) {
-                helperMap.put(str, helperMap.get(str) + 1);
-            } else {
-                helperMap.put(str, 1);
-            }*/
         }
-        Collections.sort(list);
-        String newSimplifiedDeck = "";
-        for (String s : list) newSimplifiedDeck += "," + s;
-        // Special flags
-        //while (jd-- > 0) newSimplifiedDeck += "@";
-        //while (qs-- > 0) newSimplifiedDeck += "#";
-        ArrayList<Meld> toReturn = new ArrayList<>();
-        List<Meld> potential;
-        switch (type) {
-            case 1:
-                potential = new ArrayList(Arrays.asList(Meld.RUN, Meld.RUN_KING, Meld.RUN_QUEEN, Meld.RUN_MARRIAGE, Meld.ROYAL_MARRIAGE, Meld.COMMON_MARRIAGE, Meld.DIX));
-                for (Meld m : potential) {
-                    if (Pattern.matches(m.REGEX, newSimplifiedDeck)) toReturn.add(m);
-                }
-                break;
-
-            case 2:
-                potential = new ArrayList(Arrays.asList(Meld.PINOCHLE, Meld.DOUBLE_PINOCHLE));
-                for (Meld m : potential) {
-                    if (Pattern.matches(m.REGEX, newSimplifiedDeck)) toReturn.add(m);
-                }
-                break;
-
-            case 3:
-                potential = new ArrayList(Arrays.asList(Meld.JACKS_ABOUND, Meld.JACKS_AROUND, Meld.QUEENS_ABOUND, Meld.QUEENS_AROUND, Meld.ACES_ABOUND, Meld.ACES_AROUND, Meld.KINGS_ABOUND, Meld.KINGS_AROUND));
-                for (Meld m : potential) {
-                    if (Pattern.matches(m.REGEX, newSimplifiedDeck)) toReturn.add(m);
-                }
-                break;
+        if (valid) {
+            for (Card card : required) {
+                cards.remove(card);
+            }
         }
-        return toReturn;
+        return valid;
+    }
+
+    public static ArrayList<Meld> checkMelds(Deck deck, Suit trump) {
+        ArrayList<Meld> melds = new ArrayList<>();
+        ArrayList<Card> class1Deck = new Deck(deck).getCards();
+        for (int i = 0; i < Meld.values().length ; i++) {
+            Meld meld = Meld.values()[i];
+            if (meld.getType() != 1) continue;
+            Card[] required;
+            switch (meld) {
+                case RUN:
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case RUN_KING:
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.KING, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case RUN_QUEEN:
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.QUEEN, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case RUN_MARRIAGE:
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.KING, trump), new Card(Rank.QUEEN, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case DOUBLE_RUN:
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case DIX:
+                    required = new Card[]{new Card(Rank.NINE, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case ROYAL_MARRIAGE:
+                    required = new Card[]{new Card(Rank.KING, trump), new Card(Rank.QUEEN, trump)};
+                    if (isValidMeld(class1Deck, required)) melds.add(meld);
+                    break;
+                case COMMON_MARRIAGE:
+                    for (Suit suit : Suit.values()) {
+                        if (suit.equals(trump)) continue;
+                        Card king = new Card(Rank.KING, suit);
+                        Card queen = new Card(Rank.QUEEN, suit);
+                        if (class1Deck.contains(king) && class1Deck.contains(queen)) {
+                            class1Deck.remove(king);
+                            class1Deck.remove(queen);
+                            melds.add(meld);
+                            break;
+                        }
+                    }
+                    break;
+            }
+
+        }
+        ArrayList<Card> class2Deck = new Deck(deck).getCards();
+        for (int i = 0; i < Meld.values().length ; i++) {
+            Meld meld = Meld.values()[i];
+            if (meld.getType() != 2) continue;
+            Card[] required;
+            switch (meld) {
+                case PINOCHLE:
+                    required = new Card[]{new Card(Rank.JACK, Suit.Diamond), new Card(Rank.QUEEN, Suit.Spade)};
+                    if (isValidMeld(class2Deck, required)) melds.add(meld);
+                    break;
+                case DOUBLE_PINOCHLE:
+                    required = new Card[]{new Card(Rank.JACK, Suit.Diamond), new Card(Rank.JACK, Suit.Diamond), new Card(Rank.QUEEN, Suit.Spade), new Card(Rank.QUEEN, Suit.Spade)};
+                    if (isValidMeld(class2Deck, required)) melds.add(meld);
+                    break;
+            }
+        }
+        ArrayList<Card> class3Deck = new Deck(deck).getCards();
+        for (int i = 0; i < Meld.values().length ; i++) {
+            Meld meld = Meld.values()[i];
+            if (meld.getType() != 3) continue;
+            Card[] required;
+            switch (meld) {
+                case ACES_AROUND:
+                    required = new Card[]{new Card(Rank.ACE, Suit.Heart), new Card(Rank.ACE, Suit.Spade), new Card(Rank.ACE, Suit.Club), new Card(Rank.ACE, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case ACES_ABOUND:
+                    required = new Card[]{new Card(Rank.ACE, Suit.Heart), new Card(Rank.ACE, Suit.Spade), new Card(Rank.ACE, Suit.Club), new Card(Rank.ACE, Suit.Diamond),
+                                          new Card(Rank.ACE, Suit.Heart), new Card(Rank.ACE, Suit.Spade), new Card(Rank.ACE, Suit.Club), new Card(Rank.ACE, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case KINGS_AROUND:
+                    required = new Card[]{new Card(Rank.KING, Suit.Heart), new Card(Rank.KING, Suit.Spade), new Card(Rank.KING, Suit.Club), new Card(Rank.KING, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case KINGS_ABOUND:
+                    required = new Card[]{new Card(Rank.KING, Suit.Heart), new Card(Rank.KING, Suit.Spade), new Card(Rank.KING, Suit.Club), new Card(Rank.KING, Suit.Diamond),
+                            new Card(Rank.KING, Suit.Heart), new Card(Rank.KING, Suit.Spade), new Card(Rank.KING, Suit.Club), new Card(Rank.KING, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case QUEENS_AROUND:
+                    required = new Card[]{new Card(Rank.QUEEN, Suit.Heart), new Card(Rank.QUEEN, Suit.Spade), new Card(Rank.QUEEN, Suit.Club), new Card(Rank.QUEEN, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case QUEENS_ABOUND:
+                    required = new Card[]{new Card(Rank.QUEEN, Suit.Heart), new Card(Rank.QUEEN, Suit.Spade), new Card(Rank.QUEEN, Suit.Club), new Card(Rank.QUEEN, Suit.Diamond),
+                            new Card(Rank.QUEEN, Suit.Heart), new Card(Rank.QUEEN, Suit.Spade), new Card(Rank.QUEEN, Suit.Club), new Card(Rank.QUEEN, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case JACKS_AROUND:
+                    required = new Card[]{new Card(Rank.JACK, Suit.Heart), new Card(Rank.JACK, Suit.Spade), new Card(Rank.JACK, Suit.Club), new Card(Rank.JACK, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+                case JACKS_ABOUND:
+                    required = new Card[]{new Card(Rank.JACK, Suit.Heart), new Card(Rank.JACK, Suit.Spade), new Card(Rank.JACK, Suit.Club), new Card(Rank.JACK, Suit.Diamond),
+                            new Card(Rank.JACK, Suit.Heart), new Card(Rank.JACK, Suit.Spade), new Card(Rank.JACK, Suit.Club), new Card(Rank.JACK, Suit.Diamond)};
+                    if (isValidMeld(class3Deck, required)) melds.add(meld);
+                    break;
+            }
+        }
+        return melds;
     }
 
     public static int totalPoints(ArrayList<Meld> melds) {
-        return -1;
-    }  
-
+        int total = 0;
+        for (Meld meld : melds) {
+            total += meld.getPoints();
+        }
+        return total;
+    }
 }
