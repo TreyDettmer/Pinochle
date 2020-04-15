@@ -106,11 +106,12 @@ public class PinochleMainActivity extends GameMainActivity {
         PopupMenu meldsMenu = new PopupMenu(this,v);
         meldsMenu.inflate(R.menu.melds_menu);
         meldsMenu.getMenu().clear();
-        for (String meld : melds)
-        {
-            meldsMenu.getMenu().add(meld);
+        if (melds != null) {
+            for (String meld : melds) {
+                meldsMenu.getMenu().add(meld);
+            }
+            meldsMenu.show();
         }
-        meldsMenu.show();
     }
 
 }

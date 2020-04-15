@@ -60,9 +60,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private static RectF centerDeckRect;
     private static int handCardOffset;
     private static Deck myHand;
-    private static ArrayList<Meld> melds;
     static Paint buttonPaint;
     static Paint biddingTextPaint;
+    private static ArrayList<Meld> myMelds;
     private static Paint trumpChoiceTextPaint;
     private static Paint blackPaint;
     private static Paint highlightPaint;
@@ -183,6 +183,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 case BIDDING:
                     myActivity.phaseTextView.setText("Phase: Bidding");
                     myActivity.trumpSuitTextView.setText("");
+                    myActivity.melds = null;
                     break;
                 case CHOOSE_TRUMP:
                     myActivity.phaseTextView.setText("Phase: Choose Trump");
@@ -191,16 +192,18 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 case EXCHANGE_CARDS:
                     myActivity.phaseTextView.setText("Phase: Card Exchange");
                     myActivity.trumpSuitTextView.setText("Trump: " + state.getTrumpSuit().getName());
+
                     break;
                 case MELDING:
                     myActivity.phaseTextView.setText("Phase: Calculate Melds");
+                    sendMeldsToActivity();
                     game.sendAction(new PinochleActionCalculateMelds(this));
                     voted = false;
                     break;
                 case VOTE_GO_SET:
                     myActivity.phaseTextView.setText("Phase: Go Set?");
 
-                    melds = Meld.checkMelds(myHand, state.getTrumpSuit());
+
 
                     if (state.getWonBid() != playerNum && state.getWonBid() != teammatePlayerNum)
                     {
@@ -226,6 +229,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 case ACKNOWLEDGE_SCORE:
                     myActivity.phaseTextView.setText("Phase: Scoring");
                     myActivity.trumpSuitTextView.setText("");
+                    myActivity.melds = null;
                     if (acknowledgePressed) {
                         game.sendAction(new PinochleActionAcknowledgeScore(this));
                     }
@@ -505,7 +509,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     protected void drawVoteGoSetPrompt(Canvas c)
     {
         if (state.getWonBid() == playerNum || state.getWonBid() == teammatePlayerNum) {
-            int meldPoints = Meld.totalPoints(melds);
             int maxBid = state.getMaxBid();
             c.drawText("Your team bid " + maxBid + " points.", 960, 370, biddingTextPaint);
             c.drawText("Your team scored " + state.getMeldsScoreboard()[state.getTeam(playerNum)] + " points.", 960, 440, biddingTextPaint);
@@ -525,6 +528,26 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
 
 
+
+    }
+
+    protected void sendMeldsToActivity()
+    {
+        myMelds = state.getMelds()[playerNum];
+        if (myMelds != null)
+        {
+            ArrayList<String> meldStrings = new ArrayList<>();
+            int points = 0;
+            for (Meld m : myMelds)
+            {
+                meldStrings.add(m.getName() + ": " + m.getPoints());
+                points += m.getPoints();
+
+            }
+            meldStrings.add("Total meld points: " + points);
+            myActivity.melds = meldStrings;
+
+        }
 
     }
 
