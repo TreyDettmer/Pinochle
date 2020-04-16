@@ -16,7 +16,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="1000px"
-        android:onClick="showMelds"
         android:paddingLeft="100px"
         android:paddingRight="100px"
         android:text="Melds"

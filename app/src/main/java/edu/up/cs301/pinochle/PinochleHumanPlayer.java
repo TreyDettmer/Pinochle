@@ -278,6 +278,20 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         trumpSuitTextView = myActivity.findViewById(R.id.trumpSuitTextView);
         phaseTextView = myActivity.findViewById(R.id.phaseTextView);
         meldsMenuButton = myActivity.findViewById(R.id.meldsMenuButton);
+        meldsMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PopupMenu meldsMenu = new PopupMenu(myActivity, view);
+                meldsMenu.inflate(R.menu.melds_menu);
+                meldsMenu.getMenu().clear();
+                if (melds != null) {
+                    for (String meld : melds) {
+                        meldsMenu.getMenu().add(meld);
+                    }
+                    meldsMenu.show();
+                }
+            }
+        });
         melds = new ArrayList<>();
 
         initSuitImages();
@@ -291,20 +305,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         // any state-related processing is done
         if (state != null) {
             receiveInfo(state);
-        }
-    }
-
-
-    public void showMelds(View v)
-    {
-        PopupMenu meldsMenu = new PopupMenu(myActivity,v);
-        meldsMenu.inflate(R.menu.melds_menu);
-        meldsMenu.getMenu().clear();
-        if (melds != null) {
-            for (String meld : melds) {
-                meldsMenu.getMenu().add(meld);
-            }
-            meldsMenu.show();
         }
     }
 
