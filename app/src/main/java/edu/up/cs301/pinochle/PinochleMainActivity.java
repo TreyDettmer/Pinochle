@@ -28,17 +28,6 @@ import edu.up.cs301.game.R;
  */
 public class PinochleMainActivity extends GameMainActivity {
     public static final int PORT_NUMBER = 8753;
-    public TextView leftPlayerInfoTextView;
-    public TextView leftPlayerNameTextView;
-    public TextView rightPlayerInfoTextView;
-    public TextView rightPlayerNameTextView;
-    public TextView topPlayerInfoTextView;
-    public TextView topPlayerNameTextView;
-    public TextView humanPlayerInfoTextView;
-    public TextView phaseTextView;
-    public TextView trumpSuitTextView;
-    public ArrayList<String> melds;
-
 
     /** a pinochle game for four players. The default is human vs. computer */
     @Override
@@ -77,41 +66,6 @@ public class PinochleMainActivity extends GameMainActivity {
     @Override
     public LocalGame createLocalGame() {
         return new PinochleLocalGame();
-    }
-
-    /** initialize text views **/
-    @SuppressLint("SourceLockedOrientationActivity")
-    public void initializeGui()
-    {
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        leftPlayerInfoTextView = findViewById(R.id.leftPlayerInfo);
-        leftPlayerNameTextView = findViewById(R.id.leftPlayerName);
-        rightPlayerInfoTextView = findViewById(R.id.rightPlayerInfo);
-        rightPlayerNameTextView = findViewById(R.id.rightPlayerName);
-        topPlayerInfoTextView = findViewById(R.id.topPlayerInfo);
-        topPlayerNameTextView = findViewById(R.id.topPlayerName);
-        humanPlayerInfoTextView = findViewById(R.id.humanPlayerInfo);
-        trumpSuitTextView = findViewById(R.id.trumpSuitTextView);
-        phaseTextView = findViewById(R.id.phaseTextView);
-        melds = new ArrayList<>();
-
-
-
-
-    }
-
-
-    public void showMelds(View v)
-    {
-        PopupMenu meldsMenu = new PopupMenu(this,v);
-        meldsMenu.inflate(R.menu.melds_menu);
-        meldsMenu.getMenu().clear();
-        if (melds != null) {
-            for (String meld : melds) {
-                meldsMenu.getMenu().add(meld);
-            }
-            meldsMenu.show();
-        }
     }
 
 }

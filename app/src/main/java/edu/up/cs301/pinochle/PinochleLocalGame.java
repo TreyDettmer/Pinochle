@@ -238,7 +238,7 @@ public class PinochleLocalGame extends LocalGame {
             Card trick = actionPlayTrick.getTrick();
 
             if (trick == null) {
-                if (gameState.getCenterDeck().size() == 4) {
+                if (gameState.getCenterDeck().size() >= 4) {
                     int trickWinner = gameState.getTrickWinner();
                     int trickWinnerTeam = gameState.getTeam(gameState.getTrickWinner());
                     System.out.println("Trick winner: " + trickWinner);

@@ -1,6 +1,8 @@
 package edu.up.cs301.pinochle;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -10,9 +12,13 @@ import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.design.widget.Snackbar;
+import android.support.v7.view.menu.MenuView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.PopupMenu;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,6 +52,17 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private PinochleGameState state;
     private PinochleMainActivity myActivity;
     private AnimationSurface surface;
+    public TextView leftPlayerInfoTextView;
+    public TextView leftPlayerNameTextView;
+    public TextView rightPlayerInfoTextView;
+    public TextView rightPlayerNameTextView;
+    public TextView topPlayerInfoTextView;
+    public TextView topPlayerNameTextView;
+    public TextView humanPlayerInfoTextView;
+    public TextView phaseTextView;
+    public TextView trumpSuitTextView;
+    public Button meldsMenuButton;
+    public ArrayList<String> melds;
     private int backgroundColor;
     private int teammatePlayerNum;
     private int playerToLeftIndex;
@@ -174,34 +191,34 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             state = (PinochleGameState) info;
             teammatePlayerNum = state.getTeammate(playerNum);
             PinochleGamePhase phase = state.getPhase();
-            myActivity.leftPlayerNameTextView.setText(allPlayerNames[playerToLeftIndex]);
-            myActivity.rightPlayerNameTextView.setText(allPlayerNames[playerToRightIndex]);
-            myActivity.topPlayerNameTextView.setText(allPlayerNames[teammatePlayerNum]);
+            leftPlayerNameTextView.setText(allPlayerNames[playerToLeftIndex]);
+            rightPlayerNameTextView.setText(allPlayerNames[playerToRightIndex]);
+            topPlayerNameTextView.setText(allPlayerNames[teammatePlayerNum]);
             updateGUI(phase);
 
             switch (phase) {
                 case BIDDING:
-                    myActivity.phaseTextView.setText("Phase: Bidding");
-                    myActivity.trumpSuitTextView.setText("");
-                    myActivity.melds = null;
+                    phaseTextView.setText("Phase: Bidding");
+                    trumpSuitTextView.setText("");
+                    melds = null;
                     break;
                 case CHOOSE_TRUMP:
-                    myActivity.phaseTextView.setText("Phase: Choose Trump");
-                    myActivity.trumpSuitTextView.setText("");
+                    phaseTextView.setText("Phase: Choose Trump");
+                    trumpSuitTextView.setText("");
                     break;
                 case EXCHANGE_CARDS:
-                    myActivity.phaseTextView.setText("Phase: Card Exchange");
-                    myActivity.trumpSuitTextView.setText("Trump: " + state.getTrumpSuit().getName());
+                    phaseTextView.setText("Phase: Card Exchange");
+                    trumpSuitTextView.setText("Trump: " + state.getTrumpSuit().getName());
 
                     break;
                 case MELDING:
-                    myActivity.phaseTextView.setText("Phase: Calculate Melds");
+                    phaseTextView.setText("Phase: Calculate Melds");
                     sendMeldsToActivity();
                     game.sendAction(new PinochleActionCalculateMelds(this));
                     voted = false;
                     break;
                 case VOTE_GO_SET:
-                    myActivity.phaseTextView.setText("Phase: Go Set?");
+                    phaseTextView.setText("Phase: Go Set?");
 
 
 
@@ -216,7 +233,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
                     break;
                 case TRICK_TAKING:
-                    myActivity.phaseTextView.setText("Phase: Trick-taking");
+                    phaseTextView.setText("Phase: Trick-taking");
                     if (state.getTurn() == playerNum) {
                         if (state.getCenterDeck().getCards().size() == 4) {
                             sleep(1);
@@ -227,9 +244,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     acknowledgePressed = false;
                     break;
                 case ACKNOWLEDGE_SCORE:
-                    myActivity.phaseTextView.setText("Phase: Scoring");
-                    myActivity.trumpSuitTextView.setText("");
-                    myActivity.melds = null;
+                    phaseTextView.setText("Phase: Scoring");
+                    trumpSuitTextView.setText("");
+                    melds = null;
                     if (acknowledgePressed) {
                         game.sendAction(new PinochleActionAcknowledgeScore(this));
                     }
@@ -240,6 +257,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void setAsGui(GameMainActivity activity)
     {
@@ -248,9 +266,21 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
         // Load the layout resource for the new configuration
         activity.setContentView(R.layout.pinochle_human_player);
-        myActivity.initializeGui();
-        initSuitImages();
 
+        myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        leftPlayerInfoTextView = myActivity.findViewById(R.id.leftPlayerInfo);
+        leftPlayerNameTextView = myActivity.findViewById(R.id.leftPlayerName);
+        rightPlayerInfoTextView = myActivity.findViewById(R.id.rightPlayerInfo);
+        rightPlayerNameTextView = myActivity.findViewById(R.id.rightPlayerName);
+        topPlayerInfoTextView = myActivity.findViewById(R.id.topPlayerInfo);
+        topPlayerNameTextView = myActivity.findViewById(R.id.topPlayerName);
+        humanPlayerInfoTextView = myActivity.findViewById(R.id.humanPlayerInfo);
+        trumpSuitTextView = myActivity.findViewById(R.id.trumpSuitTextView);
+        phaseTextView = myActivity.findViewById(R.id.phaseTextView);
+        meldsMenuButton = myActivity.findViewById(R.id.meldsMenuButton);
+        melds = new ArrayList<>();
+
+        initSuitImages();
 
         Card.initImages(activity);
         // link the animator (this object) to the animation surface
@@ -264,6 +294,20 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+
+    public void showMelds(View v)
+    {
+        PopupMenu meldsMenu = new PopupMenu(myActivity,v);
+        meldsMenu.inflate(R.menu.melds_menu);
+        meldsMenu.getMenu().clear();
+        if (melds != null) {
+            for (String meld : melds) {
+                meldsMenu.getMenu().add(meld);
+            }
+            meldsMenu.show();
+        }
+    }
+
     /**
      * updates the GUI
      *
@@ -272,91 +316,96 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
         if (state != null)
         {
-            if (phase == PinochleGamePhase.VOTE_GO_SET || phase == PinochleGamePhase.ACKNOWLEDGE_SCORE) {
-                myActivity.humanPlayerInfoTextView.setVisibility(View.INVISIBLE);
-                myActivity.leftPlayerNameTextView.setVisibility(View.INVISIBLE);
-                myActivity.leftPlayerInfoTextView.setVisibility(View.INVISIBLE);
-                myActivity.topPlayerNameTextView.setVisibility(View.INVISIBLE);
-                myActivity.topPlayerInfoTextView.setVisibility(View.INVISIBLE);
-                myActivity.rightPlayerNameTextView.setVisibility(View.INVISIBLE);
-                myActivity.rightPlayerInfoTextView.setVisibility(View.INVISIBLE);
+            if (phase == PinochleGamePhase.TRICK_TAKING) {
+                meldsMenuButton.setVisibility(View.VISIBLE);
             } else {
-                myActivity.humanPlayerInfoTextView.setVisibility(View.VISIBLE);
-                myActivity.leftPlayerNameTextView.setVisibility(View.VISIBLE);
-                myActivity.leftPlayerInfoTextView.setVisibility(View.VISIBLE);
-                myActivity.topPlayerNameTextView.setVisibility(View.VISIBLE);
-                myActivity.topPlayerInfoTextView.setVisibility(View.VISIBLE);
-                myActivity.rightPlayerNameTextView.setVisibility(View.VISIBLE);
-                myActivity.rightPlayerInfoTextView.setVisibility(View.VISIBLE);
+                meldsMenuButton.setVisibility(View.INVISIBLE);
+            }
+            if (phase == PinochleGamePhase.VOTE_GO_SET || phase == PinochleGamePhase.ACKNOWLEDGE_SCORE) {
+                humanPlayerInfoTextView.setVisibility(View.INVISIBLE);
+                leftPlayerNameTextView.setVisibility(View.INVISIBLE);
+                leftPlayerInfoTextView.setVisibility(View.INVISIBLE);
+                topPlayerNameTextView.setVisibility(View.INVISIBLE);
+                topPlayerInfoTextView.setVisibility(View.INVISIBLE);
+                rightPlayerNameTextView.setVisibility(View.INVISIBLE);
+                rightPlayerInfoTextView.setVisibility(View.INVISIBLE);
+            } else {
+                humanPlayerInfoTextView.setVisibility(View.VISIBLE);
+                leftPlayerNameTextView.setVisibility(View.VISIBLE);
+                leftPlayerInfoTextView.setVisibility(View.VISIBLE);
+                topPlayerNameTextView.setVisibility(View.VISIBLE);
+                topPlayerInfoTextView.setVisibility(View.VISIBLE);
+                rightPlayerNameTextView.setVisibility(View.VISIBLE);
+                rightPlayerInfoTextView.setVisibility(View.VISIBLE);
             }
             int turn = state.getTurn();
             if (turn == playerToLeftIndex)
             {
-                myActivity.leftPlayerInfoTextView.setText("[my turn]");
+                leftPlayerInfoTextView.setText("[my turn]");
             }
             else if (turn == teammatePlayerNum)
             {
-                myActivity.topPlayerInfoTextView.setText("[my turn]");
+                topPlayerInfoTextView.setText("[my turn]");
             }
             else if (turn == playerToRightIndex)
             {
-                myActivity.rightPlayerInfoTextView.setText("[my turn]");
+                rightPlayerInfoTextView.setText("[my turn]");
             }
             else
             {
-                myActivity.humanPlayerInfoTextView.setText("[your turn]");
+                humanPlayerInfoTextView.setText("[your turn]");
             }
             if (phase == PinochleGamePhase.BIDDING || phase == PinochleGamePhase.CHOOSE_TRUMP)
             {
                 if (state.getPassed(playerToRightIndex))
                 {
-                    myActivity.rightPlayerInfoTextView.setText("[passed]");
+                    rightPlayerInfoTextView.setText("[passed]");
                 }
                 else
                 {
                     if (turn != playerToRightIndex)
                     {
                         if (state.getBids()[playerToRightIndex] != 0) {
-                            myActivity.rightPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToRightIndex] + "]");
+                            rightPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToRightIndex] + "]");
                         }
                     }
                 }
                 if (state.getPassed(teammatePlayerNum))
                 {
-                    myActivity.topPlayerInfoTextView.setText("[passed]");
+                    topPlayerInfoTextView.setText("[passed]");
                 }
                 else
                 {
                     if (turn != teammatePlayerNum)
                     {
                         if (state.getBids()[teammatePlayerNum] != 0) {
-                            myActivity.topPlayerInfoTextView.setText("[Bid " + state.getBids()[teammatePlayerNum] + "]");
+                            topPlayerInfoTextView.setText("[Bid " + state.getBids()[teammatePlayerNum] + "]");
                         }
                     }
                 }
                 if (state.getPassed(playerToLeftIndex))
                 {
-                    myActivity.leftPlayerInfoTextView.setText("[passed]");
+                    leftPlayerInfoTextView.setText("[passed]");
                 }
                 else
                 {
                     if (turn != playerToLeftIndex)
                     {
                         if (state.getBids()[playerToLeftIndex] != 0) {
-                            myActivity.leftPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToLeftIndex] + "]");
+                            leftPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToLeftIndex] + "]");
                         }
                     }
                 }
                 if (state.getPassed(playerNum))
                 {
-                    myActivity.humanPlayerInfoTextView.setText("[passed]");
+                    humanPlayerInfoTextView.setText("[passed]");
                 }
                 else
                 {
                     if (turn != playerNum)
                     {
                         if (state.getBids()[playerNum] != 0) {
-                            myActivity.humanPlayerInfoTextView.setText("[Bid " + state.getBids()[playerNum] + "]");
+                            humanPlayerInfoTextView.setText("[Bid " + state.getBids()[playerNum] + "]");
                         }
                     }
                 }
@@ -366,17 +415,17 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
             else if (state.getPhase() == PinochleGamePhase.MELDING)
             {
-                myActivity.leftPlayerInfoTextView.setText("[info]");
-                myActivity.topPlayerInfoTextView.setText("[info]");
-                myActivity.rightPlayerInfoTextView.setText("[info]");
-                myActivity.humanPlayerInfoTextView.setText("[info]");
+                leftPlayerInfoTextView.setText("[info]");
+                topPlayerInfoTextView.setText("[info]");
+                rightPlayerInfoTextView.setText("[info]");
+                humanPlayerInfoTextView.setText("[info]");
             }
             else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING)
             {
-                if (state.getTurn() != playerToLeftIndex) {myActivity.leftPlayerInfoTextView.setText("[info]");}
-                if (state.getTurn() != playerToRightIndex) {myActivity.rightPlayerInfoTextView.setText("[info]");}
-                if (state.getTurn() != teammatePlayerNum) {myActivity.topPlayerInfoTextView.setText("[info]");}
-                if (state.getTurn() != playerNum) {myActivity.humanPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != playerToLeftIndex) {leftPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != playerToRightIndex) {rightPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != teammatePlayerNum) {topPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != playerNum) {humanPlayerInfoTextView.setText("[info]");}
 
             }
 
@@ -545,7 +594,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
             }
             meldStrings.add("Total meld points: " + points);
-            myActivity.melds = meldStrings;
+            melds = meldStrings;
 
         }
 
