@@ -177,10 +177,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
                 case TRICK_TAKING:
                     if (state.getTurn() == playerNum) {
-
-                        if (state.getCenterDeck().getCards().size() >= 4)
-                        {
-                            sleep(1);
+                        if (state.getCenterDeck().getCards().size() >= 4) {
                             game.sendAction(new PinochleActionPlayTrick(this,null));
                             break;
                         }
