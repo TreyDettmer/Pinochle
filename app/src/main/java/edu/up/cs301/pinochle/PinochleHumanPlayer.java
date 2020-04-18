@@ -638,7 +638,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             c.drawText("Your team bid " + maxBid + " points.", 960, 370, biddingTextPaint);
             c.drawText("Your team scored " + state.getMeldsScoreboard()[state.getTeam(playerNum)] + " points.", 960, 440, biddingTextPaint);
             c.drawText("Do you want to go set?", 960, 510, biddingTextPaint);
-            c.drawText("NOTE: The game continues only if both teammate votes yes.", 960, 580, biddingTextPaint);
+            c.drawText("NOTE: The round ends if both teammates vote yes.", 960, 580, biddingTextPaint);
             if (!voted) {
                 c.drawRect(voteYesButtonRect, buttonPaint);
                 c.drawRect(voteNoButtonRect, buttonPaint);
