@@ -176,6 +176,15 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
 
                 case TRICK_TAKING:
+                    if (state.getTurn() == playerNum) {
+
+                        if (state.getCenterDeck().getCards().size() >= 4)
+                        {
+                            sleep(1);
+                            game.sendAction(new PinochleActionPlayTrick(this,null));
+                            break;
+                        }
+                    }
                     // TODO: Temporary:
 
                     // The cards from the player's deck but shuffled to randomize the order.
