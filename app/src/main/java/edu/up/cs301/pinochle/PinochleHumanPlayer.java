@@ -52,17 +52,26 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private PinochleGameState state;
     private PinochleMainActivity myActivity;
     private AnimationSurface surface;
-    public TextView leftPlayerInfoTextView;
-    public TextView leftPlayerNameTextView;
-    public TextView rightPlayerInfoTextView;
-    public TextView rightPlayerNameTextView;
-    public TextView topPlayerInfoTextView;
-    public TextView topPlayerNameTextView;
-    public TextView humanPlayerInfoTextView;
-    public TextView phaseTextView;
-    public TextView trumpSuitTextView;
-    public Button meldsMenuButton;
-    public ArrayList<String> melds;
+    private TextView leftPlayerInfoTextView;
+    private TextView leftPlayerNameTextView;
+    private TextView rightPlayerInfoTextView;
+    private TextView rightPlayerNameTextView;
+    private TextView topPlayerInfoTextView;
+    private TextView topPlayerNameTextView;
+    private TextView humanPlayerInfoTextView;
+    private TextView phaseTextView;
+    private TextView bidTextView;
+    private TextView trumpSuitTextView;
+    private Button meldsMenuButton;
+    private ArrayList<String> melds;
+    private TextView team0NameTextView;
+    private TextView team0TotalTextView;
+    private TextView team0MeldsTextView;
+    private TextView team0TricksTextView;
+    private TextView team1NameTextView;
+    private TextView team1TotalTextView;
+    private TextView team1MeldsTextView;
+    private TextView team1TricksTextView;
     private int backgroundColor;
     private int teammatePlayerNum;
     private int playerToLeftIndex;
@@ -99,30 +108,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         initializeGUI();
         exchangeCards = new ArrayList<>();
         highlightMarkers = new ArrayList<>();
-
-
-        if (playerNum == 0)
-        {
-            playerToRightIndex = 3;
-            playerToLeftIndex = 1;
-        }
-        else if (playerNum == 1)
-        {
-            playerToRightIndex = 0;
-            playerToLeftIndex = 2;
-        }
-        else if (playerNum == 2)
-        {
-            playerToLeftIndex = 3;
-            playerToRightIndex = 1;
-        }
-        else
-        {
-            playerToLeftIndex = 0;
-            playerToRightIndex = 2;
-        }
-
-
     }
 
     public void initializeGUI()
@@ -165,6 +150,26 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     @Override
     public void receiveInfo(GameInfo info) {
+        if (playerNum == 0)
+        {
+            playerToRightIndex = 3;
+            playerToLeftIndex = 1;
+        }
+        else if (playerNum == 1)
+        {
+            playerToRightIndex = 0;
+            playerToLeftIndex = 2;
+        }
+        else if (playerNum == 2)
+        {
+            playerToLeftIndex = 3;
+            playerToRightIndex = 1;
+        }
+        else
+        {
+            playerToLeftIndex = 0;
+            playerToRightIndex = 2;
+        }
         if (info instanceof IllegalMoveInfo) {
             surface.flash(Color.RED, 50);
             String message = null;
@@ -199,11 +204,20 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             switch (phase) {
                 case BIDDING:
                     phaseTextView.setText("Phase: Bidding");
+                    bidTextView.setText("");
                     trumpSuitTextView.setText("");
                     melds = null;
                     break;
                 case CHOOSE_TRUMP:
                     phaseTextView.setText("Phase: Choose Trump");
+                    int wonBidTeam = state.getTeam(state.getWonBid());
+                    String teamName;
+                    if (state.getTeam(playerNum) == wonBidTeam) {
+                        teamName = "Your";
+                    } else {
+                        teamName = "Opposing";
+                    }
+                    bidTextView.setText("Bid: " + teamName + " team bid " + state.getMaxBid());
                     trumpSuitTextView.setText("");
                     break;
                 case EXCHANGE_CARDS:
@@ -213,15 +227,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case MELDING:
                     phaseTextView.setText("Phase: Calculate Melds");
-                    sendMeldsToActivity();
                     game.sendAction(new PinochleActionCalculateMelds(this));
                     voted = false;
                     break;
                 case VOTE_GO_SET:
                     phaseTextView.setText("Phase: Go Set?");
-
-
-
+                    sendMeldsToActivity();
                     if (state.getWonBid() != playerNum && state.getWonBid() != teammatePlayerNum)
                     {
                         game.sendAction(new PinochleActionVoteGoSet(this,false));
@@ -234,8 +245,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     break;
                 case TRICK_TAKING:
                     phaseTextView.setText("Phase: Trick-taking");
+                    if (state.getTrickRound() == 0 && state.getTurn() == state.getWonBid()) {
+                        sendMeldsToActivity();
+                    }
                     if (state.getTurn() == playerNum) {
-                        if (state.getCenterDeck().getCards().size() == 4) {
+                        if (state.getCenterDeck().getCards().size() >= 4) {
                             sleep(1);
                             game.sendAction(new PinochleActionPlayTrick(this, null));
                             break;
@@ -275,6 +289,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         topPlayerInfoTextView = myActivity.findViewById(R.id.topPlayerInfo);
         topPlayerNameTextView = myActivity.findViewById(R.id.topPlayerName);
         humanPlayerInfoTextView = myActivity.findViewById(R.id.humanPlayerInfo);
+        bidTextView = myActivity.findViewById(R.id.bidTextView);
         trumpSuitTextView = myActivity.findViewById(R.id.trumpSuitTextView);
         phaseTextView = myActivity.findViewById(R.id.phaseTextView);
         meldsMenuButton = myActivity.findViewById(R.id.meldsMenuButton);
@@ -293,6 +308,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
         });
         melds = new ArrayList<>();
+        team0NameTextView = myActivity.findViewById(R.id.team0_name);
+        team0TotalTextView = myActivity.findViewById(R.id.team0_toal);
+        team0MeldsTextView = myActivity.findViewById(R.id.team0_melds);
+        team0TricksTextView = myActivity.findViewById(R.id.team0_tricks);
+        team1NameTextView = myActivity.findViewById(R.id.team1_name);
+        team1TotalTextView = myActivity.findViewById(R.id.team1_total);
+        team1MeldsTextView = myActivity.findViewById(R.id.team1_melds);
+        team1TricksTextView = myActivity.findViewById(R.id.team1_tricks);
 
         initSuitImages();
 
@@ -316,9 +339,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
         if (state != null)
         {
-            if (phase == PinochleGamePhase.TRICK_TAKING) {
-                meldsMenuButton.setVisibility(View.VISIBLE);
-            } else {
+            if (phase != PinochleGamePhase.VOTE_GO_SET && phase != PinochleGamePhase.TRICK_TAKING) {
                 meldsMenuButton.setVisibility(View.INVISIBLE);
             }
             if (phase == PinochleGamePhase.VOTE_GO_SET || phase == PinochleGamePhase.ACKNOWLEDGE_SCORE) {
@@ -338,7 +359,28 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 rightPlayerNameTextView.setVisibility(View.VISIBLE);
                 rightPlayerInfoTextView.setVisibility(View.VISIBLE);
             }
+
+            int[] totalScores = state.getScoreboard();
+            int[] meldsScores = state.getMeldsScoreboard();
+            int[] tricksScores = state.getTricksScoreboard();
+
+            if (state.getTeam(playerNum) == 0) {
+                team0NameTextView.setText("Your team");
+                team1NameTextView.setText("Opposing team");
+            } else {
+                team0NameTextView.setText("Opposing team");
+                team1NameTextView.setText("Your team");
+            }
+            team0TotalTextView.setText(String.valueOf(totalScores[0]));
+            team0MeldsTextView.setText(String.valueOf(meldsScores[0]));
+            team0TricksTextView.setText(String.valueOf(tricksScores[0]));
+            team1TotalTextView.setText(String.valueOf(totalScores[1]));
+            team1MeldsTextView.setText(String.valueOf(meldsScores[1]));
+            team1TricksTextView.setText(String.valueOf(tricksScores[1]));
+
+
             int turn = state.getTurn();
+
             if (turn == playerToLeftIndex)
             {
                 leftPlayerInfoTextView.setText("[my turn]");
@@ -490,8 +532,14 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 drawCard(c, cardRect, state.getCenterDeck().getCards().get(i));
             }
         }
+
+        int wonLastTrick = state.getPreviousTrickWinner();
+
         if (state.getTurn() == playerNum && state.getCenterDeck().getCards().size() != 4)
         {
+            if (state.getTrickRound() > 0 && playerNum == wonLastTrick) {
+                c.drawText("You won the last trick!", 960, 640, biddingTextPaint);
+            }
             c.drawText("Choose a card below to play.", 960, 710, biddingTextPaint);
         } else {
             c.drawText("Waiting for other players...", 960, 710, biddingTextPaint);
@@ -597,7 +645,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             melds = meldStrings;
 
         }
-
+        meldsMenuButton.setVisibility(View.VISIBLE);
     }
 
 
@@ -636,8 +684,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     {
         if (state.getTurn() == playerNum)
         {
-            c.drawText("You won the bid!", 960, 530, trumpChoiceTextPaint);
-            c.drawText("Choose Trump Suit", 960, 460, trumpChoiceTextPaint);
+            c.drawText("You won the bid!", 960, 460, trumpChoiceTextPaint);
+            c.drawText("Choose Trump Suit", 960, 530, trumpChoiceTextPaint);
             for (int i = 0; i < 4; i++) {
                 RectF rect = new RectF(trumpSuitChoiceRect.left + (200 * i), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * i), trumpSuitChoiceRect.bottom);
                 Rect r = new Rect(0,0, suits[i].getWidth(), suits[i].getHeight());
