@@ -361,7 +361,6 @@ public class PinochleGameState extends GameState {
             deal[i] = mainDeck.removeTopCard();
 
         }
-
         return deal;
     }
 

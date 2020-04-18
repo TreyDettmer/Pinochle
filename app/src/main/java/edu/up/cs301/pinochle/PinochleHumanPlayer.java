@@ -1094,7 +1094,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             //top
 
             initialRect = new RectF(1200,30,1280,170);
-            for (int i = state.getPlayerDeck(state.getTeammate(playerNum)).size(); i >= 0 ; i--)
+            for (int i = state.getPlayerDeck(state.getTeammate(playerNum)).size() - 1; i >= 0 ; i--)
             {
                 drawCard(g, new RectF(initialRect.left - (cardOffset * (i + 1)), initialRect.top , initialRect.right - (cardOffset * (i + 1)) , initialRect.bottom ), null);
             }
