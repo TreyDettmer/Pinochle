@@ -145,13 +145,14 @@
         android:id="@+id/humanPlayerInfo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="188dp"
-        android:layout_marginLeft="188dp"
         android:layout_marginTop="576dp"
+        android:layout_marginEnd="972dp"
+        android:layout_marginRight="972dp"
+        android:gravity="right"
         android:text="[Waiting]"
         android:textColor="#FFFFFF"
         android:textSize="30sp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TableLayout

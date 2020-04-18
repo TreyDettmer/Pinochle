@@ -137,7 +137,6 @@ public class PinochleLocalGame extends LocalGame {
                 } else {
                     gameState.setPlayerTurn(gameState.getWonBid());
                     gameState.setPreviousTrickWinner(gameState.getWonBid());
-                    System.out.println("Previous Trick Winner: " + gameState.getPreviousTrickWinner());
                     gameState.setPhase(PinochleGamePhase.TRICK_TAKING);
                 }
             }
@@ -201,7 +200,6 @@ public class PinochleLocalGame extends LocalGame {
                 } else {
                     gameState.setPlayerTurn(gameState.getWonBid());
                     gameState.setPreviousTrickWinner(gameState.getWonBid());
-                    System.out.println("Previous Trick Winner: " + gameState.getPreviousTrickWinner());
                     gameState.nextPhase();
                 }
 

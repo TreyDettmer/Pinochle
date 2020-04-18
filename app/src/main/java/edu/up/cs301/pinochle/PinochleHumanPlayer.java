@@ -11,6 +11,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.design.widget.Snackbar;
 import android.support.v7.view.menu.MenuView;
 import android.util.Log;
@@ -101,6 +103,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private boolean voted;
     private boolean voteGoSet;
     private boolean acknowledgePressed;
+    private Handler handler;
 
     public PinochleHumanPlayer(String name)
     {
@@ -108,6 +111,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         initializeGUI();
         exchangeCards = new ArrayList<>();
         highlightMarkers = new ArrayList<>();
+        handler = new Handler(Looper.getMainLooper());
     }
 
     public void initializeGUI()
@@ -250,6 +254,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     }
                     if (state.getTurn() == playerNum) {
                         if (state.getCenterDeck().getCards().size() >= 4) {
+                            Card card = state.getCenterDeck().getCards().get(3);
+                            String cardText = "[" + card.toString() + "]";
+                            rightPlayerInfoTextView.setText(cardText);
                             sleep(1);
                             game.sendAction(new PinochleActionPlayTrick(this, null));
                             break;
@@ -461,14 +468,15 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 topPlayerInfoTextView.setText("[Waiting]");
                 rightPlayerInfoTextView.setText("[Waiting]");
                 humanPlayerInfoTextView.setText("[Waiting]");
-            }
-            else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING)
-            {
-                if (state.getTurn() != playerToLeftIndex) {leftPlayerInfoTextView.setText("[Waiting]");}
-                if (state.getTurn() != playerToRightIndex) {rightPlayerInfoTextView.setText("[Waiting]");}
-                if (state.getTurn() != teammatePlayerNum) {topPlayerInfoTextView.setText("[Waiting]");}
-                if (state.getTurn() != playerNum) {humanPlayerInfoTextView.setText("[Waiting]");}
-
+            } else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING) {
+                if (state.getTurn() != playerToLeftIndex) leftPlayerInfoTextView.setText("[Waiting]");
+                else leftPlayerInfoTextView.setText("[My turn]");
+                if (state.getTurn() != playerToRightIndex) rightPlayerInfoTextView.setText("[Waiting]");
+                else rightPlayerInfoTextView.setText("[My turn]");
+                if (state.getTurn() != teammatePlayerNum) topPlayerInfoTextView.setText("[Waiting]");
+                else topPlayerInfoTextView.setText("[My turn]");
+                if (state.getTurn() != playerNum) humanPlayerInfoTextView.setText("[Waiting]");
+                else humanPlayerInfoTextView.setText("[Your turn]");
             }
 
         }
@@ -525,11 +533,34 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     protected void drawTrickTakingPrompt(Canvas c)
     {
         int offset = 50;
-        for (int i = 0; i < state.getCenterDeck().getCards().size();i++)
+
+        for (int i = 0; i < state.getCenterDeck().getCards().size(); i++)
         {
             RectF cardRect = new RectF(centerDeckRect.left + (offset * i),centerDeckRect.top,centerDeckRect.right + (offset * i),centerDeckRect.bottom);
             if (state.getCenterDeck().getCards().size() > i) {
-                drawCard(c, cardRect, state.getCenterDeck().getCards().get(i));
+                final Card card = state.getCenterDeck().getCards().get(i);
+                drawCard(c, cardRect, card);
+
+                /*
+                final int previousTrickWinner = state.getPreviousTrickWinner();
+                final int finalI = i;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        int player = (previousTrickWinner + finalI) % allPlayerNames.length;
+                        String cardText = "[" + card.toString() + "]";
+                        if (player == playerToLeftIndex) {
+                            leftPlayerInfoTextView.setText(cardText);
+                        } else if (player == teammatePlayerNum) {
+                            topPlayerInfoTextView.setText(cardText);
+                        } else if (player == playerToRightIndex) {
+                            rightPlayerInfoTextView.setText(cardText);
+                        } else {
+                            humanPlayerInfoTextView.setText(cardText);
+                        }
+                    }
+                });
+                */
             }
         }
 
@@ -685,7 +716,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         if (state.getTurn() == playerNum)
         {
             c.drawText("You won the bid!", 960, 460, trumpChoiceTextPaint);
-            c.drawText("Choose Trump Suit", 960, 530, trumpChoiceTextPaint);
+            c.drawText("Choose the Trump Suit", 960, 530, trumpChoiceTextPaint);
             for (int i = 0; i < 4; i++) {
                 RectF rect = new RectF(trumpSuitChoiceRect.left + (200 * i), trumpSuitChoiceRect.top, trumpSuitChoiceRect.right + (200 * i), trumpSuitChoiceRect.bottom);
                 Rect r = new Rect(0,0, suits[i].getWidth(), suits[i].getHeight());
@@ -1064,10 +1095,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 drawCard(g, new RectF(initialRect.left, initialRect.top + (cardOffset * (i + 1)), initialRect.right , initialRect.bottom + (cardOffset * (i + 1))), null);
             }
             //top
-            initialRect = new RectF(640,30,720,170);
-            for (int i = 0; i < state.getPlayerDeck(state.getTeammate(playerNum)).size();i++)
+
+            initialRect = new RectF(1200,30,1280,170);
+            for (int i = state.getPlayerDeck(state.getTeammate(playerNum)).size(); i >= 0 ; i--)
             {
-                drawCard(g, new RectF(initialRect.left + (cardOffset * (i + 1)), initialRect.top , initialRect.right + (cardOffset * (i + 1)) , initialRect.bottom ), null);
+                drawCard(g, new RectF(initialRect.left - (cardOffset * (i + 1)), initialRect.top , initialRect.right - (cardOffset * (i + 1)) , initialRect.bottom ), null);
             }
 
 
