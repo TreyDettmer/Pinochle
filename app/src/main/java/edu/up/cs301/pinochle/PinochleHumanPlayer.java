@@ -383,25 +383,25 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
             if (turn == playerToLeftIndex)
             {
-                leftPlayerInfoTextView.setText("[my turn]");
+                leftPlayerInfoTextView.setText("[My turn]");
             }
             else if (turn == teammatePlayerNum)
             {
-                topPlayerInfoTextView.setText("[my turn]");
+                topPlayerInfoTextView.setText("[My turn]");
             }
             else if (turn == playerToRightIndex)
             {
-                rightPlayerInfoTextView.setText("[my turn]");
+                rightPlayerInfoTextView.setText("[My turn]");
             }
             else
             {
-                humanPlayerInfoTextView.setText("[your turn]");
+                humanPlayerInfoTextView.setText("[Your turn]");
             }
             if (phase == PinochleGamePhase.BIDDING || phase == PinochleGamePhase.CHOOSE_TRUMP)
             {
                 if (state.getPassed(playerToRightIndex))
                 {
-                    rightPlayerInfoTextView.setText("[passed]");
+                    rightPlayerInfoTextView.setText("[Passed]");
                 }
                 else
                 {
@@ -414,7 +414,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 }
                 if (state.getPassed(teammatePlayerNum))
                 {
-                    topPlayerInfoTextView.setText("[passed]");
+                    topPlayerInfoTextView.setText("[Passed]");
                 }
                 else
                 {
@@ -427,7 +427,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 }
                 if (state.getPassed(playerToLeftIndex))
                 {
-                    leftPlayerInfoTextView.setText("[passed]");
+                    leftPlayerInfoTextView.setText("[Passed]");
                 }
                 else
                 {
@@ -440,7 +440,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                 }
                 if (state.getPassed(playerNum))
                 {
-                    humanPlayerInfoTextView.setText("[passed]");
+                    humanPlayerInfoTextView.setText("[Passed]");
                 }
                 else
                 {
@@ -457,17 +457,17 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
             else if (state.getPhase() == PinochleGamePhase.MELDING)
             {
-                leftPlayerInfoTextView.setText("[info]");
-                topPlayerInfoTextView.setText("[info]");
-                rightPlayerInfoTextView.setText("[info]");
-                humanPlayerInfoTextView.setText("[info]");
+                leftPlayerInfoTextView.setText("[Waiting]");
+                topPlayerInfoTextView.setText("[Waiting]");
+                rightPlayerInfoTextView.setText("[Waiting]");
+                humanPlayerInfoTextView.setText("[Waiting]");
             }
             else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING)
             {
-                if (state.getTurn() != playerToLeftIndex) {leftPlayerInfoTextView.setText("[info]");}
-                if (state.getTurn() != playerToRightIndex) {rightPlayerInfoTextView.setText("[info]");}
-                if (state.getTurn() != teammatePlayerNum) {topPlayerInfoTextView.setText("[info]");}
-                if (state.getTurn() != playerNum) {humanPlayerInfoTextView.setText("[info]");}
+                if (state.getTurn() != playerToLeftIndex) {leftPlayerInfoTextView.setText("[Waiting]");}
+                if (state.getTurn() != playerToRightIndex) {rightPlayerInfoTextView.setText("[Waiting]");}
+                if (state.getTurn() != teammatePlayerNum) {topPlayerInfoTextView.setText("[Waiting]");}
+                if (state.getTurn() != playerNum) {humanPlayerInfoTextView.setText("[Waiting]");}
 
             }
 
