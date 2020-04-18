@@ -254,9 +254,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     }
                     if (state.getTurn() == playerNum) {
                         if (state.getCenterDeck().getCards().size() >= 4) {
-                            Card card = state.getCenterDeck().getCards().get(3);
-                            String cardText = "[" + card.toString() + "]";
-                            rightPlayerInfoTextView.setText(cardText);
                             sleep(1);
                             game.sendAction(new PinochleActionPlayTrick(this, null));
                             break;
