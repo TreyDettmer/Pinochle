@@ -210,20 +210,20 @@ public class Card implements Serializable {
     // images
     private static int[][] resIdx = {
     	{
-    		R.drawable.card_9c, R.drawable.card_tc, R.drawable.card_jc,
-			R.drawable.card_qc, R.drawable.card_kc, R.drawable.card_ac,
+    		R.drawable.card_9c,R.drawable.card_jc, R.drawable.card_qc,
+			R.drawable.card_kc,R.drawable.card_tc, R.drawable.card_ac,
 		},
     	{
-			R.drawable.card_9d, R.drawable.card_td, R.drawable.card_jd,
-			R.drawable.card_qd, R.drawable.card_kd, R.drawable.card_ad,
+			R.drawable.card_9d,R.drawable.card_jd, R.drawable.card_qd,
+			R.drawable.card_kd,R.drawable.card_td, R.drawable.card_ad,
     	},
     	{
-			R.drawable.card_9h, R.drawable.card_th, R.drawable.card_jh,
-			R.drawable.card_qh, R.drawable.card_kh, R.drawable.card_ah,
+			R.drawable.card_9h,R.drawable.card_jh, R.drawable.card_qh,
+			R.drawable.card_kh,R.drawable.card_th, R.drawable.card_ah,
     	},
     	{
-			R.drawable.card_9s, R.drawable.card_ts, R.drawable.card_js,
-			R.drawable.card_qs, R.drawable.card_ks, R.drawable.card_as,
+			R.drawable.card_9s,R.drawable.card_js, R.drawable.card_qs,
+			R.drawable.card_ks,R.drawable.card_ts, R.drawable.card_as,
     	},
     };
     

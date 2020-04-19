@@ -721,7 +721,11 @@ public class PinochleGameState extends GameState {
     public int getTrickWinner() {
         Card winningCard = centerDeck.getCards().get(0);
         for (Card card : centerDeck.getCards()) {
-            if (card.getRank().ordinal() > winningCard.getRank().ordinal()) winningCard = card;
+            if (card.getRank().ordinal() > winningCard.getRank().ordinal())
+            {
+                winningCard = card;
+
+            }
             if (card.getRank().equals(winningCard.getRank())) {
                 if (!card.getSuit().equals(winningCard.getSuit())) {
                     if (card.getSuit().equals(trumpSuit)) {
@@ -733,6 +737,23 @@ public class PinochleGameState extends GameState {
             }
         }
         return winningCard.getPlayer();
+    }
+
+    public Card getTrickWinningCard() {
+        Card winningCard = centerDeck.getCards().get(0);
+        for (Card card : centerDeck.getCards()) {
+            if (card.getRank().ordinal() > winningCard.getRank().ordinal()) winningCard = card;
+            if (card.getRank().equals(winningCard.getRank())) {
+                if (!card.getSuit().equals(winningCard.getSuit())) {
+                    if (card.getSuit().equals(trumpSuit)) {
+                        winningCard = card;
+                    } else if (card.getSuit().equals(leadTrick.getSuit()) && !winningCard.getSuit().equals(trumpSuit)) {
+                        winningCard = card;
+                    }
+                }
+            }
+        }
+        return winningCard;
     }
 
 

@@ -240,6 +240,11 @@ public class PinochleLocalGame extends LocalGame {
                     int trickWinner = gameState.getTrickWinner();
                     int trickWinnerTeam = gameState.getTeam(gameState.getTrickWinner());
                     System.out.println("Trick winner: " + trickWinner);
+                    for (Card c : gameState.getCenterDeck().getCards())
+                    {
+                        System.out.println(c.toString() + " played by Player " + c.getPlayer());
+                    }
+                    System.out.println("Winning card: " + gameState.getTrickWinningCard().toString());
                     gameState.setPreviousTrickWinner(trickWinner);
                     gameState.addTrickScore(trickWinnerTeam, gameState.getTrickPoints());
                     gameState.addTrickToPlayer(playerIdx);
