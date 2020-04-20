@@ -202,40 +202,50 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                     // Determines if it has the trump suit.
                     hasTrumpSuit = state.playerHasSuit(playerNum, state.getTrumpSuit());
 
-                    /*
-                     * For loop used to go through each card and determine if it
-                     * is playable based on its suit.
-                     */
-                    for (Card card : cards) {
-                        // Checks if it has the suit of the leading trick.
-                        if (hasLeadSuit) {
 
-                            // Checks if the card's suit is the same as the leading trick suit.
-                            if (card.getSuit() == state.getLeadTrick().getSuit()) {
+
+                    //checks if the player can win the trick with a card matching the leading suit. If they can then they must play the that card.
+                    Card winnableCard = state.playerHasWinnableCard(playerNum);
+                    if (winnableCard != null)
+                    {
+                        playCard = winnableCard;
+                    }
+                    else {
+
+                        /*
+                         * For loop used to go through each card and determine if it
+                         * is playable based on its suit.
+                         */
+                        for (Card card : cards) {
+                            // Checks if it has the suit of the leading trick.
+                            if (hasLeadSuit) {
+
+                                // Checks if the card's suit is the same as the leading trick suit.
+                                if (card.getSuit() == state.getLeadTrick().getSuit()) {
+
+                                    // Sets the card to play to the card of the loop.
+                                    playCard = card;
+                                    break;
+                                }
+                                // Else checks if it has the trump suit.
+                            } else if (hasTrumpSuit) {
+
+                                // Checks if the card's suit is the same as the trump suit.
+                                if (card.getSuit() == state.getTrumpSuit()) {
+
+                                    // Sets the card to play to the card of the loop.
+                                    playCard = card;
+                                    break;
+                                }
+                                // Otherwise, it plays the next random card.
+                            } else {
 
                                 // Sets the card to play to the card of the loop.
                                 playCard = card;
                                 break;
                             }
-                            // Else checks if it has the trump suit.
-                        } else if (hasTrumpSuit) {
-
-                            // Checks if the card's suit is the same as the trump suit.
-                            if (card.getSuit() == state.getTrumpSuit()) {
-
-                                // Sets the card to play to the card of the loop.
-                                playCard = card;
-                                break;
-                            }
-                            // Otherwise, it plays the next random card.
-                        } else {
-
-                            // Sets the card to play to the card of the loop.
-                            playCard = card;
-                            break;
                         }
                     }
-
                     // Sends the card to be played.
                     game.sendAction(new PinochleActionPlayTrick(this, playCard));
                     break;

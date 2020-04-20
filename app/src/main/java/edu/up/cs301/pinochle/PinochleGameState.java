@@ -403,6 +403,28 @@ public class PinochleGameState extends GameState {
         return false;
     }
 
+    /**
+     *
+     * @param player player whose hand to check
+
+     * @return
+     */
+    public Card playerHasWinnableCard(int player) {
+        Deck deck = allPlayerDecks[player];
+        Card winningCard = getCurrentHighestCard();
+        if (winningCard != null) {
+            for (Card card : deck.getCards()) {
+                if (card.getSuit().equals(winningCard.getSuit())) {
+                    if (card.getRank().ordinal() > winningCard.getRank().ordinal()) {
+                        return card;
+                    }
+                }
+            }
+            return null;
+        }
+        return null;
+    }
+
     public void setLeadTrick(Card leadTrick) {
         this.leadTrick = leadTrick;
     }
@@ -703,6 +725,32 @@ public class PinochleGameState extends GameState {
     public Card getLeadTrick() {
         if (leadTrick == null) return null;
         return new Card(leadTrick);
+    }
+
+    /**
+     * Returns the current winning card in the center deck (if a trump card hasn't been played).
+     *
+     * @return the winning card in the center deck
+     */
+    public Card getCurrentHighestCard()
+    {
+        if (centerDeck.size() > 0) {
+            Card bestCard = new Card(leadTrick);
+            for (Card c : centerDeck.getCards()) {
+                //check if a trump card has been played. If so it's impossible to win the trick so return null
+                if (c.getSuit().equals(trumpSuit) && !leadTrick.getSuit().equals(trumpSuit))
+                {
+                    return null;
+                }
+                if (c.getSuit().equals(bestCard.getSuit())) {
+                    if (c.getRank().ordinal() > bestCard.getRank().ordinal()) {
+                        bestCard = c;
+                    }
+                }
+            }
+            return bestCard;
+        }
+        return null;
     }
 
     /**

@@ -283,6 +283,15 @@ public class PinochleLocalGame extends LocalGame {
                 return false;
             }
 
+            //ensure the player plays a card that will win the trick (if they have a card that would do so).
+            Card playersWinnableCard = gameState.playerHasWinnableCard(playerIdx);
+            if (playersWinnableCard != null)
+            {
+                if (!trick.equals(playersWinnableCard)) {
+                    return false;
+                }
+            }
+
             int initSize = gameState.getPlayerDeck(playerIdx).size();
             gameState.addTrickToCenter(playerIdx, trick);
             gameState.removeCardsFromPlayer(playerIdx, trick);
