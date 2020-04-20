@@ -1,12 +1,9 @@
 package edu.up.cs301.pinochle;
 
 import java.util.ArrayList;
-import java.util.Random;
-
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
 import edu.up.cs301.card.Meld;
-import edu.up.cs301.card.Rank;
 import edu.up.cs301.card.Suit;
 import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
@@ -24,18 +21,15 @@ import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
  */
 public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
-    private int bidAllowance;
-    private int pointDifference;
-    private int pointsToWin;
-    private Card[] missingCards;
-    private Card[] losingCards;
-    private Deck theoreticalDeck;
-    private Deck deck;
-    private PinochleGameState state;
-    private boolean hasFoundTheoretical = false;
+    private int bidAllowance;   // The maximum amount the player can bid.
+    private Suit trumpSuit; // The determined Trump suit for the player.
+    private Card[] losingCards; // The determined losing cards of the player's deck.
+    private Deck deck;  // The player's deck.
+    private PinochleGameState state;    // The game's state.
+    private boolean deckAnalysisComplete = false;
 
-    // Temporary:
-    private Random rnd = new Random();
+    private static final int STARTING_BID = 250;
+    private static final int BID_20 = 20;
 
     /**
      * Constructor:
@@ -46,15 +40,17 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
         super(name);
     }
 
+    /**
+     * Receives information about the game and its current state.
+     *
+     * @param info the information of the current game.
+     */
     @Override
     protected void receiveInfo(GameInfo info) {
         if (info instanceof IllegalMoveInfo) {
             System.out.println("Illegal move");
         }
         PinochleGamePhase phase;
-
-        // TODO: Temporary:
-        int num;
         ArrayList<Card> cards;
 
         if (info instanceof PinochleGameState) {
@@ -63,62 +59,90 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
             deck = state.getPlayerDeck(playerNum);
             deck.sort();
-            theoreticalDeck = findTheoreticalDeck(deck);
-            //losingCards = findLosingCards(deck);
 
-            if (state.getTurn() == playerNum)
-            {
+            if (state.getTurn() == playerNum) {
                 sleep(2);
             }
             switch (phase) {
                 // If it is the dealing phase:
                 case BIDDING:
-                    // TODO: Temporary:
 
                     /*
-                     * A random number is generated to determine whether the player
-                     * bids 10, 20, or passes.
+                     * Checks if the melds have been calculated, as it needs to occur only once.
+                     * Additional one off functions are completed.
                      */
-                    num = rnd.nextInt(3);
+                    if (!deckAnalysisComplete) {
+                        // List of all the melds for the deck
+                        ArrayList<Meld> melds;
+                        // The maximum points found for the deck based on the trump suit.
+                        int maxPoints = 0;
+                        Suit[] suits = Suit.values();
 
-                    // If the random number is 0, the player bids 10.
-                    if (num == 0) {
-                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_10));
+                        // Finds the losing cards of the deck for the player
+                        losingCards = findLosingCards(deck);
 
-                        // Else if the random number is 1, the player bids 20.
-                    } else if (num == 1) {
+                        /*
+                         * Calculates the melds of the deck with each possible suit configuration.
+                         * For each meld of the deck and calculates the points and adds them.
+                         */
+                        for (Suit suit : suits) {
+
+                            int points = 0; // Points for the set of melds.
+                            // Gets the ArrayList of all the melds for that instance.
+                            melds = Meld.checkMelds(deck, suit);
+
+                            /*
+                             * Loops through each meld in the meld ArrayList and adds
+                             * all the points for each meld.
+                             */
+                            for (int i = 0; i < melds.size(); i++) {
+                                points += melds.get(i).getPoints();
+                            }
+
+                            /*
+                             * If the points calculated are greater than the max points,
+                             * the max points are changed, and the trump suit is selected
+                             * based on the suit that generated the melds for the deck.
+                             */
+                            if (points > maxPoints) {
+                                maxPoints = points;
+                                trumpSuit = suit;
+                            }
+                        }
+
+                        // Sets the bidAllowance to the max points plus
+                        bidAllowance = maxPoints + STARTING_BID;
+                        deckAnalysisComplete = true;
+                    }
+
+                    int maxBid = state.getMaxBid();
+
+                    /*
+                     * If the difference between the bidAllowance and maxBid is greater than 20,
+                     * the player will bid 20.
+                     */
+                    if (bidAllowance - maxBid > BID_20) {
+
                         game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_20));
 
-                        // Otherwise the player passes.
+                        /*
+                         * Else if the difference between the bidAllowance and maxBid is less than
+                         * or equal to 20 and greater than 0, the player will bid 10.
+                         */
+                    } else if (bidAllowance - maxBid <= BID_20 && bidAllowance - maxBid > 0) {
+
+                        game.sendAction(new PinochleActionBid(this, PinochleActionBid.BID_10));
+
+                        // Otherwise the player will pass.
                     } else {
+
                         game.sendAction(new PinochleActionPass(this));
                     }
                     break;
 
+                // If it is the trump suit selection phase:
                 case CHOOSE_TRUMP:
-                    // TODO: Temporary:
-                    losingCards = findLosingCards(deck);
-
-                    // Generates a random number between 0 and excluding 4.
-                    num = rnd.nextInt(4);
-
-                    // If the random number is 0, the trump suit is Club.
-                    if (num == 0) {
-                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Club));
-
-                        // Else if the random number is 1, the trump suit is Diamond.
-                    } else if (num == 1) {
-                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Diamond));
-
-                        // Else if the random number is 2, the trump suit is Heart.
-                    } else if (num == 2) {
-                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Heart));
-
-                        // Otherwise, the trump suit is Spade.
-                    } else {
-                        game.sendAction(new PinochleActionChooseTrump(this, Suit.Spade));
-                    }
-
+                    game.sendAction(new PinochleActionChooseTrump(this, trumpSuit));
                     break;
 
                 // If it is the exchanging phase:
@@ -132,7 +156,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                         // The cards of the player's deck.
                         cards = deck.getCards();
 
-                        for (int i = 0; i < 4; i++ ) {
+                        for (int i = 0; i < 4; i++) {
                             cards.remove(losingCards[i]);
                         }
 
@@ -160,32 +184,28 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
                 // If it is the go set phase:
                 case VOTE_GO_SET:
-                    // TODO: Temporary:
 
-                    // Generates either 1 or 0 (50% chance to vote to go set)
-                    num = rnd.nextInt(2);
-
-                    // If the random number is 0, the player votes to go set.
-                    if (num == 0 && state.canGoSet(state.getTeam(playerNum))) {
+                    // If the player can go set, it will.
+                    if (state.canGoSet(state.getTeam(playerNum))) {
                         game.sendAction(new PinochleActionVoteGoSet(this, true));
+
+                    // Otherwise the player won't.
                     } else {
-                        // Otherwise, it doesn't.
                         game.sendAction(new PinochleActionVoteGoSet(this, false));
                     }
                     break;
 
-
+                // IF it is the trick-taking phase:
                 case TRICK_TAKING:
                     if (state.getTurn() == playerNum) {
                         if (state.getCenterDeck().getCards().size() >= 4) {
-                            game.sendAction(new PinochleActionPlayTrick(this,null));
+                            game.sendAction(new PinochleActionPlayTrick(this, null));
                             break;
                         }
                     }
-                    // TODO: Temporary:
 
-                    // The cards from the player's deck but shuffled to randomize the order.
-                    cards = state.getPlayerDeck(playerNum).shuffle().getCards();
+                    // The cards from the shorted player's deck
+                    cards = deck.getCards();
 
                     // The card to play.
                     Card playCard = null;
@@ -204,9 +224,14 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
                     /*
                      * For loop used to go through each card and determine if it
-                     * is playable based on its suit.
+                     * is playable based on its suit. The loop starts from the end
+                     * of the array and iterates to the start, as it searches for
+                     * the highest card.
                      */
-                    for (Card card : cards) {
+                    for (int i = cards.size() - 1; i > 0; i--) {
+
+                        Card card = cards.get(i);
+
                         // Checks if it has the suit of the leading trick.
                         if (hasLeadSuit) {
 
@@ -250,12 +275,6 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
     }
 
-    private int findPointDifferece(PinochleGameState state) {
-        int pointDifference = 0;
-
-        return pointDifference;
-    }
-
     /**
      * Returns the cards from the player's deck considered to lose tricks.
      *
@@ -283,17 +302,5 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
 
         // Returns the losing cards.
         return losingCards;
-    }
-
-    private Card[] findMissingCards(Deck deck) {
-        Card[] missingCards = new Card[4];
-
-        return missingCards;
-    }
-
-    private Deck findTheoreticalDeck(Deck deck) {
-        Deck theoreticalHand = new Deck();
-
-        return theoreticalHand;
     }
 }
