@@ -15,3 +15,6 @@ Fixed issue with initial bid (showed "bid 10" and "bid 20" instead of "bid 260" 
 Fixed issue of last card in trick not showing
 4/19/2020
 Fixed issue that allowed a non-tricking-winning card to be played when a player had a card that would win the trick
+
+4/20/2020 Alex
+Adapted icon from http://www.fishdog.net/pinochle
