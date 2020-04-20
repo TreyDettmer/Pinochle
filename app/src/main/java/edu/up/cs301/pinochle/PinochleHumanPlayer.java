@@ -195,7 +195,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                         break;
                     }
                     if (state.playerHasSuit(playerNum, trumpSuit)) {
-                        message = "You have a " + trumpSuit + " (Trump suit) , so you have to play it.";
+                        message = "You have a " + trumpSuit + " (Trump suit), so you have to play it.";
                         break;
                     }
 
