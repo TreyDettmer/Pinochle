@@ -23,8 +23,7 @@ public enum Rank implements Serializable {
 		}
 	}
 	,
-	// ten
-	TEN,
+
 
 	// jack
 	JACK,
@@ -34,6 +33,9 @@ public enum Rank implements Serializable {
 
 	// king
 	KING,
+
+	// ten
+	TEN,
 
 	// ace
 	ACE,

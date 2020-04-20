@@ -184,11 +184,18 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     Suit leadTrickSuit = leadTrick.getSuit();
                     Suit trumpSuit = state.getTrumpSuit();
                     if (state.playerHasSuit(playerNum, leadTrickSuit)) {
-                        message = "You have a " + leadTrickSuit + " (lead trick suit), so you have to play it.";
+                        Card winnableCard = state.playerHasWinnableCard(playerNum);
+                        if (winnableCard != null)
+                        {
+                            message = "You have a " + winnableCard.toString() + " that beats the cards in the center so you have to play it.";
+                        }
+                        else {
+                            message = "You have a " + leadTrickSuit + " (lead trick suit), so you have to play it.";
+                        }
                         break;
                     }
                     if (state.playerHasSuit(playerNum, trumpSuit)) {
-                        message = "You have a " + trumpSuit + "  (Trump suit) , so you have to play it.";
+                        message = "You have a " + trumpSuit + " (Trump suit), so you have to play it.";
                         break;
                     }
 

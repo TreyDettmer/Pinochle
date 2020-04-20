@@ -240,6 +240,11 @@ public class PinochleLocalGame extends LocalGame {
                     int trickWinner = gameState.getTrickWinner();
                     int trickWinnerTeam = gameState.getTeam(gameState.getTrickWinner());
                     System.out.println("Trick winner: " + trickWinner);
+                    for (Card c : gameState.getCenterDeck().getCards())
+                    {
+                        System.out.println(c.toString() + " played by Player " + c.getPlayer());
+                    }
+                    System.out.println("Winning card: " + gameState.getTrickWinningCard().toString());
                     gameState.setPreviousTrickWinner(trickWinner);
                     gameState.addTrickScore(trickWinnerTeam, gameState.getTrickPoints());
                     gameState.addTrickToPlayer(playerIdx);
@@ -276,6 +281,15 @@ public class PinochleLocalGame extends LocalGame {
             }
             if (!trickSuit.equals(leadTrickSuit) && !trickSuit.equals(trumpSuit) && gameState.playerHasSuit(playerIdx, trumpSuit)) {
                 return false;
+            }
+
+            //ensure the player plays a card that will win the trick (if they have a card that would do so).
+            Card playersWinnableCard = gameState.playerHasWinnableCard(playerIdx);
+            if (playersWinnableCard != null)
+            {
+                if (!trick.equals(playersWinnableCard)) {
+                    return false;
+                }
             }
 
             int initSize = gameState.getPlayerDeck(playerIdx).size();
