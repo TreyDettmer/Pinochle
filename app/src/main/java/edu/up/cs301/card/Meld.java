@@ -12,7 +12,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/* Melds
+
+  Implements the list of, and methods to find, melds of cards.
+
+  Alex Mak, Justin Lee
+  April 2020
+ */
 public enum Meld implements Serializable {
+
     DOUBLE_RUN("Double Run",  "Two runs", 1500, 1),
     RUN_MARRIAGE("Run + Marraige",  "Run with another trump king and queen", 230, 1),
     RUN_KING("Run + King",  "Run with another trump king", 190, 1),
@@ -48,25 +56,31 @@ public enum Meld implements Serializable {
     }
 
     public String getName() {
+        // Returns the english name for the meld
         return NAME;
     }
 
     public String getDescription() {
+        // Returns the description of the meld.
         return DESCRIPTION;
     }
 
     public int getPoints() {
+        // Returns the amount of points a meld is worth
         return POINTS;
     }
 
     public int getType() {
+        // Return whether the meld is type 1, 2, or 3.
         return TYPE;
     }
 
     private static boolean isValidMeld(ArrayList<Card> cards, Card[] required) {
+        // Given a hand, and meld requirements, returns whether hand is sufficient to make the meld
         boolean valid = true;
         ArrayList<Card> temp = (ArrayList<Card>) cards.clone();
         for (Card card : required) {
+            // For each of the required cards, invalidate if one is missing.
             if (!temp.contains(card)) {
                 valid = false;
                 break;
@@ -84,38 +98,48 @@ public enum Meld implements Serializable {
 
     public static ArrayList<Meld> checkMelds(Deck deck, Suit trump) {
         ArrayList<Meld> melds = new ArrayList<>();
+        // List of found melds.
         ArrayList<Card> class1Deck = new Deck(deck).getCards();
+        // Hand
+        Card NINE = new Card(Rank.NINE, trump);
+        Card TEN = new Card(Rank.TEN, trump);
+        Card JACK = new Card(Rank.JACK, trump);
+        Card QUEEN = new Card(Rank.QUEEN, trump);
+        Card KING = new Card(Rank.KING, trump);
+        Card ACE = new Card(Rank.ACE, trump);
         for (int i = 0; i < Meld.values().length ; i++) {
+            // Iterating over the indeces of all possible melds:
             Meld meld = Meld.values()[i];
             if (meld.getType() != 1) continue;
             Card[] required;
+
             switch (meld) {
                 case RUN:
-                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump)};
+                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case RUN_KING:
-                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.KING, trump)};
+                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(KING)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case RUN_QUEEN:
-                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.QUEEN, trump)};
+                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(QUEEN)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case RUN_MARRIAGE:
-                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.KING, trump), new Card(Rank.QUEEN, trump)};
+                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(KING), new Card(QUEEN)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case DOUBLE_RUN:
-                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump)};
+                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(TEN), new Card(JACK), new Card(QUEEN), new Card(KING), new Card(ACE)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case DIX:
-                    required = new Card[]{new Card(Rank.NINE, trump)};
+                    required = new Card[]{NINE};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case ROYAL_MARRIAGE:
-                    required = new Card[]{new Card(Rank.KING, trump), new Card(Rank.QUEEN, trump)};
+                    required = new Card[]{KING, QUEEN};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case COMMON_MARRIAGE:
