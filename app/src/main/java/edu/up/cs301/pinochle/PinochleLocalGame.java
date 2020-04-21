@@ -275,7 +275,7 @@ public class PinochleLocalGame extends LocalGame {
             Suit trumpSuit = gameState.getTrumpSuit();
             Suit trickSuit = trick.getSuit();
 
-
+            System.out.println("Trick: " + trick);
             if (!trickSuit.equals(leadTrickSuit) && gameState.playerHasSuit(playerIdx, leadTrickSuit)) {
                 return false;
             }
@@ -285,6 +285,7 @@ public class PinochleLocalGame extends LocalGame {
 
             //ensure the player plays a card that will win the trick (if they have a card that would do so).
             Card playersWinnableCard = gameState.playerHasWinnableCard(playerIdx);
+            System.out.println("Players Winnable Card: " + playersWinnableCard);
             if (playersWinnableCard != null)
             {
                 if (!trick.getSuit().equals(playersWinnableCard.getSuit()) || (trick.getRank().ordinal() < playersWinnableCard.getRank().ordinal())) {
@@ -298,7 +299,7 @@ public class PinochleLocalGame extends LocalGame {
 
             if (initSize == gameState.getPlayerDeck(playerIdx).size()) return false;
 
-            System.out.println(String.format("Player %d, Teamate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), action.toString()));
+            System.out.println(String.format("Player %d, Teammate %d: %s, %s", playerIdx, teammateIdx, action.getClass().getName(), action.toString()));
 
             System.out.println("Trick round: " + gameState.getTrickRound());
             System.out.println("Last Player: " +  (gameState.getPreviousTrickWinner() - 1 + players.length) % players.length);

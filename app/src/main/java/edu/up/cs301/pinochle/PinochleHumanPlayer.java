@@ -197,7 +197,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                         Card winnableCard = state.playerHasWinnableCard(playerNum);
                         if (winnableCard != null)
                         {
-                            message = "You have a " + winnableCard.toString() + " (or higher) that beats the cards in the center so you have to play it.";
+                            message = "You have a " + winnableCard.toString() + " (or higher ranking card) that beats the cards in the center so you have to play it.";
                         }
                         else {
                             message = "You have a " + leadTrickSuit + " (lead trick suit), so you have to play it.";
