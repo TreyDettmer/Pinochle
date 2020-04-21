@@ -67,6 +67,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private TextView trumpSuitTextView;
     private Button meldsMenuButton;
     private ArrayList<String> melds;
+    private TextView scoreboard;
+    private TextView totalTextView;
+    private TextView meldsTextView;
+    private TextView tricksTextView;
     private TextView team0NameTextView;
     private TextView team0TotalTextView;
     private TextView team0MeldsTextView;
@@ -156,6 +160,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     @Override
     public void receiveInfo(GameInfo info) {
         waitingToConnectTextView.setVisibility(View.INVISIBLE);
+        scoreboard.setVisibility(View.VISIBLE);
+        totalTextView.setVisibility(View.VISIBLE);
+        meldsTextView.setVisibility(View.VISIBLE);
+        tricksTextView.setVisibility(View.VISIBLE);
         if (playerNum == 0)
         {
             playerToRightIndex = 3;
@@ -322,6 +330,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
         });
         melds = new ArrayList<>();
+        scoreboard = myActivity.findViewById(R.id.scoreboard);
+        totalTextView = myActivity.findViewById(R.id.total);
+        meldsTextView = myActivity.findViewById(R.id.melds);
+        tricksTextView = myActivity.findViewById(R.id.tricks);
         team0NameTextView = myActivity.findViewById(R.id.team0_name);
         team0TotalTextView = myActivity.findViewById(R.id.team0_toal);
         team0MeldsTextView = myActivity.findViewById(R.id.team0_melds);

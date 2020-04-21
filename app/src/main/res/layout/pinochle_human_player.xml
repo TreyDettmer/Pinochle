@@ -191,7 +191,7 @@
                 android:layout_marginLeft="7px"
                 android:layout_marginRight="20px"
                 android:gravity="right"
-                android:text=""
+                android:text="Scoreboard"
                 android:textColor="#FFFFFF"
                 android:textSize="26sp" />
 
@@ -202,7 +202,7 @@
                 android:layout_marginLeft="7px"
                 android:layout_marginRight="7px"
                 android:gravity="right"
-                android:text=""
+                android:text="Total"
                 android:textColor="#FFFFFF"
                 android:textSize="26sp" />
 
@@ -213,7 +213,7 @@
                 android:layout_marginLeft="7px"
                 android:layout_marginRight="7px"
                 android:gravity="right"
-                android:text=""
+                android:text="Melds"
                 android:textColor="#FFFFFF"
                 android:textSize="26sp" />
 
@@ -224,7 +224,7 @@
                 android:layout_marginLeft="7px"
                 android:layout_marginRight="7px"
                 android:gravity="right"
-                android:text=""
+                android:text="Tricks"
                 android:textColor="#FFFFFF"
                 android:textSize="26sp" />
         </TableRow>
