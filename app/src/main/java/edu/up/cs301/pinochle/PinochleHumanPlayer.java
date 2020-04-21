@@ -54,6 +54,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private PinochleGameState state;
     private PinochleMainActivity myActivity;
     private AnimationSurface surface;
+    private TextView waitingToConnectTextView;
     private TextView leftPlayerInfoTextView;
     private TextView leftPlayerNameTextView;
     private TextView rightPlayerInfoTextView;
@@ -154,6 +155,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     @Override
     public void receiveInfo(GameInfo info) {
+        waitingToConnectTextView.setVisibility(View.INVISIBLE);
         if (playerNum == 0)
         {
             playerToRightIndex = 3;
@@ -287,12 +289,13 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     public void setAsGui(GameMainActivity activity)
     {
         // remember the activity
-        myActivity = (PinochleMainActivity)activity;
+        myActivity = (PinochleMainActivity) activity;
 
         // Load the layout resource for the new configuration
         activity.setContentView(R.layout.pinochle_human_player);
 
         myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        waitingToConnectTextView = myActivity.findViewById(R.id.waitingToConnect);
         leftPlayerInfoTextView = myActivity.findViewById(R.id.leftPlayerInfo);
         leftPlayerNameTextView = myActivity.findViewById(R.id.leftPlayerName);
         rightPlayerInfoTextView = myActivity.findViewById(R.id.rightPlayerInfo);
@@ -956,11 +959,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     //animator methods
     @Override
     public void tick(Canvas canvas) {
+        canvas.drawColor(backgroundColor);
         if (state == null)
         {
             return;
         }
-        canvas.drawColor(backgroundColor);
         myHand = state.getPlayerDeck(playerNum);
 
         Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
