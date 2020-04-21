@@ -287,7 +287,7 @@ public class PinochleLocalGame extends LocalGame {
             Card playersWinnableCard = gameState.playerHasWinnableCard(playerIdx);
             if (playersWinnableCard != null)
             {
-                if (!trick.equals(playersWinnableCard)) {
+                if (!trick.getSuit().equals(playersWinnableCard.getSuit()) || (trick.getRank().ordinal() < playersWinnableCard.getRank().ordinal())) {
                     return false;
                 }
             }

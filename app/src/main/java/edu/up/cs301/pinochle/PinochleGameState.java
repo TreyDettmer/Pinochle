@@ -416,13 +416,16 @@ public class PinochleGameState extends GameState {
         if (playerHasSuit(player, leadTrick.getSuit())) {
             if (winningCard.getSuit().equals(trumpSuit) && !leadTrick.getSuit().equals(trumpSuit)) return null;
             else if (winningCard.getSuit().equals(leadTrick.getSuit())){
+                Card min = null;
                 for (Card card : deck.getCards()) {
                     if (card.getSuit().equals(leadTrick.getSuit())) {
                         if (card.getRank().ordinal() > winningCard.getRank().ordinal()) {
-                            return card;
+                            if (min == null) min = card;
+                            else if (card.getRank().ordinal() < min.getRank().ordinal()) min = card;
                         }
                     }
                 }
+                return min;
             }
         } else if (playerHasSuit(player, trumpSuit)) {
             if (winningCard.getSuit().equals(trumpSuit)) {
