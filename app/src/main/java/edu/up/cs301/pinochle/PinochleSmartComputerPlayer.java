@@ -1,6 +1,7 @@
 package edu.up.cs301.pinochle;
 
 import java.util.ArrayList;
+
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
 import edu.up.cs301.card.Meld;
@@ -189,7 +190,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                     if (state.canGoSet(state.getTeam(playerNum))) {
                         game.sendAction(new PinochleActionVoteGoSet(this, true));
 
-                    // Otherwise the player won't.
+                        // Otherwise the player won't.
                     } else {
                         game.sendAction(new PinochleActionVoteGoSet(this, false));
                     }
@@ -205,6 +206,7 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                     }
 
                     // The cards from the shorted player's deck
+                    deck.sort();
                     cards = deck.getCards();
 
                     // The card to play.
@@ -222,42 +224,50 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
                     // Determines if it has the trump suit.
                     hasTrumpSuit = state.playerHasSuit(playerNum, state.getTrumpSuit());
 
-                    /*
-                     * For loop used to go through each card and determine if it
-                     * is playable based on its suit. The loop starts from the end
-                     * of the array and iterates to the start, as it searches for
-                     * the highest card.
-                     */
-                    for (int i = cards.size() - 1; i > 0; i--) {
+                    //checks if the player can win the trick with a card matching the leading suit. If they can then they must play the that card.
+                    Card winnableCard = state.playerHasWinnableCard(playerNum);
+                    if (winnableCard != null) {
 
-                        Card card = cards.get(i);
+                        playCard = winnableCard;
 
-                        // Checks if it has the suit of the leading trick.
-                        if (hasLeadSuit) {
+                    } else {
+                        /*
+                         * For loop used to go through each card and determine if it
+                         * is playable based on its suit. The loop starts from the end
+                         * of the array and iterates to the start, as it searches for
+                         * the highest card.
+                         */
+                        for (int i = cards.size() - 1; i >= 0; i--) {
 
-                            // Checks if the card's suit is the same as the leading trick suit.
-                            if (card.getSuit() == state.getLeadTrick().getSuit()) {
+                            Card card = cards.get(i);
+
+                            // Checks if it has the suit of the leading trick.
+                            if (hasLeadSuit) {
+
+                                // Checks if the card's suit is the same as the leading trick suit.
+                                if (card.getSuit() == state.getLeadTrick().getSuit()) {
+
+                                    // Sets the card to play to the card of the loop.
+                                    playCard = card;
+                                    break;
+                                }
+                                // Else checks if it has the trump suit.
+                            } else if (hasTrumpSuit) {
+
+                                // Checks if the card's suit is the same as the trump suit.
+                                if (card.getSuit() == state.getTrumpSuit()) {
+
+                                    // Sets the card to play to the card of the loop.
+                                    playCard = card;
+                                    break;
+                                }
+                                // Otherwise, it plays the next random card.
+                            } else {
 
                                 // Sets the card to play to the card of the loop.
                                 playCard = card;
                                 break;
                             }
-                            // Else checks if it has the trump suit.
-                        } else if (hasTrumpSuit) {
-
-                            // Checks if the card's suit is the same as the trump suit.
-                            if (card.getSuit() == state.getTrumpSuit()) {
-
-                                // Sets the card to play to the card of the loop.
-                                playCard = card;
-                                break;
-                            }
-                            // Otherwise, it plays the next random card.
-                        } else {
-
-                            // Sets the card to play to the card of the loop.
-                            playCard = card;
-                            break;
                         }
                     }
 
