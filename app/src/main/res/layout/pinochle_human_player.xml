@@ -193,7 +193,8 @@
                 android:gravity="right"
                 android:text="Scoreboard"
                 android:textColor="#FFFFFF"
-                android:textSize="26sp" />
+                android:textSize="26sp"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/total"
@@ -204,7 +205,8 @@
                 android:gravity="right"
                 android:text="Total"
                 android:textColor="#FFFFFF"
-                android:textSize="26sp" />
+                android:textSize="26sp"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/melds"
@@ -215,7 +217,8 @@
                 android:gravity="right"
                 android:text="Melds"
                 android:textColor="#FFFFFF"
-                android:textSize="26sp" />
+                android:textSize="26sp"
+                android:visibility="invisible" />
 
             <TextView
                 android:id="@+id/tricks"
@@ -226,7 +229,8 @@
                 android:gravity="right"
                 android:text="Tricks"
                 android:textColor="#FFFFFF"
-                android:textSize="26sp" />
+                android:textSize="26sp"
+                android:visibility="invisible" />
         </TableRow>
 
         <TableRow
