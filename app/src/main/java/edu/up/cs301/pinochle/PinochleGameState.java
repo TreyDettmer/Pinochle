@@ -411,17 +411,42 @@ public class PinochleGameState extends GameState {
      */
     public Card playerHasWinnableCard(int player) {
         Deck deck = allPlayerDecks[player];
-        Card winningCard = getCurrentHighestCard();
-        if (winningCard != null) {
-            for (Card card : deck.getCards()) {
-                if (card.getSuit().equals(winningCard.getSuit())) {
-                    if (card.getRank().ordinal() > winningCard.getRank().ordinal()) {
-                        return card;
+        Card winningCard = getTrickWinningCard();
+        if (winningCard == null) return null;
+        if (playerHasSuit(player, leadTrick.getSuit())) {
+            if (winningCard.getSuit().equals(trumpSuit) && !leadTrick.getSuit().equals(trumpSuit)) return null;
+            else if (winningCard.getSuit().equals(leadTrick.getSuit())){
+                for (Card card : deck.getCards()) {
+                    if (card.getSuit().equals(leadTrick.getSuit())) {
+                        if (card.getRank().ordinal() > winningCard.getRank().ordinal()) {
+                            return card;
+                        }
                     }
                 }
             }
-            return null;
+        } else if (playerHasSuit(player, trumpSuit)) {
+            if (winningCard.getSuit().equals(trumpSuit)) {
+                for (Card card : deck.getCards()) {
+                    if (card.getSuit().equals(trumpSuit)) {
+                        if (card.getRank().ordinal() > winningCard.getRank().ordinal()) {
+                            return card;
+                        }
+                    }
+                }
+            } else {
+                Card max = deck.getCards().get(0);
+                for (Card card : deck.getCards()) {
+                    if (card.getSuit().equals(trumpSuit)) {
+                        if (card.getRank().ordinal() > max.getRank().ordinal()) {
+                            max = card;
+                        }
+                    }
+                }
+                return max;
+            }
+
         }
+
         return null;
     }
 
@@ -728,29 +753,26 @@ public class PinochleGameState extends GameState {
     }
 
     /**
-     * Returns the current winning card in the center deck (if a trump card hasn't been played).
+     * Returns the current winning card in the center deck.
      *
      * @return the winning card in the center deck
      */
-    public Card getCurrentHighestCard()
-    {
-        if (centerDeck.size() > 0) {
-            Card bestCard = new Card(leadTrick);
-            for (Card c : centerDeck.getCards()) {
-                //check if a trump card has been played. If so it's impossible to win the trick so return null
-                if (c.getSuit().equals(trumpSuit) && !leadTrick.getSuit().equals(trumpSuit))
-                {
-                    return null;
+    public Card getTrickWinningCard() {
+        if (centerDeck.getCards().size() == 0) return null;
+        Card winningCard = centerDeck.getCards().get(0);
+        for (Card card : centerDeck.getCards()) {
+            if (card.getSuit().equals(trumpSuit)) {
+                if (winningCard.getSuit().equals(trumpSuit)) {
+                    if (card.getRank().ordinal() > winningCard.getRank().ordinal()) winningCard = card;
+                } else {
+                    winningCard = card;
                 }
-                if (c.getSuit().equals(bestCard.getSuit())) {
-                    if (c.getRank().ordinal() > bestCard.getRank().ordinal()) {
-                        bestCard = c;
-                    }
-                }
+            } else if (card.getSuit().equals(winningCard.getSuit())) {
+                if (card.getRank().ordinal() > winningCard.getRank().ordinal()) winningCard = card;
             }
-            return bestCard;
+
         }
-        return null;
+        return winningCard;
     }
 
     /**
@@ -767,41 +789,8 @@ public class PinochleGameState extends GameState {
     }
 
     public int getTrickWinner() {
-        Card winningCard = centerDeck.getCards().get(0);
-        for (Card card : centerDeck.getCards()) {
-            if (card.getRank().ordinal() > winningCard.getRank().ordinal())
-            {
-                winningCard = card;
-
-            }
-            if (card.getRank().equals(winningCard.getRank())) {
-                if (!card.getSuit().equals(winningCard.getSuit())) {
-                    if (card.getSuit().equals(trumpSuit)) {
-                        winningCard = card;
-                    } else if (card.getSuit().equals(leadTrick.getSuit()) && !winningCard.getSuit().equals(trumpSuit)) {
-                        winningCard = card;
-                    }
-                }
-            }
-        }
+        Card winningCard = getTrickWinningCard();
         return winningCard.getPlayer();
-    }
-
-    public Card getTrickWinningCard() {
-        Card winningCard = centerDeck.getCards().get(0);
-        for (Card card : centerDeck.getCards()) {
-            if (card.getRank().ordinal() > winningCard.getRank().ordinal()) winningCard = card;
-            if (card.getRank().equals(winningCard.getRank())) {
-                if (!card.getSuit().equals(winningCard.getSuit())) {
-                    if (card.getSuit().equals(trumpSuit)) {
-                        winningCard = card;
-                    } else if (card.getSuit().equals(leadTrick.getSuit()) && !winningCard.getSuit().equals(trumpSuit)) {
-                        winningCard = card;
-                    }
-                }
-            }
-        }
-        return winningCard;
     }
 
 

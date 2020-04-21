@@ -425,6 +425,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
             if (phase == PinochleGamePhase.BIDDING || phase == PinochleGamePhase.CHOOSE_TRUMP)
             {
+
                 if (state.getPassed(playerToRightIndex))
                 {
                     rightPlayerInfoTextView.setText("[Passed]");
@@ -435,6 +436,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[playerToRightIndex] != 0) {
                             rightPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToRightIndex] + "]");
+                        } else {
+                            rightPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -448,6 +451,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[teammatePlayerNum] != 0) {
                             topPlayerInfoTextView.setText("[Bid " + state.getBids()[teammatePlayerNum] + "]");
+                        } else {
+                            topPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -461,6 +466,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[playerToLeftIndex] != 0) {
                             leftPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToLeftIndex] + "]");
+                        } else {
+                            leftPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -474,6 +481,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[playerNum] != 0) {
                             humanPlayerInfoTextView.setText("[Bid " + state.getBids()[playerNum] + "]");
+                        } else {
+                            humanPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
