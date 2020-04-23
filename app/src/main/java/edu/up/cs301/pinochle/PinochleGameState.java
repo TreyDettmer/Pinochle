@@ -1,10 +1,8 @@
 package edu.up.cs301.pinochle;
 
 import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-
 import edu.up.cs301.card.Card;
 import edu.up.cs301.card.Deck;
 import edu.up.cs301.card.Meld;
