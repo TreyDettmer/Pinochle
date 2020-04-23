@@ -10,7 +10,7 @@ import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
 
-/*
+/**
  * Smart computer player that attempts to play intelligently and make
  * calculated decisions during the game.
  *

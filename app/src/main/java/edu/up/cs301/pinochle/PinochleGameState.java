@@ -9,8 +9,8 @@ import edu.up.cs301.card.Meld;
 import edu.up.cs301.card.Suit;
 import edu.up.cs301.game.GameFramework.infoMessage.GameState;
 
-/*
- * Game State - holds all game information
+/**
+ * Holds all game information
  *
  * @author Trey Dettmer
  * @author Justin Lee

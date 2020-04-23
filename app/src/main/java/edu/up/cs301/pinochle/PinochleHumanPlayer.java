@@ -39,8 +39,8 @@ import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
 import edu.up.cs301.game.GameFramework.utilities.Logger;
 import edu.up.cs301.game.R;
 
-/*
- * Description
+/**
+ * GUI of the human player allows a human player to send move actions to the game
  *
  * @author Trey Dettmer
  * @author Justin Lee

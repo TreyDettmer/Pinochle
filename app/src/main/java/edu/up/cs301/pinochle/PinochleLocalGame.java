@@ -9,8 +9,8 @@ import edu.up.cs301.game.GameFramework.GamePlayer;
 import edu.up.cs301.game.GameFramework.LocalGame;
 import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
 
-/*
- * PinochleLocalGame - Enforces the rules and manages the game
+/**
+ * Enforces the rules and manages the game
  *
  * @author Trey Dettmer
  * @author Justin Lee

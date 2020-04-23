@@ -12,7 +12,7 @@ import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
 
-/*
+/**
  * A dumb computer player that plays based off of random decisions.
  *
  * @author Trey Dettmer
