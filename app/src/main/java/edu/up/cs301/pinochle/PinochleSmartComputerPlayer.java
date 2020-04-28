@@ -62,7 +62,13 @@ public class PinochleSmartComputerPlayer extends GameComputerPlayer {
             deck.sort();
 
             if (state.getTurn() == playerNum) {
-                sleep(2);
+                if (state.getCenterDeck().getCards().size() >= 4)
+                {
+                    sleep(1.8);
+                }
+                else {
+                    sleep(1);
+                }
             }
             switch (phase) {
                 // If it is the dealing phase:

@@ -46,7 +46,13 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
             phase = state.getPhase();
             if (state.getTurn() == playerNum)
             {
-                sleep(1);
+                if (state.getCenterDeck().getCards().size() >= 4)
+                {
+                    sleep(1.8);
+                }
+                else {
+                    sleep(1);
+                }
             }
 
 

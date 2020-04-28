@@ -91,6 +91,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private static RectF voteYesButtonRect;
     private static RectF voteNoButtonRect;
     private static RectF centerDeckRect;
+    private static RectF trickWinnerHighlightRect;
     private static int handCardOffset;
     private static Deck myHand;
     static Paint buttonPaint;
@@ -101,6 +102,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private static Paint highlightPaint;
     private static Paint exchangeButtonTextPaint;
     private static Paint okButtonTextPaint;
+    private static Paint trickWinnerHighlightPaint;
 
     private static Bitmap[] suits;
     private static ArrayList<Card> exchangeCards;
@@ -108,6 +110,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private boolean voted;
     private boolean voteGoSet;
     private boolean acknowledgePressed;
+    private boolean highlightingTrickWinner;
     private Handler handler;
 
     public PinochleHumanPlayer(String name)
@@ -119,6 +122,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         handler = new Handler(Looper.getMainLooper());
     }
 
+    /**
+     * initialize the gui
+     */
     public void initializeGUI()
     {
         blackPaint = new Paint();
@@ -149,9 +155,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         okButtonRect = new RectF(860,600,1060,700);
         voteYesButtonRect = new RectF(700,640,860,740);
         voteNoButtonRect = new RectF(1060,640,1220,740);
-        centerDeckRect = new RectF(840,395,970,605);
-
+        centerDeckRect = new RectF(900,400,1020,600);
+        trickWinnerHighlightRect = new RectF(0,20,400,900);
+        trickWinnerHighlightPaint = new Paint();
+        trickWinnerHighlightPaint.setARGB(170,155,255,128);
         handCardOffset = 60;
+        highlightingTrickWinner = false;
         suits = new Bitmap[4];
 
     }
@@ -185,7 +194,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             playerToRightIndex = 2;
         }
         if (info instanceof IllegalMoveInfo) {
-            surface.flash(Color.RED, 50);
             String message = null;
             switch (state.getPhase()) {
                 case TRICK_TAKING:
@@ -360,6 +368,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     /**
      * updates the GUI
      *
+     * @param phase the current game phase
+     *
      */
     protected void updateGUI(PinochleGamePhase phase)
     {
@@ -404,7 +414,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             team1MeldsTextView.setText(String.valueOf(meldsScores[1]));
             team1TricksTextView.setText(String.valueOf(tricksScores[1]));
 
-
+            //update the info for each player
             int turn = state.getTurn();
 
             if (turn == playerToLeftIndex)
@@ -553,11 +563,23 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    /**
+     * draws melding prompt
+     *
+     * @param c canvas to draw on
+     *
+     */
     protected void drawMeldingPrompt(Canvas c)
     {
         c.drawText("Calculating melds...", 960, 710, biddingTextPaint);
     }
 
+    /**
+     * draws the trick taking prompt
+     *
+     * @param c canvas to draw on
+     *
+     */
     protected void drawTrickTakingPrompt(Canvas c)
     {
 
@@ -616,6 +638,37 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
         }
 
+        //highlight the trick winner if the trick is finished
+        if (state.getCenterDeck().getCards().size() == 4)
+        {
+            if (highlightingTrickWinner == false)
+            {
+
+                if (state.getTrickWinner() == playerToLeftIndex)
+                {
+                    trickWinnerHighlightRect = new RectF(250,420,530,600);
+                }
+                else if (state.getTrickWinner() == teammatePlayerNum)
+                {
+                    trickWinnerHighlightRect = new RectF(820,170,1110,340);
+                }
+                else if (state.getTrickWinner() == playerToRightIndex)
+                {
+                    trickWinnerHighlightRect = new RectF(1370,420,1650,600);
+                }
+                else
+                {
+                    trickWinnerHighlightRect = new RectF(-2,0,0,2);
+                }
+                highlightingTrickWinner = true;
+            }
+            c.drawRect(trickWinnerHighlightRect,trickWinnerHighlightPaint);
+
+        }
+        else
+        {
+            highlightingTrickWinner = false;
+        }
         int wonLastTrick = state.getPreviousTrickWinner();
 
         if (state.getTurn() == playerNum && state.getCenterDeck().getCards().size() != 4)
@@ -629,6 +682,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    /**
+     * draws the scoring prompt
+     *
+     * @param c canvas to draw on
+     *
+     */
     protected void drawScoringPrompt(Canvas c)
     {
         int team = state.getTeam(playerNum);
@@ -683,8 +742,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     /**
      * draws the vote to go set prompt
      *
-     * @param c
-     * 		canvas to draw on
+     * @param c canvas to draw on
+     *
      */
     protected void drawVoteGoSetPrompt(Canvas c)
     {
@@ -1002,7 +1061,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         super.gameIsOver(msg);
     }
 
-    //animator methods
     @Override
     public void tick(Canvas canvas) {
         canvas.drawColor(backgroundColor);
@@ -1010,12 +1068,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         {
             return;
         }
+        //draw all of the hands
         myHand = state.getPlayerDeck(playerNum);
-
         Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
-        //for now all other players' hands are teammates hand
         drawPlayerHands(canvas,teammateHand);
         drawHand(canvas,myHand);
+
         switch (state.getPhase())
         {
             case BIDDING:
