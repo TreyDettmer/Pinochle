@@ -149,7 +149,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         okButtonRect = new RectF(860,600,1060,700);
         voteYesButtonRect = new RectF(700,640,860,740);
         voteNoButtonRect = new RectF(1060,640,1220,740);
-        centerDeckRect = new RectF(800,400,950,630);
+        centerDeckRect = new RectF(840,395,970,605);
 
         handCardOffset = 60;
         suits = new Bitmap[4];
@@ -560,14 +560,38 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     protected void drawTrickTakingPrompt(Canvas c)
     {
-        int offset = 50;
 
+        RectF leftCardRect = new RectF(centerDeckRect.left - 65,centerDeckRect.top,centerDeckRect.right - 65,centerDeckRect.bottom);
+        RectF topCardRect = new RectF(centerDeckRect.left,centerDeckRect.top - 60,centerDeckRect.right,centerDeckRect.bottom - 60);
+        RectF rightCardRect = new RectF(centerDeckRect.left + 65,centerDeckRect.top,centerDeckRect.right + 65,centerDeckRect.bottom);
+        RectF bottomCardRect = new RectF(centerDeckRect.left,centerDeckRect.top + 60,centerDeckRect.right,centerDeckRect.bottom + 60);
+
+        //draw center deck
         for (int i = 0; i < state.getCenterDeck().getCards().size(); i++)
         {
-            RectF cardRect = new RectF(centerDeckRect.left + (offset * i),centerDeckRect.top,centerDeckRect.right + (offset * i),centerDeckRect.bottom);
+            int leadTrickPlayerIndex = (state.getPreviousTrickWinner() != -1) ? state.getPreviousTrickWinner() : state.getTurn();
+            int cardLocationIndex = i + leadTrickPlayerIndex;
+            if (cardLocationIndex >= 4){cardLocationIndex-=4;}
+
+
             if (state.getCenterDeck().getCards().size() > i) {
                 final Card card = state.getCenterDeck().getCards().get(i);
-                drawCard(c, cardRect, card);
+                if (cardLocationIndex == playerNum) {
+                    drawCard(c, bottomCardRect, card);
+                }
+                else if (cardLocationIndex == playerToLeftIndex)
+                {
+                    drawCard(c, leftCardRect, card);
+                }
+                else if (cardLocationIndex == teammatePlayerNum)
+                {
+                    drawCard(c, topCardRect, card);
+                }
+                else if (cardLocationIndex == playerToRightIndex)
+                {
+                    drawCard(c, rightCardRect, card);
+                }
+
 
                 /*
                 final int previousTrickWinner = state.getPreviousTrickWinner();
