@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 public enum Meld implements Serializable {
+    //all of the different melds
     DOUBLE_RUN("Double Run",  "Two runs", 1500, 1),
     RUN_MARRIAGE("Run + Marraige",  "Run with another trump king and queen", 230, 1),
     RUN_KING("Run + King",  "Run with another trump king", 190, 1),
@@ -63,6 +64,13 @@ public enum Meld implements Serializable {
         return TYPE;
     }
 
+
+    /**
+     * checks if given array of cards is a valid meld
+     * @param cards cards to iterate through
+     * @param required cards that must be in cards in order for meld to be valid
+     * @return whether the given array of cards is a valid meld
+     */
     private static boolean isValidMeld(ArrayList<Card> cards, Card[] required) {
         boolean valid = true;
         ArrayList<Card> temp = (ArrayList<Card>) cards.clone();
@@ -82,6 +90,12 @@ public enum Meld implements Serializable {
         return valid;
     }
 
+    /**
+     * checks the melds in a deck
+     * @param deck the deck to check
+     * @param trump the current trump suit
+     * @return melds that the deck contains
+     */
     public static ArrayList<Meld> checkMelds(Deck deck, Suit trump) {
         ArrayList<Meld> melds = new ArrayList<>();
         ArrayList<Card> class1Deck = new Deck(deck).getCards();
@@ -197,6 +211,11 @@ public enum Meld implements Serializable {
         return melds;
     }
 
+    /**
+     * calculates the total points of an array of melds
+     * @param melds melds whose point values are summed
+     * @return the total points
+     */
     public static int totalPoints(ArrayList<Meld> melds) {
         int total = 0;
         for (Meld meld : melds) {

@@ -54,6 +54,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private PinochleGameState state;
     private PinochleMainActivity myActivity;
     private AnimationSurface surface;
+    private Button meldsMenuButton;
     private TextView waitingToConnectTextView;
     private TextView leftPlayerInfoTextView;
     private TextView leftPlayerNameTextView;
@@ -65,8 +66,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private TextView phaseTextView;
     private TextView bidTextView;
     private TextView trumpSuitTextView;
-    private Button meldsMenuButton;
-    private ArrayList<String> melds;
     private TextView scoreboard;
     private TextView totalTextView;
     private TextView meldsTextView;
@@ -79,39 +78,39 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private TextView team1TotalTextView;
     private TextView team1MeldsTextView;
     private TextView team1TricksTextView;
+    private RectF handFirstCardRect;
+    private RectF biddingButtonRect;
+    private RectF trumpSuitChoiceRect;
+    private RectF exchangeButtonRect;
+    private RectF okButtonRect;
+    private RectF voteYesButtonRect;
+    private RectF voteNoButtonRect;
+    private RectF centerDeckRect;
+    private RectF trickWinnerHighlightRect;
+    private int handCardOffset;
     private int backgroundColor;
     private int teammatePlayerNum;
     private int playerToLeftIndex;
     private int playerToRightIndex;
-    private static RectF handFirstCardRect;
-    private static RectF biddingButtonRect;
-    private static RectF trumpSuitChoiceRect;
-    private static RectF exchangeButtonRect;
-    private static RectF okButtonRect;
-    private static RectF voteYesButtonRect;
-    private static RectF voteNoButtonRect;
-    private static RectF centerDeckRect;
-    private static RectF trickWinnerHighlightRect;
-    private static int handCardOffset;
-    private static Deck myHand;
-    static Paint buttonPaint;
-    static Paint biddingTextPaint;
-    private static ArrayList<Meld> myMelds;
-    private static Paint trumpChoiceTextPaint;
-    private static Paint blackPaint;
-    private static Paint highlightPaint;
-    private static Paint exchangeButtonTextPaint;
-    private static Paint okButtonTextPaint;
-    private static Paint trickWinnerHighlightPaint;
-
-    private static Bitmap[] suits;
-    private static ArrayList<Card> exchangeCards;
-    private static ArrayList<Path> highlightMarkers;
     private boolean voted;
     private boolean voteGoSet;
     private boolean acknowledgePressed;
     private boolean highlightingTrickWinner;
+    private Paint buttonPaint;
+    private Paint biddingTextPaint;
+    private Paint trumpChoiceTextPaint;
+    private Paint blackPaint;
+    private Paint highlightPaint;
+    private Paint exchangeButtonTextPaint;
+    private Paint okButtonTextPaint;
+    private Paint trickWinnerHighlightPaint;
+    private Bitmap[] suits;
+    private ArrayList<Card> exchangeCards;
+    private ArrayList<Path> highlightMarkers;
+    private ArrayList<String> melds;
+    private ArrayList<Meld> myMelds;
     private Handler handler;
+    private Deck myHand;
 
     public PinochleHumanPlayer(String name)
     {
@@ -614,27 +613,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     drawCard(c, rightCardRect, card);
                 }
 
-
-                /*
-                final int previousTrickWinner = state.getPreviousTrickWinner();
-                final int finalI = i;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int player = (previousTrickWinner + finalI) % allPlayerNames.length;
-                        String cardText = "[" + card.toString() + "]";
-                        if (player == playerToLeftIndex) {
-                            leftPlayerInfoTextView.setText(cardText);
-                        } else if (player == teammatePlayerNum) {
-                            topPlayerInfoTextView.setText(cardText);
-                        } else if (player == playerToRightIndex) {
-                            rightPlayerInfoTextView.setText(cardText);
-                        } else {
-                            humanPlayerInfoTextView.setText(cardText);
-                        }
-                    }
-                });
-                */
             }
         }
 
@@ -1166,7 +1144,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
      * @param hand
      * 		the hand
      */
-    private static void drawHand(Canvas g, Deck hand){
+    private void drawHand(Canvas g, Deck hand){
 
         if (hand != null) {
 
