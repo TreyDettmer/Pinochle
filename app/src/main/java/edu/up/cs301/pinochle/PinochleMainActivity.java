@@ -17,8 +17,8 @@ import edu.up.cs301.game.GameFramework.gameConfiguration.GameConfig;
 import edu.up.cs301.game.GameFramework.gameConfiguration.GamePlayerType;
 import edu.up.cs301.game.R;
 
-/*
- * Description
+/**
+ * Menu to setup the game
  *
  * @author Trey Dettmer
  * @author Justin Lee

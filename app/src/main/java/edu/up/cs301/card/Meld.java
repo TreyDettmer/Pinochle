@@ -12,15 +12,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-/* Melds
-
-  Implements the list of, and methods to find, melds of cards.
-
-  Alex Mak, Justin Lee
-  April 2020
+/**
+ * Enum for all Melds in Pinochle
+ *
+ * @author Steven R. Vegdahl
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
  */
 public enum Meld implements Serializable {
-
+    //All of the different melds
+    //Ordering matters because checkMelds checks in ascending order, with the most points in each
+    //class (type) first so that if a player has for instance a Double Pinochle, they would get
+    //a Double Pinochle instead of a Pinochle.
     DOUBLE_RUN("Double Run",  "Two runs", 1500, 1),
     RUN_MARRIAGE("Run + Marraige",  "Run with another trump king and queen", 230, 1),
     RUN_KING("Run + King",  "Run with another trump king", 190, 1),
@@ -43,11 +49,20 @@ public enum Meld implements Serializable {
     // to satisfy Serializable interface
     private static final long serialVersionUID = 8673272710125325L;
 
+    //instance variables
     private final String NAME;
     private final String DESCRIPTION;
     private final int POINTS;
     private final int TYPE;
 
+    /**
+     * Constructor
+     *
+     * @param name name of the meld
+     * @param description description of the meld
+     * @param points points for the meld
+     * @param type type of the meld
+     */
     Meld(String name, String description, int points, int type) {
         this.NAME = name;
         this.DESCRIPTION = description;
@@ -55,32 +70,56 @@ public enum Meld implements Serializable {
         this.TYPE = type;
     }
 
+    /**
+     * Gets the name of the meld
+     *
+     * @return name of the meld
+     */
     public String getName() {
-        // Returns the english name for the meld
         return NAME;
     }
 
+    /**
+     * Gets the description of the meld
+     *
+     * @return description of the meld
+     */
     public String getDescription() {
-        // Returns the description of the meld.
         return DESCRIPTION;
     }
 
+    /**
+     * Gets the points for the meld
+     *
+     * @return points for the meld
+     */
     public int getPoints() {
-        // Returns the amount of points a meld is worth
         return POINTS;
     }
 
+    /**
+     * Gets the type of the meld
+     *
+     * @return type of the meld
+     */
     public int getType() {
-        // Return whether the meld is type 1, 2, or 3.
         return TYPE;
     }
 
+    /**
+     * Checks if given array of cards is a valid meld
+     *
+     * @param cards cards to iterate through
+     * @param required cards that must be in cards in order for meld to be valid
+     * @return whether the given array of cards is a valid meld
+     */
     private static boolean isValidMeld(ArrayList<Card> cards, Card[] required) {
-        // Given a hand, and meld requirements, returns whether hand is sufficient to make the meld
         boolean valid = true;
         ArrayList<Card> temp = (ArrayList<Card>) cards.clone();
+        //If the deck contains a card that is required for the meld
+        //it can no longer be used again for that particular meld.
+        //Ex. we wouldn't get a double pinochle when we really had a pinochle.
         for (Card card : required) {
-            // For each of the required cards, invalidate if one is missing.
             if (!temp.contains(card)) {
                 valid = false;
                 break;
@@ -88,6 +127,8 @@ public enum Meld implements Serializable {
                 temp.remove(card);
             }
         }
+        //If the meld is valid, we remove all the cards from the deck, so the
+        //cards cannot be reused within the same type
         if (valid) {
             for (Card card : required) {
                 cards.remove(card);
@@ -96,58 +137,62 @@ public enum Meld implements Serializable {
         return valid;
     }
 
+    /**
+     * Checks the melds in a deck
+     *
+     * @param deck the deck to check
+     * @param trump the current trump suit
+     * @return melds that the deck contains
+     */
     public static ArrayList<Meld> checkMelds(Deck deck, Suit trump) {
         ArrayList<Meld> melds = new ArrayList<>();
-        // List of found melds.
+        //Make clones of our deck so that cards may be reused across different types
+        //Type 1 deck clone
         ArrayList<Card> class1Deck = new Deck(deck).getCards();
-        // Hand
-        Card NINE = new Card(Rank.NINE, trump);
-        Card TEN = new Card(Rank.TEN, trump);
-        Card JACK = new Card(Rank.JACK, trump);
-        Card QUEEN = new Card(Rank.QUEEN, trump);
-        Card KING = new Card(Rank.KING, trump);
-        Card ACE = new Card(Rank.ACE, trump);
         for (int i = 0; i < Meld.values().length ; i++) {
-            // Iterating over the indeces of all possible melds:
             Meld meld = Meld.values()[i];
+            //Must be a type 1 meld
             if (meld.getType() != 1) continue;
             Card[] required;
-
             switch (meld) {
                 case RUN:
-                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE};
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case RUN_KING:
-                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(KING)};
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.KING, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case RUN_QUEEN:
-                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(QUEEN)};
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.QUEEN, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case RUN_MARRIAGE:
-                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(KING), new Card(QUEEN)};
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.KING, trump), new Card(Rank.QUEEN, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case DOUBLE_RUN:
-                    required = new Card[]{TEN, JACK, QUEEN, KING, ACE, new Card(TEN), new Card(JACK), new Card(QUEEN), new Card(KING), new Card(ACE)};
+                    required = new Card[]{new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump), new Card(Rank.TEN, trump), new Card(Rank.JACK, trump), new Card(Rank.QUEEN, trump), new Card(Rank.KING, trump), new Card(Rank.ACE, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case DIX:
-                    required = new Card[]{NINE};
+                    required = new Card[]{new Card(Rank.NINE, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case ROYAL_MARRIAGE:
-                    required = new Card[]{KING, QUEEN};
+                    required = new Card[]{new Card(Rank.KING, trump), new Card(Rank.QUEEN, trump)};
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case COMMON_MARRIAGE:
+                    //Common marriage does not have a specific set of required cards
+                    //Instead we a apply a general rule of a king and queen in a non trump suit
                     for (Suit suit : Suit.values()) {
                         if (suit.equals(trump)) continue;
+                        //Iterate through all three possibilities
                         Card king = new Card(Rank.KING, suit);
                         Card queen = new Card(Rank.QUEEN, suit);
                         if (class1Deck.contains(king) && class1Deck.contains(queen)) {
+                            //Remove the cards so that cards cannot be reused within the type
                             class1Deck.remove(king);
                             class1Deck.remove(queen);
                             melds.add(meld);
@@ -158,6 +203,7 @@ public enum Meld implements Serializable {
             }
 
         }
+        //Type 2 deck clone
         ArrayList<Card> class2Deck = new Deck(deck).getCards();
         for (int i = 0; i < Meld.values().length ; i++) {
             Meld meld = Meld.values()[i];
@@ -174,6 +220,7 @@ public enum Meld implements Serializable {
                     break;
             }
         }
+        //Type 3 deck clone
         ArrayList<Card> class3Deck = new Deck(deck).getCards();
         for (int i = 0; i < Meld.values().length ; i++) {
             Meld meld = Meld.values()[i];
@@ -221,6 +268,11 @@ public enum Meld implements Serializable {
         return melds;
     }
 
+    /**
+     * calculates the total points of an array of melds
+     * @param melds melds whose point values are summed
+     * @return the total points
+     */
     public static int totalPoints(ArrayList<Meld> melds) {
         int total = 0;
         for (Meld meld : melds) {

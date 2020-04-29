@@ -1,17 +1,77 @@
-Log stuff
+Author:
+    Alex
+Date:
+    07 April 2020
+Problem:
+    I wanted to add Snackbars when there was illegal move made
+Resource used:
+    https://material.io/develop/android/docs/getting-started/
+Solution:
+    I used the Snackbar implementation in the HumanPlayer class.
+    I had to include an Android design library implementation in the build.gradle file
 
-Snackbars 4/7/19 - https://material.io/develop/android/docs/getting-started/
+Author:
+    Trey
+Date:
+    07 April 2020
+Problem:
+    Inital bid is incorrect incorrect
+Resource used:
+    n/a
+Solution:
+    Fixed issue with initial bid (showed "bid 10" and "bid 20" instead of "bid 260" and "bid 270").
 
-Show my earned trick points
-Center playing cards
-During exchanging if received four cards and have 16, cards block [info]
-Human player name on top of [info]
-Add a waiting for players... in between turns.
-Timer during Acknowlege score and go set
+Author:
+    Trey
+Date:
+    07 April 2020
+Problem:
+    Last trick does not show
+Resource used:
+    n/a
+Solution:
+    Fixed issue of last card in trick not showing.
 
-4/7/2020 Trey
-Fixed issue with initial bid (showed "bid 10" and "bid 20" instead of "bid 260" and "bid 270")
-4/7/2020 Trey
-Fixed issue of last card in trick not showing
-4/19/2020
-Fixed issue that allowed a non-tricking-winning card to be played when a player had a card that would win the trick
+Author:
+    Kai
+Date:
+    19 April 2020
+Problem:
+    Player is able to play a non winning trick
+Resource used:
+    n/a
+Solution:
+    Fixed issue that allowed a non-tricking-winning card to be played when a player had a card that would win the trick.
+
+Author:
+    Alex
+Date:
+    20 April 2020
+Problem:
+    Needed an app icon
+Resource used:
+    http://www.fishdog.net/pinochle
+Solution:
+    Adapted the icon from the resource to fit our theme of the game.
+
+Author:
+    Alex
+Date:
+    20 April 2020
+Problem:
+    Want to change the RelativeLayout to a ConstraintLayout
+Resource used:
+    https://developer.android.com/reference/android/support/constraint/ConstraintLayout
+Solution:
+    The HumanPlayer layout file now uses a constraint layout.
+
+Author:
+    Alex
+Date:
+    21 April 2020
+Problem:
+    Want to force the orientation to be horizontal
+Resource used:
+    https://stackoverflow.com/questions/4885620/force-portrait-orientation-mode
+Solution:
+    In the HumanPlayer class, the orientation is forced to be horizontal.

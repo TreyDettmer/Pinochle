@@ -12,7 +12,7 @@ import edu.up.cs301.game.GameFramework.GameComputerPlayer;
 import edu.up.cs301.game.GameFramework.infoMessage.GameInfo;
 import edu.up.cs301.game.GameFramework.infoMessage.IllegalMoveInfo;
 
-/*
+/**
  * A dumb computer player that plays based off of random decisions.
  *
  * @author Trey Dettmer
@@ -46,7 +46,13 @@ public class PinochleDumbComputerPlayer extends GameComputerPlayer {
             phase = state.getPhase();
             if (state.getTurn() == playerNum)
             {
-                sleep(1);
+                if (state.getCenterDeck().getCards().size() >= 4)
+                {
+                    sleep(1.8);
+                }
+                else {
+                    sleep(1);
+                }
             }
 
 

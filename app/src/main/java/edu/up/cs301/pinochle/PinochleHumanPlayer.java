@@ -39,8 +39,8 @@ import edu.up.cs301.game.GameFramework.infoMessage.NotYourTurnInfo;
 import edu.up.cs301.game.GameFramework.utilities.Logger;
 import edu.up.cs301.game.R;
 
-/*
- * Description
+/**
+ * GUI of the human player allows a human player to send move actions to the game
  *
  * @author Trey Dettmer
  * @author Justin Lee
@@ -54,6 +54,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private PinochleGameState state;
     private PinochleMainActivity myActivity;
     private AnimationSurface surface;
+    private Button meldsMenuButton;
+    private TextView waitingToConnectTextView;
     private TextView leftPlayerInfoTextView;
     private TextView leftPlayerNameTextView;
     private TextView rightPlayerInfoTextView;
@@ -64,8 +66,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private TextView phaseTextView;
     private TextView bidTextView;
     private TextView trumpSuitTextView;
-    private Button meldsMenuButton;
-    private ArrayList<String> melds;
+    private TextView scoreboard;
+    private TextView totalTextView;
+    private TextView meldsTextView;
+    private TextView tricksTextView;
     private TextView team0NameTextView;
     private TextView team0TotalTextView;
     private TextView team0MeldsTextView;
@@ -74,36 +78,39 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     private TextView team1TotalTextView;
     private TextView team1MeldsTextView;
     private TextView team1TricksTextView;
+    private RectF handFirstCardRect;
+    private RectF biddingButtonRect;
+    private RectF trumpSuitChoiceRect;
+    private RectF exchangeButtonRect;
+    private RectF okButtonRect;
+    private RectF voteYesButtonRect;
+    private RectF voteNoButtonRect;
+    private RectF centerDeckRect;
+    private RectF trickWinnerHighlightRect;
+    private int handCardOffset;
     private int backgroundColor;
     private int teammatePlayerNum;
     private int playerToLeftIndex;
     private int playerToRightIndex;
-    private static RectF handFirstCardRect;
-    private static RectF biddingButtonRect;
-    private static RectF trumpSuitChoiceRect;
-    private static RectF exchangeButtonRect;
-    private static RectF okButtonRect;
-    private static RectF voteYesButtonRect;
-    private static RectF voteNoButtonRect;
-    private static RectF centerDeckRect;
-    private static int handCardOffset;
-    private static Deck myHand;
-    static Paint buttonPaint;
-    static Paint biddingTextPaint;
-    private static ArrayList<Meld> myMelds;
-    private static Paint trumpChoiceTextPaint;
-    private static Paint blackPaint;
-    private static Paint highlightPaint;
-    private static Paint exchangeButtonTextPaint;
-    private static Paint okButtonTextPaint;
-
-    private static Bitmap[] suits;
-    private static ArrayList<Card> exchangeCards;
-    private static ArrayList<Path> highlightMarkers;
     private boolean voted;
     private boolean voteGoSet;
     private boolean acknowledgePressed;
+    private boolean highlightingTrickWinner;
+    private Paint buttonPaint;
+    private Paint biddingTextPaint;
+    private Paint trumpChoiceTextPaint;
+    private Paint blackPaint;
+    private Paint highlightPaint;
+    private Paint exchangeButtonTextPaint;
+    private Paint okButtonTextPaint;
+    private Paint trickWinnerHighlightPaint;
+    private Bitmap[] suits;
+    private ArrayList<Card> exchangeCards;
+    private ArrayList<Path> highlightMarkers;
+    private ArrayList<String> melds;
+    private ArrayList<Meld> myMelds;
     private Handler handler;
+    private Deck myHand;
 
     public PinochleHumanPlayer(String name)
     {
@@ -114,6 +121,9 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         handler = new Handler(Looper.getMainLooper());
     }
 
+    /**
+     * initialize the gui
+     */
     public void initializeGUI()
     {
         blackPaint = new Paint();
@@ -144,9 +154,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         okButtonRect = new RectF(860,600,1060,700);
         voteYesButtonRect = new RectF(700,640,860,740);
         voteNoButtonRect = new RectF(1060,640,1220,740);
-        centerDeckRect = new RectF(800,400,950,630);
-
+        centerDeckRect = new RectF(900,400,1020,600);
+        trickWinnerHighlightRect = new RectF(0,20,400,900);
+        trickWinnerHighlightPaint = new Paint();
+        trickWinnerHighlightPaint.setARGB(170,155,255,128);
         handCardOffset = 60;
+        highlightingTrickWinner = false;
         suits = new Bitmap[4];
 
     }
@@ -154,6 +167,11 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     @Override
     public void receiveInfo(GameInfo info) {
+        waitingToConnectTextView.setVisibility(View.INVISIBLE);
+        scoreboard.setVisibility(View.VISIBLE);
+        totalTextView.setVisibility(View.VISIBLE);
+        meldsTextView.setVisibility(View.VISIBLE);
+        tricksTextView.setVisibility(View.VISIBLE);
         if (playerNum == 0)
         {
             playerToRightIndex = 3;
@@ -175,7 +193,6 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             playerToRightIndex = 2;
         }
         if (info instanceof IllegalMoveInfo) {
-            surface.flash(Color.RED, 50);
             String message = null;
             switch (state.getPhase()) {
                 case TRICK_TAKING:
@@ -187,7 +204,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                         Card winnableCard = state.playerHasWinnableCard(playerNum);
                         if (winnableCard != null)
                         {
-                            message = "You have a " + winnableCard.toString() + " that beats the cards in the center so you have to play it.";
+                            message = "You have a " + winnableCard.toString() + " (or higher ranking card) that beats the cards in the center so you have to play it.";
                         }
                         else {
                             message = "You have a " + leadTrickSuit + " (lead trick suit), so you have to play it.";
@@ -287,12 +304,13 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     public void setAsGui(GameMainActivity activity)
     {
         // remember the activity
-        myActivity = (PinochleMainActivity)activity;
+        myActivity = (PinochleMainActivity) activity;
 
         // Load the layout resource for the new configuration
         activity.setContentView(R.layout.pinochle_human_player);
 
         myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        waitingToConnectTextView = myActivity.findViewById(R.id.waitingToConnect);
         leftPlayerInfoTextView = myActivity.findViewById(R.id.leftPlayerInfo);
         leftPlayerNameTextView = myActivity.findViewById(R.id.leftPlayerName);
         rightPlayerInfoTextView = myActivity.findViewById(R.id.rightPlayerInfo);
@@ -319,6 +337,10 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
         });
         melds = new ArrayList<>();
+        scoreboard = myActivity.findViewById(R.id.scoreboard);
+        totalTextView = myActivity.findViewById(R.id.total);
+        meldsTextView = myActivity.findViewById(R.id.melds);
+        tricksTextView = myActivity.findViewById(R.id.tricks);
         team0NameTextView = myActivity.findViewById(R.id.team0_name);
         team0TotalTextView = myActivity.findViewById(R.id.team0_toal);
         team0MeldsTextView = myActivity.findViewById(R.id.team0_melds);
@@ -344,6 +366,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
 
     /**
      * updates the GUI
+     *
+     * @param phase the current game phase
      *
      */
     protected void updateGUI(PinochleGamePhase phase)
@@ -389,7 +413,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             team1MeldsTextView.setText(String.valueOf(meldsScores[1]));
             team1TricksTextView.setText(String.valueOf(tricksScores[1]));
 
-
+            //update the info for each player
             int turn = state.getTurn();
 
             if (turn == playerToLeftIndex)
@@ -410,6 +434,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
             }
             if (phase == PinochleGamePhase.BIDDING || phase == PinochleGamePhase.CHOOSE_TRUMP)
             {
+
                 if (state.getPassed(playerToRightIndex))
                 {
                     rightPlayerInfoTextView.setText("[Passed]");
@@ -420,6 +445,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[playerToRightIndex] != 0) {
                             rightPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToRightIndex] + "]");
+                        } else {
+                            rightPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -433,6 +460,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[teammatePlayerNum] != 0) {
                             topPlayerInfoTextView.setText("[Bid " + state.getBids()[teammatePlayerNum] + "]");
+                        } else {
+                            topPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -446,6 +475,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[playerToLeftIndex] != 0) {
                             leftPlayerInfoTextView.setText("[Bid " + state.getBids()[playerToLeftIndex] + "]");
+                        } else {
+                            leftPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -459,6 +490,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     {
                         if (state.getBids()[playerNum] != 0) {
                             humanPlayerInfoTextView.setText("[Bid " + state.getBids()[playerNum] + "]");
+                        } else {
+                            humanPlayerInfoTextView.setText("[Waiting]");
                         }
                     }
                 }
@@ -529,45 +562,91 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    /**
+     * draws melding prompt
+     *
+     * @param c canvas to draw on
+     *
+     */
     protected void drawMeldingPrompt(Canvas c)
     {
         c.drawText("Calculating melds...", 960, 710, biddingTextPaint);
     }
 
+    /**
+     * draws the trick taking prompt
+     *
+     * @param c canvas to draw on
+     *
+     */
     protected void drawTrickTakingPrompt(Canvas c)
     {
-        int offset = 50;
 
+        RectF leftCardRect = new RectF(centerDeckRect.left - 65,centerDeckRect.top,centerDeckRect.right - 65,centerDeckRect.bottom);
+        RectF topCardRect = new RectF(centerDeckRect.left,centerDeckRect.top - 60,centerDeckRect.right,centerDeckRect.bottom - 60);
+        RectF rightCardRect = new RectF(centerDeckRect.left + 65,centerDeckRect.top,centerDeckRect.right + 65,centerDeckRect.bottom);
+        RectF bottomCardRect = new RectF(centerDeckRect.left,centerDeckRect.top + 60,centerDeckRect.right,centerDeckRect.bottom + 60);
+
+        //draw center deck
         for (int i = 0; i < state.getCenterDeck().getCards().size(); i++)
         {
-            RectF cardRect = new RectF(centerDeckRect.left + (offset * i),centerDeckRect.top,centerDeckRect.right + (offset * i),centerDeckRect.bottom);
+            int leadTrickPlayerIndex = (state.getPreviousTrickWinner() != -1) ? state.getPreviousTrickWinner() : state.getTurn();
+            int cardLocationIndex = i + leadTrickPlayerIndex;
+            if (cardLocationIndex >= 4){cardLocationIndex-=4;}
+
+
             if (state.getCenterDeck().getCards().size() > i) {
                 final Card card = state.getCenterDeck().getCards().get(i);
-                drawCard(c, cardRect, card);
+                if (cardLocationIndex == playerNum) {
+                    drawCard(c, bottomCardRect, card);
+                }
+                else if (cardLocationIndex == playerToLeftIndex)
+                {
+                    drawCard(c, leftCardRect, card);
+                }
+                else if (cardLocationIndex == teammatePlayerNum)
+                {
+                    drawCard(c, topCardRect, card);
+                }
+                else if (cardLocationIndex == playerToRightIndex)
+                {
+                    drawCard(c, rightCardRect, card);
+                }
 
-                /*
-                final int previousTrickWinner = state.getPreviousTrickWinner();
-                final int finalI = i;
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        int player = (previousTrickWinner + finalI) % allPlayerNames.length;
-                        String cardText = "[" + card.toString() + "]";
-                        if (player == playerToLeftIndex) {
-                            leftPlayerInfoTextView.setText(cardText);
-                        } else if (player == teammatePlayerNum) {
-                            topPlayerInfoTextView.setText(cardText);
-                        } else if (player == playerToRightIndex) {
-                            rightPlayerInfoTextView.setText(cardText);
-                        } else {
-                            humanPlayerInfoTextView.setText(cardText);
-                        }
-                    }
-                });
-                */
             }
         }
 
+        //highlight the trick winner if the trick is finished
+        if (state.getCenterDeck().getCards().size() == 4)
+        {
+            if (highlightingTrickWinner == false)
+            {
+
+                if (state.getTrickWinner() == playerToLeftIndex)
+                {
+                    trickWinnerHighlightRect = new RectF(250,420,530,600);
+                }
+                else if (state.getTrickWinner() == teammatePlayerNum)
+                {
+                    trickWinnerHighlightRect = new RectF(820,170,1110,340);
+                }
+                else if (state.getTrickWinner() == playerToRightIndex)
+                {
+                    trickWinnerHighlightRect = new RectF(1370,420,1650,600);
+                }
+                else
+                {
+                    trickWinnerHighlightRect = new RectF(-2,0,0,2);
+                }
+                highlightingTrickWinner = true;
+            }
+            c.drawRect(trickWinnerHighlightRect,trickWinnerHighlightPaint);
+
+        }
+        else
+        {
+            highlightingTrickWinner = false;
+        }
         int wonLastTrick = state.getPreviousTrickWinner();
 
         if (state.getTurn() == playerNum && state.getCenterDeck().getCards().size() != 4)
@@ -581,6 +660,12 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         }
     }
 
+    /**
+     * draws the scoring prompt
+     *
+     * @param c canvas to draw on
+     *
+     */
     protected void drawScoringPrompt(Canvas c)
     {
         int team = state.getTeam(playerNum);
@@ -635,8 +720,8 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
     /**
      * draws the vote to go set prompt
      *
-     * @param c
-     * 		canvas to draw on
+     * @param c canvas to draw on
+     *
      */
     protected void drawVoteGoSetPrompt(Canvas c)
     {
@@ -837,6 +922,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
                     }
                     else if (state.getPhase() == PinochleGamePhase.TRICK_TAKING)
                     {
+                        System.out.println(chosenCard);
                         game.sendAction(new PinochleActionPlayTrick(this,chosenCard));
                     }
                     return chosenCard;
@@ -953,20 +1039,19 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
         super.gameIsOver(msg);
     }
 
-    //animator methods
     @Override
     public void tick(Canvas canvas) {
+        canvas.drawColor(backgroundColor);
         if (state == null)
         {
             return;
         }
-        canvas.drawColor(backgroundColor);
+        //draw all of the hands
         myHand = state.getPlayerDeck(playerNum);
-
         Deck teammateHand = state.getPlayerDeck(teammatePlayerNum);
-        //for now all other players' hands are teammates hand
         drawPlayerHands(canvas,teammateHand);
         drawHand(canvas,myHand);
+
         switch (state.getPhase())
         {
             case BIDDING:
@@ -1059,7 +1144,7 @@ public class PinochleHumanPlayer extends GameHumanPlayer implements Animator {
      * @param hand
      * 		the hand
      */
-    private static void drawHand(Canvas g, Deck hand){
+    private void drawHand(Canvas g, Deck hand){
 
         if (hand != null) {
 

@@ -3,8 +3,8 @@ package edu.up.cs301.pinochle;
 import edu.up.cs301.game.GameFramework.GamePlayer;
 import edu.up.cs301.game.GameFramework.actionMessage.GameAction;
 
-/*
- * Description
+/**
+ * Action to pass during bidding
  *
  * @author Trey Dettmer
  * @author Justin Lee
@@ -25,6 +25,11 @@ public class PinochleActionPass extends GameAction {
         super(player);
     }
 
+    /**
+     * Converts to string for debugging
+     *
+     * @return String of the action
+     */
     public String toString() {
         return "";
     }
