@@ -233,7 +233,7 @@ public enum Meld implements Serializable {
                     break;
                 case ACES_ABOUND:
                     required = new Card[]{new Card(Rank.ACE, Suit.Heart), new Card(Rank.ACE, Suit.Spade), new Card(Rank.ACE, Suit.Club), new Card(Rank.ACE, Suit.Diamond),
-                                          new Card(Rank.ACE, Suit.Heart), new Card(Rank.ACE, Suit.Spade), new Card(Rank.ACE, Suit.Club), new Card(Rank.ACE, Suit.Diamond)};
+                            new Card(Rank.ACE, Suit.Heart), new Card(Rank.ACE, Suit.Spade), new Card(Rank.ACE, Suit.Club), new Card(Rank.ACE, Suit.Diamond)};
                     if (isValidMeld(class3Deck, required)) melds.add(meld);
                     break;
                 case KINGS_AROUND:
