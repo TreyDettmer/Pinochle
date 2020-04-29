@@ -12,8 +12,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Enum for all Melds in Pinochle
+ *
+ * @author Steven R. Vegdahl
+ * @author Trey Dettmer
+ * @author Justin Lee
+ * @author Alexander Mak
+ * @author Kai Vickers
+ * @version March 2020
+ */
 public enum Meld implements Serializable {
-    //all of the different melds
+    //All of the different melds
+    //Ordering matters because checkMelds checks in ascending order, with the most points in each
+    //class (type) first so that if a player has for instance a Double Pinochle, they would get
+    //a Double Pinochle instead of a Pinochle.
     DOUBLE_RUN("Double Run",  "Two runs", 1500, 1),
     RUN_MARRIAGE("Run + Marraige",  "Run with another trump king and queen", 230, 1),
     RUN_KING("Run + King",  "Run with another trump king", 190, 1),
@@ -36,11 +49,20 @@ public enum Meld implements Serializable {
     // to satisfy Serializable interface
     private static final long serialVersionUID = 8673272710125325L;
 
+    //instance variables
     private final String NAME;
     private final String DESCRIPTION;
     private final int POINTS;
     private final int TYPE;
 
+    /**
+     * Constructor
+     *
+     * @param name name of the meld
+     * @param description description of the meld
+     * @param points points for the meld
+     * @param type type of the meld
+     */
     Meld(String name, String description, int points, int type) {
         this.NAME = name;
         this.DESCRIPTION = description;
@@ -48,25 +70,45 @@ public enum Meld implements Serializable {
         this.TYPE = type;
     }
 
+    /**
+     * Gets the name of the meld
+     *
+     * @return name of the meld
+     */
     public String getName() {
         return NAME;
     }
 
+    /**
+     * Gets the description of the meld
+     *
+     * @return description of the meld
+     */
     public String getDescription() {
         return DESCRIPTION;
     }
 
+    /**
+     * Gets the points for the meld
+     *
+     * @return points for the meld
+     */
     public int getPoints() {
         return POINTS;
     }
 
+    /**
+     * Gets the type of the meld
+     *
+     * @return type of the meld
+     */
     public int getType() {
         return TYPE;
     }
 
-
     /**
-     * checks if given array of cards is a valid meld
+     * Checks if given array of cards is a valid meld
+     *
      * @param cards cards to iterate through
      * @param required cards that must be in cards in order for meld to be valid
      * @return whether the given array of cards is a valid meld
@@ -74,6 +116,9 @@ public enum Meld implements Serializable {
     private static boolean isValidMeld(ArrayList<Card> cards, Card[] required) {
         boolean valid = true;
         ArrayList<Card> temp = (ArrayList<Card>) cards.clone();
+        //If the deck contains a card that is required for the meld
+        //it can no longer be used again for that particular meld.
+        //Ex. we wouldn't get a double pinochle when we really had a pinochle.
         for (Card card : required) {
             if (!temp.contains(card)) {
                 valid = false;
@@ -82,6 +127,8 @@ public enum Meld implements Serializable {
                 temp.remove(card);
             }
         }
+        //If the meld is valid, we remove all the cards from the deck, so the
+        //cards cannot be reused within the same type
         if (valid) {
             for (Card card : required) {
                 cards.remove(card);
@@ -91,16 +138,20 @@ public enum Meld implements Serializable {
     }
 
     /**
-     * checks the melds in a deck
+     * Checks the melds in a deck
+     *
      * @param deck the deck to check
      * @param trump the current trump suit
      * @return melds that the deck contains
      */
     public static ArrayList<Meld> checkMelds(Deck deck, Suit trump) {
         ArrayList<Meld> melds = new ArrayList<>();
+        //Make clones of our deck so that cards may be reused across different types
+        //Type 1 deck clone
         ArrayList<Card> class1Deck = new Deck(deck).getCards();
         for (int i = 0; i < Meld.values().length ; i++) {
             Meld meld = Meld.values()[i];
+            //Must be a type 1 meld
             if (meld.getType() != 1) continue;
             Card[] required;
             switch (meld) {
@@ -133,11 +184,15 @@ public enum Meld implements Serializable {
                     if (isValidMeld(class1Deck, required)) melds.add(meld);
                     break;
                 case COMMON_MARRIAGE:
+                    //Common marriage does not have a specific set of required cards
+                    //Instead we a apply a general rule of a king and queen in a non trump suit
                     for (Suit suit : Suit.values()) {
                         if (suit.equals(trump)) continue;
+                        //Iterate through all three possibilities
                         Card king = new Card(Rank.KING, suit);
                         Card queen = new Card(Rank.QUEEN, suit);
                         if (class1Deck.contains(king) && class1Deck.contains(queen)) {
+                            //Remove the cards so that cards cannot be reused within the type
                             class1Deck.remove(king);
                             class1Deck.remove(queen);
                             melds.add(meld);
@@ -148,6 +203,7 @@ public enum Meld implements Serializable {
             }
 
         }
+        //Type 2 deck clone
         ArrayList<Card> class2Deck = new Deck(deck).getCards();
         for (int i = 0; i < Meld.values().length ; i++) {
             Meld meld = Meld.values()[i];
@@ -164,6 +220,7 @@ public enum Meld implements Serializable {
                     break;
             }
         }
+        //Type 3 deck clone
         ArrayList<Card> class3Deck = new Deck(deck).getCards();
         for (int i = 0; i < Meld.values().length ; i++) {
             Meld meld = Meld.values()[i];
